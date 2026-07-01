@@ -1,0 +1,10 @@
+{
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage and log in with the configured test account credentials" },
+    { "type": "assertion", "description": "Verify the '⚔️ Turnuvalar' button is visible after login on the home page" },
+    { "type": "action", "description": "Click the '⚔️ Turnuvalar' button and verify /tournament loads" },
+    { "type": "action", "description": "Return to the home page" },
+    { "type": "action", "description": "Click the '⚔️ Turnuvalar' button again" },
+    { "type": "assertion", "description": "Verify the tournaments page opens successfully a second time" }
+  ]
+}

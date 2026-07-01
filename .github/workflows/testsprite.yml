@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       run_all:
-        description: 'Run full suite (7 tests) instead of failed-only'
+        description: 'Run full suite (7 tests) instead of auth-nav subset'
         required: false
         default: 'false'
         type: choice
@@ -52,6 +52,12 @@ jobs:
               testsprite test run "$ID" --wait
             done
           else
-            # Failed-only: Home interaction — Use tournaments button repeatedly
-            testsprite test run ad90b2b9-f857-4c92-8d6a-135b5ddc28c7 --wait
+            # Auth-gated nav: guest hidden + login tournament flow (4 tests)
+            for ID in \
+              73374ea0-00ce-4307-9275-2b98f264bf33 \
+              28118134-b833-4b6f-ba20-38efd0bff083 \
+              c3f060b1-79bd-4f39-8f99-e388ff26a10f \
+              ad90b2b9-f857-4c92-8d6a-135b5ddc28c7; do
+              testsprite test run "$ID" --wait
+            done
           fi

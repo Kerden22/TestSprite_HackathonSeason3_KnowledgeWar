@@ -1,0 +1,9 @@
+{
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the KnowledgeWar homepage as a guest (not logged in)" },
+    { "type": "assertion", "description": "Verify the 'Özellikler' (Features) link is visible in the main navigation" },
+    { "type": "assertion", "description": "Verify the 'Giriş Yap' login button is visible in the header" },
+    { "type": "assertion", "description": "Verify the 'Turnuvalar' nav link is NOT visible for guests" },
+    { "type": "assertion", "description": "Verify the '⚔️ Turnuvalar' button is NOT visible in the header for guests" }
+  ]
+}

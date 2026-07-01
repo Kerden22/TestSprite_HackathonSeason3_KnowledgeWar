@@ -344,11 +344,11 @@
             <a href="#features" id="navFeaturesLink"
               class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Özellikler</a>
             <a href="#tournaments" id="navTournamentsLink"
-              class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
+              class="hidden text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <!-- tournamentBtn always visible; roadmapBtn logged-in only -->
+          <!-- Turnuva + Yol Haritası: sadece giriş yapmış kullanıcılar -->
           <div class="flex items-center space-x-4 mr-6">
             <div id="roadmapNavWrapper" class="hidden">
               <button id="roadmapBtn"
@@ -356,10 +356,12 @@
                 🗺️ Yol Haritası
               </button>
             </div>
-            <button id="tournamentBtn" type="button" aria-label="Turnuvalar Tournaments"
-              class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-              ⚔️ Turnuvalar
-            </button>
+            <div id="tournamentNavWrapper" class="hidden">
+              <button id="tournamentBtn" type="button" aria-label="Turnuvalar Tournaments"
+                class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                ⚔️ Turnuvalar
+              </button>
+            </div>
           </div>
 
           <div id="authButtons" class="ml-8">
@@ -833,6 +835,7 @@
       const userButtons = document.getElementById("userButtons");
       const userName = document.getElementById("userName");
       const roadmapNavWrapper = document.getElementById("roadmapNavWrapper");
+      const tournamentNavWrapper = document.getElementById("tournamentNavWrapper");
       const navTournamentsLink = document.getElementById("navTournamentsLink");
 
       if (token && userData) {
@@ -840,13 +843,16 @@
         guestButtons.classList.add("hidden");
         userButtons.classList.remove("hidden");
         roadmapNavWrapper.classList.remove("hidden");
+        tournamentNavWrapper.classList.remove("hidden");
+        navTournamentsLink.classList.remove("hidden");
         userName.textContent = user.first_name || "Profil";
       } else {
         guestButtons.classList.remove("hidden");
         userButtons.classList.add("hidden");
         roadmapNavWrapper.classList.add("hidden");
+        tournamentNavWrapper.classList.add("hidden");
+        navTournamentsLink.classList.add("hidden");
       }
-      navTournamentsLink.classList.remove("hidden");
     }
 
     // Buton event listener'ları
@@ -858,7 +864,7 @@
     const tournamentBtn = document.getElementById("tournamentBtn");
 
     loginBtn.addEventListener("click", function (e) {
-      window.location.href = "/login?next=/tournament";
+      window.location.href = "/login";
     });
 
     registerBtn.addEventListener("click", function (e) {
