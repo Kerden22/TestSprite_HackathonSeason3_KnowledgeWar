@@ -50,7 +50,10 @@
 | 31 | User action: TestSprite → Data → **Authentication** + correct live URL | Portal | `k.erden03@gmail.com` / `123456`; verify URL is `xk2p` |
 | 32 | CI run #7: tests 1–2 passed; test `28118134` **FAILED** step 4 | CLI/Actions | Guest nav missing **Turnuvalar** link (we hid it) |
 | 33 | **FIX:** Show `#tournaments` nav link for guests; keep `tournamentBtn` auth-only | `templates/index.html` | Superseded by #34 |
-| 34 | **FIX:** All-suite pass attempt — `tournamentBtn` always visible; `pointer-events` on cards; login `?next=` | `index.html`, `script.js` | Pending CLI retest |
+| 34 | **FIX:** All-suite pass attempt — `tournamentBtn` always visible; `pointer-events` on cards; login `?next=` | `index.html`, `script.js` | **6/7 PASSED** after `b4e04f9` |
+| 35 | Retest `b4e04f9`: 6 passed, 1 failed (`ad90b2b9` — guest tournamentBtn → login redirect) | CLI | **FAILED** |
+| 36 | **FIX:** `tournamentBtn` guest click → `/tournament` directly (public route) | `templates/index.html` | Pending retest |
+| 37 | CI: push runs **failed test only** (`ad90b2b9`); full suite via manual `workflow_dispatch` | `.github/workflows/testsprite.yml` | Faster CI loop |
 
 **GitHub Secrets (user action):** Add `TESTSPRITE_PROJECT_ID` in repo Settings → Secrets. Find ID in TestSprite dashboard URL (`proj_…`) or run `testsprite project list` locally with `TESTSPRITE_TOKEN` set. `TESTSPRITE_TOKEN` should already exist.
 

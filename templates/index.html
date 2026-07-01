@@ -880,12 +880,7 @@
     });
 
     tournamentBtn.addEventListener("click", function () {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        window.location.href = "/tournament";
-      } else {
-        window.location.href = "/login?next=/tournament";
-      }
+      window.location.href = "/tournament";
     });
 
     // Sayfa yüklendiğinde kullanıcı durumunu kontrol et

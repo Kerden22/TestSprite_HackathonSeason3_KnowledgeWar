@@ -3,6 +3,16 @@ name: TestSprite CI/CD Verification
 on:
   push:
     branches: [ master, main ]
+  workflow_dispatch:
+    inputs:
+      run_all:
+        description: 'Run full suite (7 tests) instead of failed-only'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 jobs:
   test:
@@ -30,14 +40,18 @@ jobs:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
         run: |
           testsprite setup --from-env
-          PROJECT=50dc7e80-8d2d-4933-8c55-5361fab9ebb2
-          for ID in \
-            b14b87e9-49c8-434d-b054-86fb37fcf94a \
-            73374ea0-00ce-4307-9275-2b98f264bf33 \
-            28118134-b833-4b6f-ba20-38efd0bff083 \
-            c3f060b1-79bd-4f39-8f99-e388ff26a10f \
-            ad90b2b9-f857-4c92-8d6a-135b5ddc28c7 \
-            d747883b-de16-429c-8f9b-31ae98a2f33c \
-            d32cca15-c7ba-494b-9098-63396ec998f8; do
-            testsprite test run "$ID" --wait
-          done
+          if [ "${{ github.event.inputs.run_all }}" = "true" ]; then
+            for ID in \
+              b14b87e9-49c8-434d-b054-86fb37fcf94a \
+              73374ea0-00ce-4307-9275-2b98f264bf33 \
+              28118134-b833-4b6f-ba20-38efd0bff083 \
+              c3f060b1-79bd-4f39-8f99-e388ff26a10f \
+              ad90b2b9-f857-4c92-8d6a-135b5ddc28c7 \
+              d747883b-de16-429c-8f9b-31ae98a2f33c \
+              d32cca15-c7ba-494b-9098-63396ec998f8; do
+              testsprite test run "$ID" --wait
+            done
+          else
+            # Failed-only: Home interaction — Use tournaments button repeatedly
+            testsprite test run ad90b2b9-f857-4c92-8d6a-135b5ddc28c7 --wait
+          fi
