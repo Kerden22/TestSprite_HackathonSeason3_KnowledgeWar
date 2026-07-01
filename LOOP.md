@@ -36,7 +36,8 @@
 | 17 | Root cause (tournament): guest users blocked by JS auth check before navigation | `templates/index.html:873-887` | Fix pending: allow `/tournament` without login OR test must login first |
 | 18 | **FIX:** Hide Turnuva + Yol Haritası nav for guests; show only when `authToken` present | `templates/index.html:331-346,809-830` | Committed — guest no longer sees tournament buttons |
 | 19 | **FIX:** CI workflow — Python setup, wake live URL, `test run --all --project` | `.github/workflows/testsprite.yml` | Requires `TESTSPRITE_PROJECT_ID` GitHub secret |
-| 20 | Awaiting retest on live URL + GitHub Actions run | — | Pending |
+| 20 | Pushed `ef978de` to `master`; Render redeploy + Actions triggered | — | Push **PASSED**; Render deploy pending; Actions **FAILED** (likely missing `TESTSPRITE_PROJECT_ID`) |
+| 21 | Awaiting user: add `TESTSPRITE_PROJECT_ID` secret + TestSprite retest | — | Pending |
 
 **GitHub Secrets (user action):** Add `TESTSPRITE_PROJECT_ID` in repo Settings → Secrets. Find ID in TestSprite dashboard URL (`proj_…`) or run `testsprite project list` locally with `TESTSPRITE_TOKEN` set. `TESTSPRITE_TOKEN` should already exist.
 
