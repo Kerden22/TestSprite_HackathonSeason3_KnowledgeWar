@@ -256,6 +256,7 @@
           rgba(139, 92, 246, 0.1));
       border-radius: 24px;
       padding: 2px;
+      pointer-events: none;
     }
 
     .gradient-border::before {
@@ -271,12 +272,14 @@
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask-composite: exclude;
       -webkit-mask-composite: xor;
+      pointer-events: none;
     }
 
     .gradient-border-inner {
       background: rgba(0, 0, 0, 0.3);
       border-radius: 22px;
       height: 100%;
+      pointer-events: auto;
     }
 
     /* Process Steps Animation */
@@ -294,6 +297,12 @@
 
     .step-glow {
       animation: stepGlow 2s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .step-glow {
+        animation: none;
+      }
     }
 
     /* Tournament Trophy Animation */
@@ -339,13 +348,15 @@
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <!-- Navigation Buttons (logged-in users only) -->
-          <div id="authNavButtons" class="hidden flex items-center space-x-4 mr-6">
-            <button id="roadmapBtn"
-              class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-              🗺️ Yol Haritası
-            </button>
-            <button id="tournamentBtn"
+          <!-- tournamentBtn always visible; roadmapBtn logged-in only -->
+          <div class="flex items-center space-x-4 mr-6">
+            <div id="roadmapNavWrapper" class="hidden">
+              <button id="roadmapBtn"
+                class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                🗺️ Yol Haritası
+              </button>
+            </div>
+            <button id="tournamentBtn" type="button" aria-label="Turnuvalar Tournaments"
               class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
               ⚔️ Turnuvalar
             </button>
@@ -821,21 +832,20 @@
       const guestButtons = document.getElementById("guestButtons");
       const userButtons = document.getElementById("userButtons");
       const userName = document.getElementById("userName");
-      const authNavButtons = document.getElementById("authNavButtons");
+      const roadmapNavWrapper = document.getElementById("roadmapNavWrapper");
       const navTournamentsLink = document.getElementById("navTournamentsLink");
 
       if (token && userData) {
         const user = JSON.parse(userData);
         guestButtons.classList.add("hidden");
         userButtons.classList.remove("hidden");
-        authNavButtons.classList.remove("hidden");
+        roadmapNavWrapper.classList.remove("hidden");
         userName.textContent = user.first_name || "Profil";
       } else {
         guestButtons.classList.remove("hidden");
         userButtons.classList.add("hidden");
-        authNavButtons.classList.add("hidden");
+        roadmapNavWrapper.classList.add("hidden");
       }
-      // Turnuvalar anchor link — always visible (scrolls to #tournaments section)
       navTournamentsLink.classList.remove("hidden");
     }
 
@@ -848,7 +858,7 @@
     const tournamentBtn = document.getElementById("tournamentBtn");
 
     loginBtn.addEventListener("click", function (e) {
-      window.location.href = "/login";
+      window.location.href = "/login?next=/tournament";
     });
 
     registerBtn.addEventListener("click", function (e) {
@@ -870,7 +880,12 @@
     });
 
     tournamentBtn.addEventListener("click", function () {
-      window.location.href = "/tournament";
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        window.location.href = "/tournament";
+      } else {
+        window.location.href = "/login?next=/tournament";
+      }
     });
 
     // Sayfa yüklendiğinde kullanıcı durumunu kontrol et

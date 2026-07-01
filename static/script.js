@@ -173,9 +173,12 @@ loginFormElement.addEventListener('submit', async function (e) {
         
         showNotification('Giriş başarılı!', 'success');
         
-        // Redirect to main page
+        const urlParams = new URLSearchParams(window.location.search);
+        const next = urlParams.get('next');
+        const redirectTo = next && next.startsWith('/') ? next : '/';
+        
         setTimeout(() => {
-            window.location.href = '/';
+            window.location.href = redirectTo;
         }, 500);
         
     } catch (error) {

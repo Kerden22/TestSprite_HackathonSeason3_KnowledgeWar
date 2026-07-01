@@ -49,7 +49,8 @@
 | 30 | **FIX:** Login form `name`/`autocomplete`/`loginSubmitBtn`; faster redirect | `login-register.html`, `script.js` | Helps TestSprite Authentication |
 | 31 | User action: TestSprite → Data → **Authentication** + correct live URL | Portal | `k.erden03@gmail.com` / `123456`; verify URL is `xk2p` |
 | 32 | CI run #7: tests 1–2 passed; test `28118134` **FAILED** step 4 | CLI/Actions | Guest nav missing **Turnuvalar** link (we hid it) |
-| 33 | **FIX:** Show `#tournaments` nav link for guests; keep `tournamentBtn` auth-only | `templates/index.html` | Pending retest |
+| 33 | **FIX:** Show `#tournaments` nav link for guests; keep `tournamentBtn` auth-only | `templates/index.html` | Superseded by #34 |
+| 34 | **FIX:** All-suite pass attempt — `tournamentBtn` always visible; `pointer-events` on cards; login `?next=` | `index.html`, `script.js` | Pending CLI retest |
 
 **GitHub Secrets (user action):** Add `TESTSPRITE_PROJECT_ID` in repo Settings → Secrets. Find ID in TestSprite dashboard URL (`proj_…`) or run `testsprite project list` locally with `TESTSPRITE_TOKEN` set. `TESTSPRITE_TOKEN` should already exist.
 
