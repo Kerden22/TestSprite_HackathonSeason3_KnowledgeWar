@@ -188,9 +188,38 @@ def update_database_schema():
     except Exception as e:
         print(f"Veritabanı güncelleme hatası: {e}")
 
+def seed_default_test_user():
+    """Her deploy'da TestSprite için varsayılan test kullanıcısını garanti et (Render SQLite ephemeral)."""
+    email = os.getenv('DEFAULT_TEST_USER_EMAIL', 'k.erden03@gmail.com')
+    password = os.getenv('DEFAULT_TEST_USER_PASSWORD', '123456')
+    first_name = os.getenv('DEFAULT_TEST_USER_FIRST_NAME', 'Kerem')
+    last_name = os.getenv('DEFAULT_TEST_USER_LAST_NAME', 'Test')
+
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        password_hash = generate_password_hash(password)
+        cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+        if cursor.fetchone():
+            cursor.execute(
+                'UPDATE users SET password_hash = ?, first_name = ?, last_name = ? WHERE email = ?',
+                (password_hash, first_name, last_name, email)
+            )
+        else:
+            cursor.execute(
+                'INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)',
+                (first_name, last_name, email, password_hash)
+            )
+        conn.commit()
+        conn.close()
+        print(f"Default test user ready: {email}")
+    except Exception as e:
+        print(f"Default test user seed error: {e}")
+
 # Veritabanını başlatma
 init_db()
 update_database_schema()
+seed_default_test_user()
 
 # BTK Akademi entegrasyonu için fonksiyonlar
 def search_btk_courses(query):

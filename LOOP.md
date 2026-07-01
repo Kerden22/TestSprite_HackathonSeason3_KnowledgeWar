@@ -38,6 +38,11 @@
 | 19 | **FIX:** CI workflow — Python setup, wake live URL, `test run --all --project` | `.github/workflows/testsprite.yml` | Requires `TESTSPRITE_PROJECT_ID` GitHub secret |
 | 20 | Pushed `ef978de` to `master`; Render redeploy + Actions triggered | — | Push **PASSED**; Render deploy pending; Actions **FAILED** (likely missing `TESTSPRITE_PROJECT_ID`) |
 | 21 | Awaiting user: add `TESTSPRITE_PROJECT_ID` secret + TestSprite retest | — | Pending |
+| 22 | CLI setup OK (`testsprite setup --from-env`); project `50dc7e80-...` listed | CLI | **PASSED** |
+| 23 | CLI `test run --all --project` on FE suite | CLI | **SKIPPED** — batch endpoint BE-only; 7 FE tests skipped |
+| 24 | Portal last status (pre-CLI rerun): 3 passed / 2 failed / 2 blocked | UI suite | Tournament tests still **failed** (guest, pre-auth-nav-fix runs) |
+| 25 | Next: run FE tests individually via CLI; update TestSprite plan for login-first | — | Pending |
+| 26 | **FIX:** `seed_default_test_user()` on startup — `k.erden03@gmail.com` / `123456` | `app.py` (after `init_db`) | Render ephemeral DB; user recreated each deploy |
 
 **GitHub Secrets (user action):** Add `TESTSPRITE_PROJECT_ID` in repo Settings → Secrets. Find ID in TestSprite dashboard URL (`proj_…`) or run `testsprite project list` locally with `TESTSPRITE_TOKEN` set. `TESTSPRITE_TOKEN` should already exist.
 
@@ -48,7 +53,7 @@
 | Metric | Count |
 |--------|:---:|
 | Total iterations | 1 |
-| FAIL → FIX cycles | 2 (gunicorn, auth nav hide) |
+| FAIL → FIX cycles | 3 (gunicorn, auth nav hide, test user seed) |
 | Tests created | 7 (KnowledgeWar Login Flow suite) |
 | Tests banked (green) | 3 |
 | TestSprite reruns | 1 (live web) |
