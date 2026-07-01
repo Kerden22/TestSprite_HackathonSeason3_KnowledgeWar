@@ -21,6 +21,7 @@
 | 9 | Live smoke test: `/` and `/login` return 200 | Manual | **PASSED** |
 | 10 | Render Environment: set `GEMINI_API_KEY`, `SECRET_KEY` in dashboard | — | User action required |
 | 11 | Awaiting TestSprite baseline tests on live URL | — | Pending |
+| 12 | CI/CD integration configured: added `.github/workflows/testsprite.yml` (push to master/main → `testsprite run --all`) | — | Workflow ready; requires `TESTSPRITE_TOKEN` in GitHub Secrets |
 
 ---
 
@@ -32,6 +33,7 @@
 | FAIL → FIX cycles | 1 (gunicorn missing) |
 | Tests created | 0 |
 | Tests banked (green) | 0 |
-| TestSprite reruns | 0 |
+| TestSprite reruns | 0 (CI/CD auto on push after secret configured) |
+| CI/CD integrated | Yes — `.github/workflows/testsprite.yml` |
 | Live URL | https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com |
 | GitHub Repo | https://github.com/Kerden22/TestSprite_HackathonSeason3_KnowledgeWar |
