@@ -1,0 +1,18 @@
+{
+  "testId": "c3f060b1-79bd-4f39-8f99-e388ff26a10f",
+  "status": "failed",
+  "startedAt": null,
+  "finishedAt": "2026-07-01T14:08:59.441Z",
+  "videoUrl": "https://testsprite-videos.s3.us-east-1.amazonaws.com/34d8d448-8021-7076-ae6b-533705641a44/1782913822086824//tmp/ccae1514-627b-46ed-aff7-fb32b46d664a/result.webm",
+  "failureAnalysisUrl": null,
+  "snapshotId": "snap_229d6887aef55da8",
+  "runIdIfAvailable": "e52d0265-1111-41d0-9c6d-5a9211d9bddb",
+  "codeVersion": null,
+  "targetUrl": "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com",
+  "targetUrlSource": "run",
+  "failedStepIndex": 1,
+  "failureKind": "timeout",
+  "verdict": "failed",
+  "executionStatus": "completed",
+  "summary": "Failed (timeout): The test is finding the \"4\" text, but the click is being blocked by a sibling/parent div with classes like \"gradient-border hover-lift fade-in step-glow\" that intercepts pointer events. This suggests a front-end layering/z-index/pointer-events issue or an animation overlay that covers the target during or after render. On the hosting side, the deployed build likely has a CSS/DOM overlap bug where a decorative or loading overlay remains above the intended clickable element, cau…"
+}

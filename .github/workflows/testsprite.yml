@@ -5,8 +5,8 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
     inputs:
-      run_all:
-        description: 'Run full suite (7 tests) instead of auth-nav subset'
+      run_backend:
+        description: 'Also run backend API tests (5 tests)'
         required: false
         default: 'false'
         type: choice
@@ -35,29 +35,50 @@ jobs:
             https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/ \
             || true
 
-      - name: Run TestSprite Web Test
+      - name: Run TestSprite Frontend Suite (25 tests)
         env:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
         run: |
           testsprite setup --from-env
-          if [ "${{ github.event.inputs.run_all }}" = "true" ]; then
-            for ID in \
-              b14b87e9-49c8-434d-b054-86fb37fcf94a \
-              73374ea0-00ce-4307-9275-2b98f264bf33 \
-              28118134-b833-4b6f-ba20-38efd0bff083 \
-              c3f060b1-79bd-4f39-8f99-e388ff26a10f \
-              ad90b2b9-f857-4c92-8d6a-135b5ddc28c7 \
-              d747883b-de16-429c-8f9b-31ae98a2f33c \
-              d32cca15-c7ba-494b-9098-63396ec998f8; do
-              testsprite test run "$ID" --wait
-            done
-          else
-            # Auth-gated nav: guest hidden + login tournament flow (4 tests)
-            for ID in \
-              73374ea0-00ce-4307-9275-2b98f264bf33 \
-              28118134-b833-4b6f-ba20-38efd0bff083 \
-              c3f060b1-79bd-4f39-8f99-e388ff26a10f \
-              ad90b2b9-f857-4c92-8d6a-135b5ddc28c7; do
-              testsprite test run "$ID" --wait
-            done
-          fi
+          for ID in \
+            b14b87e9-49c8-434d-b054-86fb37fcf94a \
+            73374ea0-00ce-4307-9275-2b98f264bf33 \
+            28118134-b833-4b6f-ba20-38efd0bff083 \
+            c3f060b1-79bd-4f39-8f99-e388ff26a10f \
+            ad90b2b9-f857-4c92-8d6a-135b5ddc28c7 \
+            d747883b-de16-429c-8f9b-31ae98a2f33c \
+            d32cca15-c7ba-494b-9098-63396ec998f8 \
+            1064d65e-d946-448e-9495-49264ec46f85 \
+            cd17f8ca-dbed-4ea7-b53d-7c442d0cc644 \
+            2fe15023-4492-4cd9-9c27-b0e9ee29e8b0 \
+            e6d48742-1ea8-43dc-bf5e-ad783b454b89 \
+            54a8c006-1a19-4a45-8773-5ef81bba3a60 \
+            62968e6e-bdf2-4fe9-89fd-da310cf7831a \
+            ed7b621c-49ea-40c8-8459-6d22f333ab27 \
+            98fc7986-5f96-49a4-9674-71bc6bb1ff78 \
+            925fd7eb-92d3-4404-a501-86639447e523 \
+            db296a54-27d7-40a4-b83a-fe566724e6d0 \
+            cafbbc5c-b657-4420-84cf-32bb4154a901 \
+            359739b2-6815-4df1-9c27-4cbf070ece66 \
+            5cf8b6d4-9cd7-4e5b-baec-440b0de376bd \
+            4a6a7cf9-82fd-4285-92f2-9ba3d2f61848 \
+            dc6769f8-db98-44f5-99ef-154c0fa77471 \
+            a5b1c09f-26f1-4451-a0ee-1961bae0aef1 \
+            c2d5d7c3-0e8f-4247-a384-ff80c45d4dc4 \
+            302da8b4-76f4-4ea4-b8a4-dbe4e1482c82; do
+            testsprite test run "$ID" --wait
+          done
+
+      - name: Run TestSprite Backend Suite
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_backend == 'true'
+        env:
+          TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
+        run: |
+          for ID in \
+            822308eb-edfe-4b84-af4e-abdc44e4982b \
+            85b52f13-342f-4b6c-933e-bc0815ad2273 \
+            d1753dd2-0161-4c35-8164-92e92b237601 \
+            31e5401a-5dba-42a6-9762-83366fa3ab67 \
+            3d145644-69f1-4866-b971-f806a78d4e33; do
+            testsprite test run "$ID" --wait
+          done

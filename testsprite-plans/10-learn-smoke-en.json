@@ -1,0 +1,11 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "Learn page loads in English",
+  "planSteps": [
+    { "type": "action", "description": "Log in with the configured test account and navigate to /learn" },
+    { "type": "assertion", "description": "Verify the subtitle 'Get a personalized course recommendation with 4 questions' is visible" },
+    { "type": "assertion", "description": "Verify the question label '1. What skill do you want to learn?' is visible" },
+    { "type": "assertion", "description": "Verify the '← Back to Roadmap' link is visible" }
+  ]
+}

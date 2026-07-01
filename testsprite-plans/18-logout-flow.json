@@ -1,0 +1,11 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "Logout returns guest navigation",
+  "planSteps": [
+    { "type": "action", "description": "Log in with the configured test account on the homepage" },
+    { "type": "action", "description": "Click the 'Log out' button in the header" },
+    { "type": "assertion", "description": "Verify the 'Log in' button is visible in the header" },
+    { "type": "assertion", "description": "Verify the '⚔️ Tournaments' header button is NOT visible for guests" }
+  ]
+}

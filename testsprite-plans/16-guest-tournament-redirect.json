@@ -1,0 +1,9 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "Guest cannot access tournament page",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /tournament as a guest without logging in" },
+    { "type": "assertion", "description": "Verify the browser is redirected to /login" }
+  ]
+}

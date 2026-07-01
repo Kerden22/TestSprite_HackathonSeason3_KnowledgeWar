@@ -1,0 +1,8 @@
+{
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage as a guest" },
+    { "type": "action", "description": "Click the 'Features' link in the navigation" },
+    { "type": "action", "description": "Scroll to top of page and click the 'Features' link again" },
+    { "type": "assertion", "description": "Verify the features section is still visible and the 'Features' nav link remains clickable" }
+  ]
+}

@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "snapshot",
+    "stepIndex": 1,
+    "summary": "Step 1 'Navigate to https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com' passed.",
+    "path": "steps/01-snapshot.html"
+  }
+]

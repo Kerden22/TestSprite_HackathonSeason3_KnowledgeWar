@@ -1,0 +1,10 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "Login register form loads in English",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login?form=register as a guest" },
+    { "type": "assertion", "description": "Verify the heading 'Join the journey' is visible on the register form" },
+    { "type": "assertion", "description": "Verify the 'Create account' submit button is visible on the register form" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "rootCauseHypothesis": "The hosted app likely differs from the tested expected state: the “Tournaments” button may not be rendered on the home page in production, may be hidden by a CSS/responsive layout issue, or may fail to appear because client-side JavaScript or data fetching is broken on the hosting side. A common deployment-side cause is a failed build/runtime config mismatch causing the navigation component or its styles to not load, so the test cannot verify the button’s visibility. Underlying error: Expected: Verify the tournaments button is visible (could not be verified on the page)",
+  "recommendedFixTarget": {
+    "kind": "env",
+    "reference": null,
+    "rationale": "Ensure the landing page renders a visible, correctly labeled “Tournaments” button on initial load without requiring login, scrolling, or delayed client-side hydration. If the button is conditionally rendered, verify the hosting environment is serving the expected build and API/config values so the navigation bar or CTA is not hidden by a failed script, CSS issue, or missing data. Also check for responsive breakpoints/z-index issues that could make the button present but not visible in the deployed app."
+  },
+  "evidence": []
+}

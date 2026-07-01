@@ -1,0 +1,8 @@
+{
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the KnowledgeWar homepage as a guest (not logged in)" },
+    { "type": "assertion", "description": "Verify the hero section displays the text 'AI-POWERED'" },
+    { "type": "assertion", "description": "Verify the hero section displays the text 'LEARNING PLATFORM'" },
+    { "type": "assertion", "description": "Verify the EN | TR language toggle with buttons EN and TR is visible in the header" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "Profile page loads in English",
+  "planSteps": [
+    { "type": "action", "description": "Log in with the configured test account and navigate to /profile" },
+    { "type": "assertion", "description": "Verify the heading 'My Tournament Wins' is visible" },
+    { "type": "assertion", "description": "Verify the heading 'Courses in Progress' is visible" },
+    { "type": "assertion", "description": "Verify the heading 'Completed Courses' is visible" }
+  ]
+}

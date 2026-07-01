@@ -34,6 +34,7 @@ if GEMINI_API_KEY != "your_gemini_api_key_here":
     genai.configure(api_key=GEMINI_API_KEY)
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'btk-auth-secret-key-2024')
 CORS(app)
 
@@ -222,97 +223,284 @@ update_database_schema()
 seed_default_test_user()
 
 # BTK Akademi entegrasyonu için fonksiyonlar
-def search_btk_courses(query):
-    """BTK Akademi'de kurs arama"""
-    try:
-        # Environment variables'dan API anahtarlarını al
-        google_api_key = os.getenv("GOOGLE_SEARCH_API_KEY")
-        cse_id = os.getenv("GOOGLE_CSE_ID")
-        
-        # API anahtarları yoksa demo veri döndür
-        if not google_api_key or not cse_id or google_api_key == "your_google_search_api_key_here":
-            print("API keys not configured, returning demo data")
-            return get_demo_courses(query)
-        
-        response = requests.get(
-            "https://www.googleapis.com/customsearch/v1",
-            params={
-                "key": google_api_key,
-                "cx": cse_id,
-                "q": query,
-                "num": 10,
-                "siteSearch": "btkakademi.gov.tr",
-                "siteSearchFilter": "i"
-            }
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            return data.get("items", [])
-        else:
-            print(f"API response error: {response.status_code}")
-            return get_demo_courses(query)
-            
-    except Exception as e:
-        print(f"BTK arama hatası: {str(e)}")
-        return get_demo_courses(query)
-    
+def _parse_gemini_courses_json(response):
+    """Gemini yanıtından BTK kurs listesi çıkar."""
+    response_text = (response.text or "").strip()
+    if not response_text:
+        return []
 
-    #BTK Akademi'den kurs verisi alınamadığında örnek (demo) kurs verileri döndürmek için kullanılır
-def get_demo_courses(query):
-    """Demo kurs verileri döndür"""
+    if response_text.startswith("```json"):
+        json_match = re.search(r"```json\s*(.*?)\s*```", response_text, re.DOTALL)
+        response_text = json_match.group(1).strip() if json_match else response_text[7:].strip()
+    elif response_text.startswith("```"):
+        json_match = re.search(r"```\s*(.*?)\s*```", response_text, re.DOTALL)
+        response_text = json_match.group(1).strip() if json_match else response_text[3:].strip()
+
+    response_text = clean_and_fix_json(response_text)
+    parsed = json.loads(response_text)
+    if isinstance(parsed, dict):
+        parsed = parsed.get("courses") or parsed.get("items") or []
+    if not isinstance(parsed, list):
+        return []
+
+    courses = []
+    for item in parsed:
+        if not isinstance(item, dict):
+            continue
+        link = (item.get("link") or item.get("url") or "").strip()
+        if "btkakademi.gov.tr" not in link.lower():
+            continue
+        courses.append({
+            "title": item.get("title", "Kurs başlığı bulunamadı"),
+            "link": link,
+            "snippet": item.get("snippet") or item.get("description") or "Açıklama bulunamadı",
+        })
+    return courses
+
+
+_btk_gemini_cache = {}
+_BTK_GEMINI_CACHE_TTL = 300
+
+
+def search_btk_courses_with_gemini(query, skill=None):
+    """Google CSE kullanılamadığında Gemini ile gerçek BTK kursları bul."""
+    if GEMINI_API_KEY == "your_gemini_api_key_here":
+        return []
+
+    cache_key = f"{(skill or '').strip().lower()}|{query.strip().lower()}"
+    cached = _btk_gemini_cache.get(cache_key)
+    if cached and (time.time() - cached["ts"]) < _BTK_GEMINI_CACHE_TTL:
+        return cached["courses"]
+
+    try:
+        focus = (skill or query).strip()
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = f"""Find up to 5 real online courses on BTK Akademi (btkakademi.gov.tr) matching this search.
+
+Search query: {query}
+Primary skill: {focus}
+
+Return ONLY a JSON array. Each object must have:
+- "title": course title (Turkish)
+- "link": full HTTPS URL on btkakademi.gov.tr (use /portal/course/... URLs when possible)
+- "snippet": one-sentence Turkish description
+
+Use only courses that exist on btkakademi.gov.tr. Do not invent URLs."""
+
+        response = model.generate_content(prompt)
+        courses = _parse_gemini_courses_json(response)
+        if courses:
+            print(f"Gemini BTK araması: {len(courses)} kurs bulundu ({query!r})")
+        else:
+            print(f"Gemini BTK araması sonuç döndürmedi: {query!r}")
+        _btk_gemini_cache[cache_key] = {"ts": time.time(), "courses": courses}
+        return courses
+    except Exception as e:
+        err = str(e)
+        if "429" in err:
+            retry_match = re.search(r"retry in ([\d.]+)s", err, re.IGNORECASE)
+            wait = int(float(retry_match.group(1))) + 2 if retry_match else 35
+            print(f"Gemini kota aşıldı, {wait}s sonra tekrar deneniyor...")
+            time.sleep(wait)
+            try:
+                response = model.generate_content(prompt)
+                courses = _parse_gemini_courses_json(response)
+                if courses:
+                    print(f"Gemini BTK araması (retry): {len(courses)} kurs ({query!r})")
+                _btk_gemini_cache[cache_key] = {"ts": time.time(), "courses": courses}
+                return courses
+            except Exception as retry_err:
+                print(f"Gemini BTK arama retry hatası: {retry_err}")
+                return []
+        print(f"Gemini BTK arama hatası: {e}")
+        return []
+
+
+def search_btk_courses(query, skill=None):
+    """BTK Akademi'de kurs arama — önce Google CSE, sonra Gemini, en son demo."""
+    google_api_key = os.getenv("GOOGLE_SEARCH_API_KEY")
+    cse_id = os.getenv("GOOGLE_CSE_ID")
+
+    if google_api_key and cse_id and google_api_key != "your_google_search_api_key_here":
+        try:
+            response = requests.get(
+                "https://www.googleapis.com/customsearch/v1",
+                params={
+                    "key": google_api_key,
+                    "cx": cse_id,
+                    "q": query,
+                    "num": 10,
+                    "siteSearch": "btkakademi.gov.tr",
+                    "siteSearchFilter": "i",
+                },
+                timeout=15,
+            )
+
+            if response.status_code == 200:
+                items = response.json().get("items", [])
+                if items:
+                    print(f"Google CSE: {len(items)} kurs ({query!r})")
+                    return [_normalize_course_item(item) for item in items]
+                print(f"Google CSE 0 sonuç: {query!r}")
+            else:
+                err = response.json().get("error", {}).get("message", response.text[:200])
+                print(f"Google CSE hatası ({response.status_code}): {err}")
+                if response.status_code == 403:
+                    print(
+                        "İpucu: Google Cloud Console'da 'Custom Search JSON API' etkinleştirin "
+                        "(şimdilik Gemini araması kullanılacak)."
+                    )
+        except Exception as e:
+            print(f"Google CSE istek hatası: {e}")
+    else:
+        print("Google CSE anahtarları yapılandırılmamış, Gemini aramasına geçiliyor")
+
+    gemini_courses = search_btk_courses_with_gemini(query, skill=skill)
+    if gemini_courses:
+        return gemini_courses
+
+    print(f"Tüm arama yöntemleri başarısız, demo kurslar kullanılıyor: {query!r}")
+    return get_demo_courses(query, skill=skill)
+
+
+def _normalize_course_item(item):
+    return {
+        "title": item.get("title", "Kurs başlığı bulunamadı"),
+        "link": item.get("link", "#"),
+        "snippet": item.get("snippet", "Açıklama bulunamadı"),
+    }
+
+
+def get_demo_courses(query, skill=None):
+    """BTK araması başarısız olduğunda örnek kurs verileri döndür"""
     demo_courses = [
         {
-            "title": "Python Programlama Temelleri",
-            "link": "https://btkakademi.gov.tr/course/python-temelleri",
-            "snippet": "Python programlama dilinin temel kavramları, değişkenler, döngüler, fonksiyonlar ve nesne yönelimli programlama konularını içeren kapsamlı bir kurs."
+            "title": "Python Programlama (1)",
+            "link": "https://btkakademi.gov.tr/portal/course/python-programlama-1-12297",
+            "snippet": "Python programlama dilinin temel kavramları, değişkenler, döngüler, fonksiyonlar ve nesne yönelimli programlama.",
+            "tags": ["python", "programlama", "temel", "başlangıç"],
         },
         {
-            "title": "Python ile Veri Analizi",
-            "link": "https://btkakademi.gov.tr/course/python-veri-analizi",
-            "snippet": "Pandas, NumPy ve Matplotlib kütüphaneleri kullanarak veri analizi ve görselleştirme tekniklerini öğrenin."
+            "title": "İleri Seviye Python Programlama",
+            "link": "https://btkakademi.gov.tr/portal/course/ileri-seviye-python-programlama-12773",
+            "snippet": "Pandas, NumPy ve ileri Python konuları ile veri analizi ve uygulama geliştirme.",
+            "tags": ["python", "veri", "analiz", "ileri"],
         },
         {
-            "title": "Python Web Geliştirme",
-            "link": "https://btkakademi.gov.tr/course/python-web",
-            "snippet": "Django ve Flask framework'leri ile web uygulamaları geliştirme ve API tasarımı konularını kapsar."
+            "title": "Python ile Web Geliştirme",
+            "link": "https://btkakademi.gov.tr/portal/course/python-programlama-2-12772",
+            "snippet": "Django ve Flask ile web uygulamaları ve API geliştirme.",
+            "tags": ["python", "web", "django", "flask"],
         },
         {
-            "title": "Python Makine Öğrenmesi",
-            "link": "https://btkakademi.gov.tr/course/python-ml",
-            "snippet": "Scikit-learn, TensorFlow ve PyTorch kullanarak makine öğrenmesi algoritmaları ve yapay zeka uygulamaları."
+            "title": "JavaScript Programlama",
+            "link": "https://btkakademi.gov.tr/portal/course/javascript-programlama-10649",
+            "snippet": "JavaScript temelleri, DOM, etkileşimli web sayfaları ve modern JS.",
+            "tags": ["javascript", "js", "web", "frontend"],
         },
         {
-            "title": "Python Siber Güvenlik",
-            "link": "https://btkakademi.gov.tr/course/python-security",
-            "snippet": "Python ile güvenlik testleri, penetrasyon testleri ve güvenlik araçları geliştirme konuları."
-        }
+            "title": "HTML ve CSS ile Web Tasarımı",
+            "link": "https://btkakademi.gov.tr/portal/course/html-ve-css-ile-web-tasarimi-10648",
+            "snippet": "HTML5, CSS3 ve responsive web tasarımı temelleri.",
+            "tags": ["html", "css", "web", "tasarım", "frontend"],
+        },
+        {
+            "title": "React.js ile Modern Web Uygulamaları",
+            "link": "https://btkakademi.gov.tr/portal/course/react-js-12775",
+            "snippet": "React bileşenleri, state yönetimi ve modern frontend geliştirme.",
+            "tags": ["react", "javascript", "frontend", "web"],
+        },
+        {
+            "title": "Java Programlama",
+            "link": "https://btkakademi.gov.tr/portal/course/java-programlama-10651",
+            "snippet": "Java temelleri, nesne yönelimli programlama ve uygulama geliştirme.",
+            "tags": ["java", "programlama", "oop"],
+        },
+        {
+            "title": "Siber Güvenlik Temelleri",
+            "link": "https://btkakademi.gov.tr/portal/course/siber-guvenlik-10654",
+            "snippet": "Temel siber güvenlik kavramları, ağ güvenliği ve güvenli yazılım.",
+            "tags": ["siber", "güvenlik", "security", "ağ"],
+        },
+        {
+            "title": "Veritabanı Yönetimi ve SQL",
+            "link": "https://btkakademi.gov.tr/portal/course/veritabani-yonetimi-10653",
+            "snippet": "İlişkisel veritabanları, SQL sorguları ve veri modelleme.",
+            "tags": ["sql", "veritabanı", "database", "db"],
+        },
+        {
+            "title": "Git ve GitHub ile Versiyon Kontrolü",
+            "link": "https://btkakademi.gov.tr/portal/course/git-ve-github-10652",
+            "snippet": "Git komutları, branch yönetimi ve GitHub ile ekip çalışması.",
+            "tags": ["git", "github", "versiyon", "yazılım"],
+        },
     ]
     
-    # Query'ye göre filtreleme
-    filtered_courses = []
     query_lower = query.lower()
-    
+    focus = (skill or query).lower().strip()
+    focus_parts = [w for w in re.split(r"[^\wğüşıöç]+", focus, flags=re.IGNORECASE) if len(w) > 2]
+    keywords = [
+        w for w in re.split(r"[^\wğüşıöç]+", query_lower, flags=re.IGNORECASE)
+        if len(w) > 2 and w not in {"seviye", "kurs", "level", "course", "egitim", "eğitim", "programlama", "baslangic", "başlangıç"}
+    ]
+
+    scored = []
     for course in demo_courses:
-        if any(keyword in course['title'].lower() or keyword in course['snippet'].lower() 
-               for keyword in query_lower.split()):
-            filtered_courses.append(course)
-    
-    # Eğer hiç sonuç bulunamazsa, ilk 2 kursu döndür
-    if not filtered_courses:
-        return demo_courses[:2]
-    
-    return filtered_courses
+        haystack = " ".join([
+            course["title"],
+            course["snippet"],
+            " ".join(course.get("tags", [])),
+        ]).lower()
+        score = 0
+        for part in focus_parts:
+            if part in haystack:
+                score += 10
+        for kw in keywords:
+            if kw in haystack:
+                score += 1
+        if score > 0:
+            scored.append((score, course))
+
+    if scored:
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [course for _, course in scored[:5]]
+
+    skill_aliases = {
+        "js": "javascript",
+        "node": "javascript",
+        "reactjs": "react",
+        "db": "veritabanı",
+        "database": "veritabanı",
+        "security": "siber",
+    }
+    for alias, target in skill_aliases.items():
+        if alias in query_lower:
+            keywords.append(target)
+
+    for course in demo_courses:
+        haystack = " ".join([course["title"], course["snippet"], " ".join(course.get("tags", []))]).lower()
+        if any(kw in haystack for kw in keywords):
+            return [course]
+
+    return demo_courses[:3]
 
 def analyze_user_profile(responses):
     """Kullanıcı yanıtlarını analiz ederek profil oluştur"""
     try:
         # Basit profil oluştur (Gemini API olmadan)
         level_mapping = {
+            "none": "başlangıç",
+            "basic": "başlangıç",
+            "intermediate": "orta",
+            "advanced": "ileri",
             "Hiç bilmiyorum": "başlangıç",
             "Temel bilgim var": "başlangıç",
             "Orta seviye": "orta",
-            "İleri seviye": "ileri"
+            "İleri seviye": "ileri",
+            "Complete beginner": "başlangıç",
+            "Basic knowledge": "başlangıç",
+            "Intermediate": "orta",
+            "Advanced": "ileri",
         }
         
         style_mapping = {
@@ -334,17 +522,158 @@ def analyze_user_profile(responses):
         print(f"Profil analizi hatası: {str(e)}")
         return None
 
+KNOWN_BTK_COURSES = [
+    {
+        "match": ["html", "css", "web tasarım", "web tasarim", "html5"],
+        "title": "HTML ve CSS ile Web Tasarımı",
+        "link": "https://btkakademi.gov.tr/portal/course/html-ve-css-ile-web-tasarimi-10648",
+    },
+    {
+        "match": ["javascript", "js"],
+        "title": "JavaScript Programlama",
+        "link": "https://btkakademi.gov.tr/portal/course/javascript-programlama-10649",
+    },
+    {
+        "match": ["python"],
+        "title": "Python Programlama",
+        "link": "https://btkakademi.gov.tr/portal/course/python-programlama-1-12297",
+    },
+    {
+        "match": ["react"],
+        "title": "React.js",
+        "link": "https://btkakademi.gov.tr/portal/course/react-js-12775",
+    },
+    {
+        "match": ["java"],
+        "title": "Java Programlama",
+        "link": "https://btkakademi.gov.tr/portal/course/java-programlama-10651",
+    },
+    {
+        "match": ["git", "github"],
+        "title": "Git ve GitHub",
+        "link": "https://btkakademi.gov.tr/portal/course/git-ve-github-10652",
+    },
+    {
+        "match": ["sql", "veritabanı", "veritabani", "database"],
+        "title": "Veritabanı ve SQL",
+        "link": "https://btkakademi.gov.tr/portal/course/veritabani-yonetimi-10653",
+    },
+    {
+        "match": ["siber", "güvenlik", "guvenlik", "security"],
+        "title": "Siber Güvenlik",
+        "link": "https://btkakademi.gov.tr/portal/course/siber-guvenlik-10654",
+    },
+]
+
+
+def lookup_known_btk_course(title, skill=None):
+    """API kotası olmadan bilinen BTK kurs URL'lerini eşleştir."""
+    haystack = f"{title} {skill or ''}".lower()
+    haystack = re.sub(r"[^\wğüşıöç\s]", " ", haystack, flags=re.IGNORECASE)
+
+    best = None
+    best_score = 0
+    for course in KNOWN_BTK_COURSES:
+        score = sum(1 for keyword in course["match"] if keyword in haystack)
+        if score > best_score:
+            best_score = score
+            best = course
+
+    if best and best_score > 0:
+        return best["link"]
+    return None
+
+
+def is_generic_btk_link(link):
+    """Portal ana sayfası veya geçersiz link mi?"""
+    if not link or link == "#":
+        return True
+    normalized = link.rstrip("/").lower()
+    if normalized in {
+        "https://btkakademi.gov.tr/portal",
+        "https://www.btkakademi.gov.tr/portal",
+        "http://btkakademi.gov.tr/portal",
+        "http://www.btkakademi.gov.tr/portal",
+    }:
+        return True
+    return "/course/" not in normalized and "/egitim/" not in normalized
+
+
+def resolve_btk_course_link(title, link=None, skill=None):
+    """Genel portal linklerini gerçek BTK kurs URL'sine çevir."""
+    if link and not is_generic_btk_link(link):
+        return link
+
+    known = lookup_known_btk_course(title, skill)
+    if known:
+        print(f"Bilinen BTK kursu eşleşti: {title!r} -> {known}")
+        return known
+
+    focus = (skill or title or "").strip()
+    results = search_btk_courses(focus, skill=focus)
+    if not results:
+        return link or "#"
+
+    title_lower = title.lower()
+    title_words = [w for w in re.split(r"[^\wğüşıöç]+", title_lower, flags=re.IGNORECASE) if len(w) > 2]
+
+    def score_match(course):
+        haystack = f"{course.get('title', '')} {course.get('snippet', '')}".lower()
+        return sum(1 for word in title_words if word in haystack)
+
+    ranked = sorted(
+        [c for c in results if not is_generic_btk_link(c.get("link"))],
+        key=score_match,
+        reverse=True,
+    )
+    if ranked:
+        resolved = ranked[0]["link"]
+        print(f"Kurs linki çözümlendi: {title!r} -> {resolved}")
+        return resolved
+
+    return link or "#"
+
+
+def repair_roadmap_links(course_title, course_link, roadmap_steps, skill=None):
+    """Yol haritası adımlarındaki geçersiz linkleri düzelt."""
+    resolved_link = resolve_btk_course_link(course_title, course_link, skill)
+    if is_generic_btk_link(resolved_link):
+        return course_link, roadmap_steps, False
+
+    changed = resolved_link != course_link
+    repaired_steps = []
+    for step in roadmap_steps:
+        step_copy = dict(step)
+        if is_generic_btk_link(step_copy.get("link")):
+            step_copy["link"] = resolved_link
+            changed = True
+        repaired_steps.append(step_copy)
+
+    return resolved_link, repaired_steps, changed
+
+
 def recommend_best_course(profile, courses, skill):
     """En uygun kursu seç"""
     if not courses:
         return None
-    
-    # İlk kursu en uygun olarak seç
-    best_course = courses[0]
-    
+
+    skill_lower = skill.lower().strip()
+    skill_parts = [w for w in re.split(r"[^\wğüşıöç]+", skill_lower, flags=re.IGNORECASE) if len(w) > 2]
+
+    def course_score(course):
+        text = f"{course.get('title', '')} {course.get('snippet', '')} {' '.join(course.get('tags', []))}".lower()
+        return sum(10 for part in skill_parts if part in text)
+
+    best_course = max(courses, key=course_score)
+    course_link = resolve_btk_course_link(
+        best_course.get("title", skill),
+        best_course.get("link", "#"),
+        skill,
+    )
+
     return {
         "title": best_course.get('title', 'Kurs başlığı bulunamadı'),
-        "link": best_course.get('link', '#'),
+        "link": course_link,
         "description": best_course.get('snippet', 'Açıklama bulunamadı'),
         "reason": f"Bu kurs {profile['seviye']} seviyesinde {skill} öğrenmek için en uygun seçenektir."
     }
@@ -365,7 +694,7 @@ def scrape_btk_course_sections(course_url):
                 'Upgrade-Insecure-Requests': '1',
             }
             
-            response = requests.get(course_url, headers=headers, timeout=2, verify=False)
+            response = requests.get(course_url, headers=headers, timeout=15, verify=False)
             response.raise_for_status()
             
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -860,18 +1189,25 @@ def analyze_profile():
         # BTK kurs arama
         search_query = f"{data['skill']} {profile['seviye']} seviye kurs"
         print(f"Searching for: {search_query}")
-        courses = search_btk_courses(search_query)
+        courses = search_btk_courses(search_query, skill=data['skill'])
         print(f"Found {len(courses)} courses")
         
-        # Eğer sonuç bulunamazsa, daha genel arama yap
         if not courses:
             print("No courses found, trying general search...")
             search_query = f"{data['skill']} programlama eğitim"
-            courses = search_btk_courses(search_query)
+            courses = search_btk_courses(search_query, skill=data['skill'])
             print(f"General search found {len(courses)} courses")
+
+        if not courses:
+            print("Still no courses, using skill-based demo fallback...")
+            courses = get_demo_courses(data['skill'], skill=data['skill'])
         
         # En uygun kursu seç
         best_course = recommend_best_course(profile, courses, data['skill'])
+        if not best_course:
+            print("No best course selected, forcing demo fallback...")
+            courses = get_demo_courses(data['skill'], skill=data['skill'])
+            best_course = recommend_best_course(profile, courses, data['skill'])
         print(f"Best course: {best_course}")
         
         # Profili veritabanına kaydet
@@ -943,18 +1279,24 @@ def add_course_to_roadmap():
         profile = cursor.fetchone()
         skill = profile[0] if profile else None
         level = profile[1] if profile else None
+
+        course_link = resolve_btk_course_link(
+            data['course_title'],
+            data['course_link'],
+            skill,
+        )
         
         # BTK Akademi'den kurs bölümlerini çek
-        print(f"BTK Akademi'den bölümler çekiliyor: {data['course_link']}")
-        sections = scrape_btk_course_sections(data['course_link'])
+        print(f"BTK Akademi'den bölümler çekiliyor: {course_link}")
+        sections = scrape_btk_course_sections(course_link)
         
         # Dinamik yol haritası oluştur (proje kartı ile birlikte)
-        roadmap_steps = create_dynamic_roadmap(data['course_title'], data['course_link'], sections, skill, level)
+        roadmap_steps = create_dynamic_roadmap(data['course_title'], course_link, sections, skill, level)
         
         cursor.execute('''
             INSERT INTO user_courses (user_id, course_title, course_link, course_description, roadmap_sections)
             VALUES (?, ?, ?, ?, ?)
-        ''', (payload['user_id'], data['course_title'], data['course_link'], data['course_description'], json.dumps(roadmap_steps)))
+        ''', (payload['user_id'], data['course_title'], course_link, data['course_description'], json.dumps(roadmap_steps)))
         
         conn.commit()
         conn.close()
@@ -997,18 +1339,18 @@ def get_user_roadmap():
         
         # Kurslar (sadece aktif olanlar)
         cursor.execute('''
-            SELECT course_title, course_link, course_description, roadmap_sections, added_at
+            SELECT id, course_title, course_link, course_description, roadmap_sections, added_at
             FROM user_courses WHERE user_id = ? AND status = 'active' ORDER BY added_at DESC
         ''', (payload['user_id'],))
         
         courses = cursor.fetchall()
-        conn.close()
         
         roadmap_data = {
             'profile': None,
             'courses': []
         }
         
+        profile_skill = profile[0] if profile else None
         if profile:
             roadmap_data['profile'] = {
                 'skill': profile[0],
@@ -1020,20 +1362,37 @@ def get_user_roadmap():
             }
         
         for course in courses:
+            course_id, course_title, course_link, course_description, roadmap_sections_raw, added_at = course
             roadmap_steps = []
-            if course[3]:  # roadmap_sections varsa
+            if roadmap_sections_raw:
                 try:
-                    roadmap_steps = json.loads(course[3])
-                except:
+                    roadmap_steps = json.loads(roadmap_sections_raw)
+                except Exception:
                     roadmap_steps = []
+
+            course_link, roadmap_steps, repaired = repair_roadmap_links(
+                course_title,
+                course_link,
+                roadmap_steps,
+                profile_skill,
+            )
+            if repaired:
+                cursor.execute('''
+                    UPDATE user_courses
+                    SET course_link = ?, roadmap_sections = ?
+                    WHERE id = ?
+                ''', (course_link, json.dumps(roadmap_steps), course_id))
             
             roadmap_data['courses'].append({
-                'title': course[0],
-                'link': course[1],
-                'description': course[2],
+                'title': course_title,
+                'link': course_link,
+                'description': course_description,
                 'roadmap_steps': roadmap_steps,
-                'added_at': course[4]
+                'added_at': added_at
             })
+
+        conn.commit()
+        conn.close()
         
         return jsonify(roadmap_data), 200
         
@@ -1292,23 +1651,82 @@ def extract_quoted_text(line):
     except:
         return None
 
-# Turnuva API'leri
-def generate_questions_with_gemini(topic, question_count=15):
-    """Gemini API ile soru üret"""
-    try:
-        # Gemini API anahtarını kontrol et
-        if GEMINI_API_KEY == "your_gemini_api_key_here":
-            print("UYARI: Gemini API anahtarı ayarlanmamış. Lütfen GEMINI_API_KEY environment variable'ını ayarlayın.")
-            # Demo yerine basit hata mesajı döndür
-            return [{
-                "question": f"Gemini API anahtarı ayarlanmamış. {topic} için sorular üretilemedi.",
-                "options": ["API anahtarı gerekli", "Lütfen ayarlayın", "Environment variable", "GEMINI_API_KEY"],
-                "correct_option": "A"
-            }]
-        
-        model = genai.GenerativeModel('gemini-2.5-flash')
-        
-        prompt = f"""
+SUPPORTED_CONTENT_LANGS = ('en', 'tr')
+
+def resolve_content_lang(lang):
+    """Normalize UI/content language for Gemini prompts."""
+    if not lang:
+        return 'en'
+    normalized = str(lang).lower().strip()
+    return normalized if normalized in SUPPORTED_CONTENT_LANGS else 'en'
+
+_TURKISH_CHAR_RE = re.compile(r'[çğıöşüÇĞİÖŞÜ]')
+_TURKISH_WORD_RE = re.compile(
+    r'\b(bir|için|icin|olan|değil|degil|doğru|dogru|yanlış|yanlis|aşağıdaki|asagidaki|'
+    r'hangisi|sorusu|şıkkı|sikki|cevap|nedir|nasıl|nasil|veya|ancak|lütfen|lutfen|'
+    r'konuda|konusu|seçenek|secenek|açıklayın|aciklayin|tanımlayın|tanimlayin)\b',
+    re.IGNORECASE,
+)
+
+def _looks_turkish(text):
+    if not text:
+        return False
+    s = str(text)
+    if _TURKISH_CHAR_RE.search(s):
+        return True
+    return bool(_TURKISH_WORD_RE.search(s))
+
+def questions_need_translation(questions, target_lang):
+    if resolve_content_lang(target_lang) != 'en':
+        return False
+    for q in questions:
+        if _looks_turkish(q.get('question', '')):
+            return True
+        for opt in q.get('options', []):
+            if _looks_turkish(opt):
+                return True
+    return False
+
+def ensure_questions_language(questions, lang):
+    """When UI is English, normalize quiz text to English (translate if needed)."""
+    lang = resolve_content_lang(lang)
+    if lang != 'en' or not questions:
+        return questions
+    print(f'ensure_questions_language: enforcing English for {len(questions)} question(s)')
+    return translate_questions_with_gemini(questions, 'en')
+
+def _build_question_generation_prompt(topic, question_count, lang):
+    lang = resolve_content_lang(lang)
+    if lang == 'en':
+        return f"""
+Generate {question_count} multiple-choice questions about "{topic}".
+
+RULES:
+- Write ALL questions and ALL answer options in English only (never Turkish)
+- Even if the topic name "{topic}" is in another language, the quiz must still be entirely in English
+- Every question must be strictly about "{topic}"
+- Each question must have exactly 4 options (A, B, C, D) with only one correct answer
+- Medium difficulty; clear wording; exactly one correct answer
+- correct_option must be A, B, C, or D
+
+RESPONSE FORMAT - JSON ONLY:
+{{
+    "questions": [
+        {{
+            "question": "Question text here",
+            "options": ["Option A", "Option B", "Option C", "Option D"],
+            "correct_option": "A"
+        }}
+    ]
+}}
+
+IMPORTANT:
+- Return JSON only, no markdown code fences
+- No extra commentary
+- Valid, complete JSON
+- Exactly 4 options per question
+"""
+    return f"""
 {topic} konusu için {question_count} adet çoktan seçmeli soru üret.
 
 KURALLAR:
@@ -1336,77 +1754,139 @@ YANIT FORMATI - SADECE JSON:
 - JSON formatının tam ve geçerli olduğundan emin ol
 - Her soru için tam 4 seçenek olmalı
 """
+
+def _parse_gemini_questions_json(response, topic, question_count):
+    import json
+
+    response_text = response.text.strip()
+
+    if response_text.startswith('```json'):
+        json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
+        if json_match:
+            response_text = json_match.group(1).strip()
+        else:
+            response_text = response_text[7:].strip()
+    elif response_text.startswith('```'):
+        json_match = re.search(r'```\s*(.*?)\s*```', response_text, re.DOTALL)
+        if json_match:
+            response_text = json_match.group(1).strip()
+        else:
+            response_text = response_text[3:].strip()
+
+    response_text = clean_and_fix_json(response_text)
+    result = json.loads(response_text)
+    questions = result.get("questions", [])
+
+    if len(questions) > question_count:
+        questions = questions[:question_count]
+    elif len(questions) < question_count:
+        print(f"Uyarı: İstenen {question_count} soru yerine {len(questions)} soru üretildi")
+
+    return questions
+
+def translate_questions_with_gemini(questions, target_lang='en'):
+    """Fallback: translate question set when output language does not match UI."""
+    target_lang = resolve_content_lang(target_lang)
+    if target_lang != 'en' or not questions:
+        return questions
+
+    try:
+        if GEMINI_API_KEY == "your_gemini_api_key_here":
+            return questions
+
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        import json
+        payload = json.dumps({"questions": questions}, ensure_ascii=False)
+        prompt = f"""
+Translate the following quiz questions and all answer options into English.
+Keep the same JSON structure, number of questions, number of options, and correct_option letters (A/B/C/D).
+Do not change which option is correct — only translate the text.
+
+INPUT JSON:
+{payload}
+
+Return JSON only in this format:
+{{
+    "questions": [
+        {{
+            "question": "...",
+            "options": ["...", "...", "...", "..."],
+            "correct_option": "A"
+        }}
+    ]
+}}
+"""
+        response = model.generate_content(prompt)
+        translated = _parse_gemini_questions_json(response, "translation", len(questions))
+        return translated if translated else questions
+    except Exception as e:
+        print(f"Soru çeviri hatası: {e}")
+        return questions
+
+def _fallback_error_question(topic, lang, message_key='generic'):
+    lang = resolve_content_lang(lang)
+    if lang == 'en':
+        messages = {
+            'api_key': f"Gemini API key is not configured. Could not generate questions for {topic}.",
+            'parse': f"Could not parse questions for {topic}. Please try again.",
+            'error': f"An error occurred while generating questions for {topic}.",
+        }
+        options = ["API key required", "Please configure", "Environment variable", "GEMINI_API_KEY"]
+    else:
+        messages = {
+            'api_key': f"Gemini API anahtarı ayarlanmamış. {topic} için sorular üretilemedi.",
+            'parse': f"{topic} konusunda JSON parse hatası oluştu. Lütfen tekrar deneyin.",
+            'error': f"{topic} için soru üretilirken hata oluştu.",
+        }
+        options = ["API anahtarı gerekli", "Lütfen ayarlayın", "Environment variable", "GEMINI_API_KEY"]
+    return [{
+        "question": messages.get(message_key, messages['error']),
+        "options": options if message_key == 'api_key' else ["API yanıtı hatalı", "JSON formatı bozuk", "Tekrar deneyin", "Sistem hatası"],
+        "correct_option": "A" if message_key == 'api_key' else "C"
+    }]
+
+# Turnuva API'leri
+def generate_questions_with_gemini(topic, question_count=15, lang='en'):
+    """Gemini API ile soru üret"""
+    lang = resolve_content_lang(lang)
+    print(f'generate_questions_with_gemini topic={topic!r} count={question_count} lang={lang}')
+    try:
+        if GEMINI_API_KEY == "your_gemini_api_key_here":
+            print("UYARI: Gemini API anahtarı ayarlanmamış. Lütfen GEMINI_API_KEY environment variable'ını ayarlayın.")
+            return _fallback_error_question(topic, lang, 'api_key')
+
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        prompt = _build_question_generation_prompt(topic, question_count, lang)
         
         response = model.generate_content(prompt)
         
-        # JSON parse et
         import json
-        import re
         
         try:
-            response_text = response.text.strip()
-            
-            # Markdown kod bloğu varsa temizle
-            if response_text.startswith('```json'):
-                # ```json ile başlayıp ``` ile bitenleri bul
-                json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
-                if json_match:
-                    response_text = json_match.group(1).strip()
-                else:
-                    # ```json varsa ama ``` yoksa, ```json'dan sonrasını al
-                    response_text = response_text[7:].strip()  # ```json kısmını çıkar
-            elif response_text.startswith('```'):
-                # Sadece ``` ile başlıyorsa
-                json_match = re.search(r'```\s*(.*?)\s*```', response_text, re.DOTALL)
-                if json_match:
-                    response_text = json_match.group(1).strip()
-                else:
-                    response_text = response_text[3:].strip()  # ``` kısmını çıkar
-            
-            # JSON'u temizle ve tamamla
-            response_text = clean_and_fix_json(response_text)
-            
-            # JSON parse et
-            result = json.loads(response_text)
-            questions = result.get("questions", [])
-            
-            # Soru sayısını kontrol et ve gerekirse kırp veya tamamla
-            if len(questions) > question_count:
-                questions = questions[:question_count]
-            elif len(questions) < question_count:
-                print(f"Uyarı: İstenen {question_count} soru yerine {len(questions)} soru üretildi")
-            
+            questions = _parse_gemini_questions_json(response, topic, question_count)
+            questions = ensure_questions_language(questions, lang)
             return questions
             
         except json.JSONDecodeError as e:
             print(f"JSON parse hatası: {e}")
-            print(f"Temizlenmiş AI yanıtı: {response_text[:500]}...")
             print(f"Orijinal AI yanıtı: {response.text[:500]}...")
             
-            # Son bir deneme: Manuel JSON oluştur
             try:
-                # AI yanıtından soruları çıkarmaya çalış
                 questions = extract_questions_from_text(response.text, topic, question_count)
                 if questions:
+                    questions = ensure_questions_language(questions, lang)
                     print(f"Manuel çıkarma başarılı: {len(questions)} soru bulundu")
                     return questions
             except Exception as extract_error:
                 print(f"Manuel çıkarma hatası: {extract_error}")
             
-            # JSON parse edilemezse basit bir soru döndür
-            return [{
-                "question": f"{topic} konusunda JSON parse hatası oluştu. Lütfen tekrar deneyin.",
-                "options": ["API yanıtı hatalı", "JSON formatı bozuk", "Tekrar deneyin", "Sistem hatası"],
-                "correct_option": "C"
-            }]
+            return _fallback_error_question(topic, lang, 'parse')
             
     except Exception as e:
         print(f"Gemini API hatası: {e}")
-        return [{
-            "question": f"{topic} için soru üretilirken hata oluştu: {str(e)}",
-            "options": ["API hatası", "Bağlantı sorunu", "Tekrar deneyin", "Sistem hatası"],
-            "correct_option": "C"
-        }]
+        q = _fallback_error_question(topic, lang, 'error')
+        q[0]['question'] = q[0]['question'] + (f": {str(e)}" if lang == 'en' else f": {str(e)}")
+        return q
 
 
 
@@ -1435,7 +1915,12 @@ def generate_questions():
             return jsonify({'error': 'Turnuva içeriği gereklidir'}), 400
         
         # Soruları üret
-        questions = generate_questions_with_gemini(data['content'], data.get('question_count', 15))
+        lang = resolve_content_lang(data.get('lang') or request.headers.get('X-Content-Lang'))
+        questions = generate_questions_with_gemini(
+            data['content'],
+            data.get('question_count', 15),
+            lang=lang
+        )
         
         return jsonify({
             'success': True,
@@ -1472,9 +1957,11 @@ def generate_test_questions():
         topic = data['topic']
         difficulty = data.get('difficulty', 'medium')
         count = data.get('count', 5)
+        lang = resolve_content_lang(data.get('lang') or request.headers.get('X-Content-Lang'))
+        print(f'generate_test_questions lang={lang} topic={topic!r}')
         
         # Gemini ile test soruları üret
-        questions = generate_questions_with_gemini(topic, count)
+        questions = generate_questions_with_gemini(topic, count, lang=lang)
         
         # Soruları test formatına dönüştür
         test_questions = []
@@ -1490,7 +1977,8 @@ def generate_test_questions():
             'questions': test_questions,
             'topic': topic,
             'difficulty': difficulty,
-            'count': len(test_questions)
+            'count': len(test_questions),
+            'lang': lang,
         }), 200
         
     except Exception as e:
@@ -2899,6 +3387,7 @@ def get_completed_courses():
             completed_courses.append({
                 'title': course_title,
                 'completed_at': completed_at,
+                'added_at': added_at,
                 'time_ago': time_ago,
                 'duration': duration_text
             })

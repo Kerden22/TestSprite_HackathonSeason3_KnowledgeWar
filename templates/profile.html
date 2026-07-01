@@ -1,15 +1,37 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KNOWLEDGEWAR - Profil</title>
+    <title>KNOWLEDGEWAR - Profile</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
+    <style>
+        .nav-lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 10001;
+        }
+        .nav-lang-toggle button {
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 0.875rem;
+            pointer-events: auto;
+        }
+        .profile-nav {
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+            isolation: isolate;
+        }
+    </style>
 </head>
 
-<body class="min-h-screen text-white bg-gray-900">
+<body class="min-h-screen text-white bg-gray-900" data-i18n-page-title="meta.profileTitle">
     <!-- Animated Background -->
     <div class="stars" id="stars"></div>
     <div class="floating-orb orb-1"></div>
@@ -17,24 +39,32 @@
     <div class="floating-orb orb-3"></div>
 
     <!-- Navigation -->
-    <nav class="relative z-10 glass-card border-b border-white/10">
+    <nav class="profile-nav glass-card border-b border-white/10">
         <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-4 flex-wrap">
                 <div class="flex items-center space-x-4">
                     <div class="text-2xl font-black neon-text">KNOWLEDGEWAR</div>
                     <div class="hidden md:flex items-center space-x-6 ml-8">
-                        <a href="/" class="text-gray-300 hover:text-white transition-colors">Ana sayfa</a>
-                        <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors">Yol Haritası</a>
-                        <a href="/tournament" class="text-gray-300 hover:text-white transition-colors">Turnuvalar</a>
+                        <a href="/" class="text-gray-300 hover:text-white transition-colors" data-i18n="nav.home">Home</a>
+                        <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors" data-i18n="nav.roadmap">Roadmap</a>
+                        <a href="/tournament" class="text-gray-300 hover:text-white transition-colors" data-i18n="nav.tournaments">Tournaments</a>
                     </div>
                 </div>
-                <button
-                  id="logoutBtn"
-                  onclick="logout()"
-                  class="ml-auto text-gray-300 hover:text-red-400 transition-colors font-medium ml-6"
-                >
-                  Çıkış Yap
-                </button>
+                <div class="flex items-center gap-4 ml-auto">
+                    <div id="langToggle" class="nav-lang-toggle text-sm">
+                        <button type="button" id="langEn" class="text-cyan-400 font-semibold">EN</button>
+                        <span class="text-gray-500">|</span>
+                        <button type="button" id="langTr" class="text-gray-400 hover:text-white font-medium">TR</button>
+                    </div>
+                    <button
+                      id="logoutBtn"
+                      onclick="logout()"
+                      class="text-gray-300 hover:text-red-400 transition-colors font-medium"
+                      data-i18n="nav.logout"
+                    >
+                      Log out
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -72,13 +102,12 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Tournament Wins -->
                 <div class="glass-card rounded-3xl p-8 neon-glow hover-lift slide-in">
-                    <h3 class="text-2xl font-bold neon-text mb-6">Kazandığım Turnuvalar</h3>
+                    <h3 class="text-2xl font-bold neon-text mb-6" data-i18n="profile.tournamentWins">My Tournament Wins</h3>
                     <div id="tournamentWinsContainer" class="space-y-4">
-                        <!-- Turnuva kazanımları buraya dinamik olarak yüklenecek -->
                         <div class="text-center text-gray-400 py-4" id="noWinsMessage">
                             <div class="text-2xl mb-2">🏆</div>
-                            <p class="text-sm font-medium">Henüz turnuva kazanmadınız</p>
-                            <p class="text-xs">Turnuvalara katılarak birinci olmaya çalışın!</p>
+                            <p class="text-sm font-medium" data-i18n="profile.noWinsTitle">No tournament wins yet</p>
+                            <p class="text-xs" data-i18n="profile.noWinsHint">Join tournaments and try to finish first!</p>
                         </div>
                     </div>
                 </div>
@@ -86,14 +115,13 @@
                 <!-- Current Courses -->
                 <div class="glass-card rounded-3xl p-8 neon-glow hover-lift slide-in">
                     <div class="mb-6">
-                        <h3 class="text-2xl font-bold neon-text">Devam Eden Kurslar</h3>
+                        <h3 class="text-2xl font-bold neon-text" data-i18n="profile.activeCourses">Courses in Progress</h3>
                     </div>
                     <div id="activeCourseContainer">
-                        <!-- Aktif kurs buraya dinamik olarak yüklenecek -->
                         <div class="text-center text-gray-400 py-8" id="noActiveCourseMessage">
                             <div class="text-4xl mb-4">📚</div>
-                            <p class="text-lg font-semibold">Henüz aktif bir kursunuz yok</p>
-                            <p class="text-sm">Yol haritasından bir kurs seçerek öğrenmeye başlayın!</p>
+                            <p class="text-lg font-semibold" data-i18n="profile.noActiveTitle">No active course</p>
+                            <p class="text-sm" data-i18n="profile.noActiveHint">Pick a course from your roadmap to start learning!</p>
                         </div>
                     </div>
                 </div>
@@ -101,14 +129,13 @@
                 <!-- Activity Feed -->
                 <div class="glass-card rounded-3xl p-8 neon-glow hover-lift slide-in">
                     <div class="mb-6">
-                        <h3 class="text-2xl font-bold neon-text">Tamamlanmış Kurslar</h3>
+                        <h3 class="text-2xl font-bold neon-text" data-i18n="profile.completedCourses">Completed Courses</h3>
                     </div>
                     <div id="completedCoursesContainer" class="space-y-4">
-                        <!-- Tamamlanmış kurslar buraya dinamik olarak yüklenecek -->
                         <div class="text-center text-gray-400 py-8" id="noCompletedCoursesMessage">
                             <div class="text-4xl mb-4">🎓</div>
-                            <p class="text-lg font-semibold">Henüz tamamlanmış kursunuz yok</p>
-                            <p class="text-sm">Kursları tamamlayarak burada görünecek!</p>
+                            <p class="text-lg font-semibold" data-i18n="profile.noCompletedTitle">No completed courses yet</p>
+                            <p class="text-sm" data-i18n="profile.noCompletedHint">Completed courses will appear here!</p>
                         </div>
                     </div>
                 </div>
@@ -122,7 +149,7 @@
             <div class="modal-enter gradient-border max-w-2xl w-full">
                 <div class="gradient-border-inner p-8">
                     <div class="flex items-center justify-between mb-8">
-                        <h2 class="text-3xl font-bold neon-text">Edit Profile</h2>
+                        <h2 class="text-3xl font-bold neon-text" data-i18n="profile.editProfile">Edit Profile</h2>
                         <button id="closeModal"
                             class="text-gray-400 hover:text-white text-3xl transition-colors">×</button>
                     </div>
@@ -130,41 +157,42 @@
                     <form class="space-y-6">
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">First Name</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-2" data-i18n="profile.firstName">First Name</label>
                                 <input type="text" value="John"
                                     class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Last Name</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-2" data-i18n="profile.lastName">Last Name</label>
                                 <input type="text" value="Doe"
                                     class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" data-i18n="profile.jobTitle">Title</label>
                             <input type="text" value="Full Stack Developer"
                                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors">
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Location</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" data-i18n="profile.location">Location</label>
                             <input type="text" value="Istanbul, Turkey"
                                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors">
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" data-i18n="profile.bio">Bio</label>
                             <textarea rows="4"
                                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                placeholder="Tell us about yourself..."></textarea>
+                                data-i18n-placeholder="profile.bioPlaceholder" placeholder="Tell us about yourself..."></textarea>
                         </div>
 
                         <div class="flex justify-end space-x-4">
                             <button type="button" id="cancelEdit"
-                                class="px-6 py-3 text-gray-400 hover:text-white transition-colors">Cancel</button>
+                                class="px-6 py-3 text-gray-400 hover:text-white transition-colors" data-i18n="profile.cancel">Cancel</button>
                             <button type="submit"
-                                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-8 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-8 rounded-xl neon-glow hover:scale-105 transition-all duration-300"
+                                data-i18n="profile.saveChanges">
                                 Save Changes
                             </button>
                         </div>
@@ -174,6 +202,7 @@
         </div>
     </div>
 
+    <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script src="{{ url_for('static', filename='profile.js') }}"></script>
     <script>
         // Check if user is logged in
@@ -229,12 +258,16 @@
                     const data = await response.json();
                     const user = data.user;
 
-                    // Format dates
-                    const createdDate = new Date(user.created_at).toLocaleDateString('tr-TR');
-                    const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString('tr-TR') : 'İlk giriş';
+                    const locale = (typeof getLang === 'function' && getLang() === 'tr') ? 'tr-TR' : 'en-US';
+                    const createdDate = new Date(user.created_at).toLocaleDateString(locale);
+                    const lastLoginDate = user.last_login
+                        ? new Date(user.last_login).toLocaleDateString(locale)
+                        : t('profile.firstLogin');
 
-                    document.getElementById('userCreatedAt').textContent = createdDate;
-                    document.getElementById('userLastLogin').textContent = lastLoginDate;
+                    const createdEl = document.getElementById('userCreatedAt');
+                    const loginEl = document.getElementById('userLastLogin');
+                    if (createdEl) createdEl.textContent = createdDate;
+                    if (loginEl) loginEl.textContent = lastLoginDate;
                 }
             } catch (error) {
                 console.error('Profil yüklenirken hata:', error);
@@ -248,7 +281,13 @@
         }
 
         // Check auth on page load
-        document.addEventListener('DOMContentLoaded', checkAuth);
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof initI18n === 'function') {
+                await initI18n();
+                applyTranslations();
+            }
+            checkAuth();
+        });
     </script>
 </body>
 

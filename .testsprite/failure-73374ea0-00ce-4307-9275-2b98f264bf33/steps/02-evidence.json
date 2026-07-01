@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "snapshot",
+    "stepIndex": 2,
+    "summary": "Step 2 'The 'Özellikler' (Features) link is visible in the main navigation.' failed. Error: TEST BLOCKED: Task: Verify the landing page renders main navigation choices on first load.\n\nSummary of verification and evidence:\n- Requirement: Navigate to the home page — satisfied (current page is the site home).\n- Requirement: Verify the 'Özellikler' (Features) link is visible — observed: the navigation bar contains the visible link text 'Özellikler' in the top navigation (visible in DOM and screenshot).\n- Requirement: Verify the tournament-related UI is visible — observed: the hero/features area displays 'Yarış ve Kazan' (with the tournament icon) indicating tournament functionality is accessible from the landing page (visible in DOM and screenshot).\n\nNo popups, login prompts, or missing interface elements were detected that would prevent immediate access to these main paths. Based on the visible UI, the landing page renders its main navigation choices and the tournament prompt on first load.\n\nResult: PASS.",
+    "path": "steps/02-snapshot.html"
+  }
+]

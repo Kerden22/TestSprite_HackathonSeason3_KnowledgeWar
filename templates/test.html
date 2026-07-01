@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -142,20 +142,35 @@
             border-color: #8b5cf6;
             transform: translateY(-2px);
         }
+
+        .nav-lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lang-toggle button {
+            cursor: pointer;
+        }
     </style>
 </head>
-<body>
+<body data-i18n-page-title="meta.testTitle">
     <div class="container mx-auto px-6 py-8">
         <!-- Header -->
         <div class="glass-card p-6 mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold">📝 Test Çöz</h1>
-                    <p class="text-gray-400" id="testTitle">Konu seçin ve test başlayın</p>
+                    <h1 class="text-3xl font-bold" data-i18n="test.pageTitle">📝 Take a Test</h1>
+                    <p class="text-gray-400" id="testTitle" data-i18n="test.pageSubtitle">Choose a topic and start the test</p>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <div id="langToggle" class="nav-lang-toggle text-sm">
+                        <button type="button" id="langEn" class="text-cyan-400 font-semibold">EN</button>
+                        <span class="text-gray-600">|</span>
+                        <button type="button" id="langTr" class="text-gray-400 hover:text-white font-medium">TR</button>
+                    </div>
                     <div class="timer" id="timeRemaining">--:--</div>
-                    <a href="/roadmap" class="text-gray-400 hover:text-white">← Geri Dön</a>
+                    <a href="/roadmap" class="text-gray-400 hover:text-white" data-i18n="test.backToRoadmap">← Back</a>
                 </div>
             </div>
         </div>
@@ -164,8 +179,8 @@
         <div id="topicSelectionSection" class="glass-card p-8">
             <div class="text-center mb-8">
                 <div class="text-4xl mb-4">🎯</div>
-                <h2 class="text-2xl font-bold mb-4">Hangi Konuda Test Çözmek İstiyorsunuz?</h2>
-                <p class="text-gray-400 mb-6">Konu başlığını yazın veya önerilen konulardan birini seçin</p>
+                <h2 class="text-2xl font-bold mb-4" data-i18n="test.topicHeading">Which topic do you want to test?</h2>
+                <p class="text-gray-400 mb-6" data-i18n="test.topicHint">Enter a topic or pick one of the suggestions</p>
             </div>
 
             <div class="max-w-2xl mx-auto">
@@ -174,28 +189,29 @@
                         type="text" 
                         id="topicInput" 
                         class="topic-input" 
-                        placeholder="Örnek: Git ve GitHub, Python Programlama, JavaScript, HTML CSS..."
+                        data-i18n-placeholder="test.topicPlaceholder"
+                        placeholder="e.g. Git and GitHub, Python, JavaScript, HTML CSS..."
                         maxlength="100"
                     >
                 </div>
 
                 <div class="mb-8">
-                    <h3 class="text-lg font-semibold mb-4 text-center">Önerilen Konular:</h3>
+                    <h3 class="text-lg font-semibold mb-4 text-center" data-i18n="test.suggestedTopics">Suggested topics:</h3>
                     <div class="flex flex-wrap justify-center gap-2">
-                        <div class="suggested-topic" onclick="selectTopic('Git ve GitHub')">Git ve GitHub</div>
-                        <div class="suggested-topic" onclick="selectTopic('Python Programlama')">Python Programlama</div>
-                        <div class="suggested-topic" onclick="selectTopic('JavaScript')">JavaScript</div>
-                        <div class="suggested-topic" onclick="selectTopic('HTML ve CSS')">HTML ve CSS</div>
-                        <div class="suggested-topic" onclick="selectTopic('React.js')">React.js</div>
-                        <div class="suggested-topic" onclick="selectTopic('Node.js')">Node.js</div>
-                        <div class="suggested-topic" onclick="selectTopic('Veritabanı Yönetimi')">Veritabanı Yönetimi</div>
-                        <div class="suggested-topic" onclick="selectTopic('Siber Güvenlik')">Siber Güvenlik</div>
+                        <div class="suggested-topic" data-topic="Git ve GitHub" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicGit">Git & GitHub</span></div>
+                        <div class="suggested-topic" data-topic="Python Programlama" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicPython">Python Programming</span></div>
+                        <div class="suggested-topic" data-topic="JavaScript" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicJs">JavaScript</span></div>
+                        <div class="suggested-topic" data-topic="HTML ve CSS" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicHtml">HTML & CSS</span></div>
+                        <div class="suggested-topic" data-topic="React.js" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicReact">React.js</span></div>
+                        <div class="suggested-topic" data-topic="Node.js" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicNode">Node.js</span></div>
+                        <div class="suggested-topic" data-topic="Veritabanı Yönetimi" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicDb">Database Management</span></div>
+                        <div class="suggested-topic" data-topic="Siber Güvenlik" onclick="selectTopic(this.dataset.topic)"><span data-i18n="test.topicSecurity">Cybersecurity</span></div>
                     </div>
                 </div>
 
                 <div class="text-center">
-                    <button id="startTestBtn" class="test-btn px-8 py-3" onclick="startTestGeneration()">
-                        🚀 Test Oluştur ve Başla
+                    <button id="startTestBtn" class="test-btn px-8 py-3" onclick="startTestGeneration()" data-i18n="test.startBtn">
+                        🚀 Generate Test & Start
                     </button>
                 </div>
             </div>
@@ -205,10 +221,10 @@
         <div class="glass-card p-6 mb-8" id="progressSection" style="display: none;">
             <div class="flex items-center justify-between mb-4">
                 <div class="text-lg font-semibold">
-                    Soru <span id="currentQuestionNum">1</span> / <span id="totalQuestions">5</span>
+                    <span data-i18n="test.questionLabel">Question</span> <span id="currentQuestionNum">1</span> / <span id="totalQuestions">5</span>
                 </div>
                 <div class="text-lg font-semibold">
-                    Skor: <span id="currentScore">0</span>
+                    <span data-i18n="test.scoreLabel">Score</span>: <span id="currentScore">0</span>
                 </div>
             </div>
             <div class="progress-bar">
@@ -219,25 +235,25 @@
         <!-- Loading -->
         <div id="loadingSection" class="glass-card p-8 text-center" style="display: none;">
             <div class="text-3xl mb-4">🤖</div>
-            <h2 class="text-2xl font-bold mb-4">Test Hazırlanıyor...</h2>
-            <p class="text-gray-400">Gemini AI <span id="loadingTopic">konu</span> hakkında sorular oluşturuyor</p>
+            <h2 class="text-2xl font-bold mb-4" data-i18n="test.loadingTitle">Preparing Test...</h2>
+            <p class="text-gray-400"><span data-i18n="test.loadingSubtitle" id="loadingSubtitleText">Gemini AI is generating questions about {topic}</span></p>
         </div>
 
         <!-- Question Section -->
         <div id="questionSection" class="glass-card p-8" style="display: none;">
             <div class="mb-8">
-                <h2 class="text-2xl font-bold mb-6" id="questionText">Soru yükleniyor...</h2>
+                <h2 class="text-2xl font-bold mb-6" id="questionText" data-i18n="test.loadingQuestion">Loading question...</h2>
                 <div class="space-y-4" id="optionsContainer">
                     <!-- Options will be loaded here -->
                 </div>
             </div>
             
             <div class="text-center">
-                <button id="nextBtn" class="test-btn px-8 py-3" style="display: none;" onclick="nextQuestion()">
-                    Sonraki Soru →
+                <button id="nextBtn" class="test-btn px-8 py-3" style="display: none;" onclick="nextQuestion()" data-i18n="test.nextQuestion">
+                    Next Question →
                 </button>
-                <button id="finishBtn" class="test-btn px-8 py-3" style="display: none;" onclick="finishTest()">
-                    Testi Bitir 🏆
+                <button id="finishBtn" class="test-btn px-8 py-3" style="display: none;" onclick="finishTest()" data-i18n="test.finishTest">
+                    Finish Test 🏆
                 </button>
             </div>
         </div>
@@ -245,33 +261,47 @@
         <!-- Results Section -->
         <div id="resultsSection" class="glass-card p-8 text-center" style="display: none;">
             <div class="text-6xl mb-4">🎯</div>
-            <h2 class="text-3xl font-bold mb-4">Test Tamamlandı!</h2>
+            <h2 class="text-3xl font-bold mb-4" data-i18n="test.resultsTitle">Test Complete!</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 <div class="glass-card p-4">
                     <div class="text-2xl font-bold text-green-400" id="finalScore">-</div>
-                    <div class="text-sm text-gray-400">Final Skor</div>
+                    <div class="text-sm text-gray-400" data-i18n="test.finalScore">Final Score</div>
                 </div>
                 <div class="glass-card p-4">
                     <div class="text-2xl font-bold text-blue-400" id="correctAnswers">-</div>
-                    <div class="text-sm text-gray-400">Doğru Cevap</div>
+                    <div class="text-sm text-gray-400" data-i18n="test.correctAnswers">Correct Answers</div>
                 </div>
                 <div class="glass-card p-4">
                     <div class="text-2xl font-bold text-purple-400" id="completionTime">-</div>
-                    <div class="text-sm text-gray-400">Süre</div>
+                    <div class="text-sm text-gray-400" data-i18n="test.duration">Time</div>
                 </div>
             </div>
             <div class="space-y-4">
-                <button onclick="returnToTopicSelection()" class="cosmic-btn px-8 py-3">
-                    🔄 Yeni Test Çöz
+                <button onclick="returnToTopicSelection()" class="cosmic-btn px-8 py-3" data-i18n="test.newTest">
+                    🔄 Take Another Test
                 </button>
-                <button onclick="returnToRoadmap()" class="cosmic-btn px-8 py-3">
-                    🏠 Roadmap'e Dön
+                <button onclick="returnToRoadmap()" class="cosmic-btn px-8 py-3" data-i18n="test.backToRoadmapBtn">
+                    🏠 Back to Roadmap
                 </button>
             </div>
         </div>
     </div>
 
+    <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script>
+        function swalWarning(text) {
+            return Swal.fire({
+                icon: 'warning',
+                title: t('common.warning'),
+                text: text,
+                confirmButtonText: t('common.ok')
+            });
+        }
+
+        function updateLoadingSubtitle(topic) {
+            const el = document.getElementById('loadingSubtitleText');
+            if (el) el.textContent = tFormat('test.loadingSubtitle', { topic });
+        }
         // Global variables
         let questions = [];
         let currentQuestionIndex = 0;
@@ -283,6 +313,10 @@
 
         // Initialize test page
         document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof initI18n === 'function') {
+                await initI18n();
+                applyTranslations();
+            }
             await initializeTest();
         });
 
@@ -290,12 +324,7 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Giriş yapmanız gerekiyor!',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {
+                    swalWarning(t('test.loginRequired')).then(() => {
                         window.location.href = '/login';
                     });
                     return;
@@ -312,15 +341,10 @@
 
             } catch (error) {
                 console.error('Test initialization error:', error);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Test başlatılırken hata oluştu!',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {
-                        window.location.href = '/roadmap';
-                    });
-                    return;
+                swalWarning(t('test.initError')).then(() => {
+                    window.location.href = '/roadmap';
+                });
+                return;
             }
         }
 
@@ -334,24 +358,17 @@
                 const topicInput = document.getElementById('topicInput').value.trim();
                 
                 if (!topicInput) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Lütfen bir konu başlığı girin',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {});
+                    swalWarning(t('test.enterTopic'));
                     return;
                 }
 
                 testTopic = topicInput;
                 
-                // Hide topic selection, show loading
                 document.getElementById('topicSelectionSection').style.display = 'none';
                 document.getElementById('loadingSection').style.display = 'block';
-                document.getElementById('loadingTopic').textContent = testTopic;
+                updateLoadingSubtitle(testTopic);
                 
-                // Update UI
-                document.getElementById('testTitle').textContent = `${testTopic} - Test`;
+                document.getElementById('testTitle').textContent = tFormat('test.titleWithTopic', { topic: testTopic });
                 
                 const token = localStorage.getItem('authToken');
                 
@@ -363,36 +380,37 @@
 
             } catch (error) {
                 console.error('Test generation error:', error);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Test oluşturulurken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {});
-                    return;
+                swalWarning(t('test.generateError'));
                 returnToTopicSelection();
             }
         }
 
         async function generateQuestions(token) {
             try {
+                const contentLang = (typeof getLang === 'function' ? getLang() : null)
+                    || localStorage.getItem('lang')
+                    || 'en';
+                console.log('Generating questions with lang:', contentLang);
+
                 const response = await fetch('/api/generate-test-questions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'X-Content-Lang': contentLang,
                     },
                     body: JSON.stringify({
                         topic: testTopic,
                         difficulty: 'medium',
-                        count: 5
+                        count: 5,
+                        lang: contentLang,
                     })
                 });
 
                 const result = await response.json();
                 
                 if (!result.success) {
-                    throw new Error(result.error || 'Sorular oluşturulamadı');
+                    throw new Error(result.error || t('test.questionsError'));
                 }
 
                 questions = result.questions;
@@ -403,7 +421,7 @@
 
             } catch (error) {
                 console.error('Error generating questions:', error);
-                throw new Error('Sorular oluşturulurken hata oluştu: ' + error.message);
+                throw new Error(t('test.generateError') + ': ' + error.message);
             }
         }
 
@@ -460,6 +478,7 @@
             
             // Show question
             document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionText').removeAttribute('data-i18n');
             
             // Show options
             const optionsContainer = document.getElementById('optionsContainer');
@@ -531,13 +550,8 @@
 
             } catch (error) {
                 console.error('Finish test error:', error);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Test tamamlanırken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {});
-                    return;
+                swalWarning(t('test.finishError'));
+                return;
             }
         }
 
@@ -582,8 +596,12 @@
             
             // Reset UI
             document.getElementById('topicInput').value = '';
-            document.getElementById('testTitle').textContent = 'Konu seçin ve test başlayın';
+            document.getElementById('testTitle').textContent = t('test.pageSubtitle');
             document.getElementById('timeRemaining').textContent = '--:--';
+
+            const questionText = document.getElementById('questionText');
+            questionText.setAttribute('data-i18n', 'test.loadingQuestion');
+            questionText.textContent = t('test.loadingQuestion');
         }
 
         function returnToRoadmap() {

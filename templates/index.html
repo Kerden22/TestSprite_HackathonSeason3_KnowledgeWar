@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
     * {
       margin: 0;
@@ -17,7 +17,12 @@
     }
 
     body {
-      font-family: "Orbitron", monospace;
+      font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+      font-size: 1rem;
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       background: radial-gradient(ellipse at top,
           #1e1b4b 0%,
           #0f0f23 50%,
@@ -25,12 +30,22 @@
       overflow-x: hidden;
     }
 
+    h1, h2, h3, h4, h5, h6 {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    p, li, span, a, button {
+      font-family: inherit;
+    }
+
     /* Scroll offset for fixed nav (anchor links / TestSprite) */
     section[id] {
       scroll-margin-top: 6rem;
     }
 
-    /* Animated Background */
+    /* Animated Background — always behind page content */
     .stars {
       position: fixed;
       top: 0;
@@ -38,7 +53,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 1;
+      z-index: 0;
     }
 
     .star {
@@ -68,7 +83,7 @@
       filter: blur(1px);
       animation: float 6s ease-in-out infinite;
       pointer-events: none;
-      z-index: 1;
+      z-index: 0;
     }
 
     .orb-1 {
@@ -127,10 +142,221 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Neon Effects */
+    /* Neon Effects — softer for readability */
     .neon-text {
-      color: #00f5ff;
-      text-shadow: 0 0 5px #00f5ff, 0 0 10px #00f5ff, 0 0 15px #00f5ff;
+      color: #7dd3fc;
+      text-shadow: 0 0 12px rgba(125, 211, 252, 0.28);
+    }
+
+    .hero-glow {
+      text-shadow: 0 0 18px rgba(125, 211, 252, 0.4);
+    }
+
+    .brand-logo {
+      font-weight: 700;
+      font-size: 1.35rem;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      background: linear-gradient(45deg, #00f5ff, #ff00f5, #00ff88, #ffaa00);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: hologramShift 3s ease-in-out infinite;
+    }
+
+    @keyframes hologramShift {
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .brand-logo {
+        font-size: 1.65rem;
+      }
+    }
+
+    /* Readable section titles (less glow, better legibility) */
+    .section-title-readable {
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #f8fafc 0%, #bae6fd 45%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+    }
+
+    .section-subtitle-readable {
+      color: #cbd5e1;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 1.6;
+    }
+
+    .feature-card-title {
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: #f1f5f9;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      text-shadow: none;
+    }
+
+    .feature-card-desc {
+      color: #b8c5d6;
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    #features .gradient-border-inner {
+      background: rgba(10, 15, 30, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links {
+        gap: 1.25rem;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .nav-links {
+        gap: 1.5rem;
+      }
+    }
+
+    .nav-link {
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    @media (min-width: 768px) {
+      .nav-link {
+        font-size: 1.05rem;
+      }
+    }
+
+    .nav-bar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      min-width: 0;
+    }
+
+    @media (min-width: 1024px) {
+      .nav-left {
+        gap: 3.5rem;
+      }
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 768px) {
+      .nav-right {
+        gap: 2.25rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .nav-right {
+        gap: 3rem;
+      }
+    }
+
+    .nav-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .nav-cta-group {
+        gap: 1.5rem;
+      }
+    }
+
+    .nav-auth-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .nav-auth-group {
+        gap: 1.5rem;
+      }
+    }
+
+    .nav-lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 0.25rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .nav-lang-toggle button {
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    /* Fixed nav must stay above all scrolling sections */
+    .main-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 9999;
+      pointer-events: auto;
+      isolation: isolate;
+    }
+
+    /* Global typography — readable weights */
+    .font-black {
+      font-weight: 700;
+    }
+
+    .section-neon-title {
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    section p,
+    section .text-gray-300,
+    section .text-gray-400 {
+      font-weight: 400;
     }
 
     .neon-glow {
@@ -332,64 +558,61 @@
   <div class="floating-orb orb-3"></div>
 
   <!-- Navigation -->
-  <nav class="relative z-20 glass-card border-b border-white/10 fixed w-full top-0">
-    <div class="container mx-auto px-6 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <div class="text-3xl font-black neon-text">KNOWLEDGEWAR</div>
-          <div class="flex items-center space-x-3 md:space-x-8 ml-4 md:ml-12 text-sm md:text-base">
-            <a href="#home" class="text-white hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.home">Home</a>
-            <a href="#how-it-works" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.howItWorks">How it works</a>
+  <nav class="main-nav glass-card border-b border-white/10">
+    <div class="container mx-auto px-6 md:px-8 py-4 md:py-5">
+      <div class="nav-bar-row">
+        <div class="nav-left">
+          <div class="brand-logo">KNOWLEDGEWAR</div>
+          <div class="nav-links text-sm md:text-base">
+            <a href="#home" class="nav-link text-white hover:text-cyan-400 transition-colors" data-i18n="nav.home">Home</a>
+            <a href="#how-it-works" class="nav-link text-gray-300 hover:text-cyan-400 transition-colors" data-i18n="nav.howItWorks">How it works</a>
             <a href="#features" id="navFeaturesLink"
-              class="text-gray-300 hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.features">Features</a>
+              class="nav-link text-gray-300 hover:text-cyan-400 transition-colors" data-i18n="nav.features">Features</a>
             <a href="#tournaments" id="navTournamentsLink"
-              class="hidden text-gray-300 hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.tournaments">Tournaments</a>
+              class="nav-link text-gray-300 hover:text-cyan-400 transition-colors" data-i18n="nav.tournaments">Tournaments</a>
           </div>
         </div>
-        <div class="flex items-center space-x-4">
-          <!-- Turnuva + Yol Haritası: sadece giriş yapmış kullanıcılar -->
-          <div class="flex items-center space-x-4 mr-6">
+        <div class="nav-right">
+          <div class="nav-cta-group">
             <div id="roadmapNavWrapper" class="hidden">
               <button id="roadmapBtn"
-                class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300"
+                class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold py-2 px-5 md:px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300 text-sm md:text-base"
                 data-i18n="nav.roadmapBtn">
                 🗺️ Roadmap
               </button>
             </div>
             <div id="tournamentNavWrapper" class="hidden">
               <button id="tournamentBtn" type="button" data-i18n-aria="nav.tournamentsAria"
-                class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300"
+                class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold py-2 px-5 md:px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300 text-sm md:text-base"
                 data-i18n="nav.tournamentsBtn">
                 ⚔️ Tournaments
               </button>
             </div>
           </div>
 
-          <div id="langToggle" class="flex items-center space-x-1 text-sm mr-2">
-            <button type="button" id="langEn" class="text-cyan-400 font-bold">EN</button>
+          <div id="langToggle" class="nav-lang-toggle text-sm">
+            <button type="button" id="langEn" class="text-cyan-400 font-semibold">EN</button>
             <span class="text-gray-600">|</span>
             <button type="button" id="langTr" class="text-gray-400 hover:text-white font-medium">TR</button>
           </div>
 
-          <div id="authButtons" class="ml-4">
-            <!-- Giriş yapmamış kullanıcılar için -->
-            <div id="guestButtons">
-              <button id="loginBtn" class="me-3 ml-6 text-gray-300 hover:text-white transition-colors font-medium" data-i18n="nav.login">
+          <div id="authButtons">
+            <div id="guestButtons" class="nav-auth-group">
+              <button id="loginBtn" class="text-gray-300 hover:text-white transition-colors font-medium" data-i18n="nav.login">
                 Log in
               </button>
               <button id="registerBtn"
-                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300"
+                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-2 px-5 md:px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300 text-sm md:text-base"
                 data-i18n="nav.register">
                 Sign up
               </button>
             </div>
-            <!-- Giriş yapmış kullanıcılar için -->
-            <div id="userButtons" class="hidden">
+            <div id="userButtons" class="nav-auth-group hidden">
               <button id="profileBtn"
-                class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-2 px-5 md:px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300 text-sm md:text-base">
                 <span id="userName">Profil</span>
               </button>
-              <button id="logoutBtn" class="text-gray-300 hover:text-red-400 transition-colors font-medium ml-6" data-i18n="nav.logout">
+              <button id="logoutBtn" class="text-gray-300 hover:text-red-400 transition-colors font-medium" data-i18n="nav.logout">
                 Log out
               </button>
             </div>
@@ -400,32 +623,31 @@
   </nav>
 
   <!-- Hero Section -->
-  <section id="home" class="relative z-10 min-h-screen flex items-center justify-center pt-20">
+  <section id="home" class="relative z-[1] min-h-screen flex items-center justify-center pt-20">
     <div class="container mx-auto px-6 text-center">
       <div class="slide-in-up">
-        <h1 class="text-5xl md:text-7xl font-black mb-8">
-          <span class="neon-text">AI DESTEKLİ</span><br />
-          <span class="gradient-text">ÖĞRENME PLATFORMU</span>
+        <h1 class="text-5xl md:text-7xl font-bold mb-8">
+          <span class="neon-text hero-glow" data-i18n="home.heroTitleLine1">AI-POWERED</span><br />
+          <span class="gradient-text" data-i18n="home.heroTitleLine2">LEARNING PLATFORM</span>
         </h1>
-        <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-          Öğrenmek istediğin konuyu söyle, yapay zeka BTK Akademi'den en uygun
-          kursları bulup
-          <span class="neon-text">kişiselleştirilmiş yol haritası</span>
-          oluştursun. Sorularla pekiştir, turnuvalarda yarış!
+        <p class="text-lg md:text-xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed font-normal">
+          <span data-i18n="home.heroDescPart1">Tell us what you want to learn. AI finds the best BTK Academy courses and builds a </span>
+          <span class="neon-text" data-i18n="home.heroDescHighlight">personalized roadmap</span>
+          <span data-i18n="home.heroDescPart2">. Practice with questions and compete in tournaments!</span>
         </p>
       </div>
     </div>
   </section>
 
   <!-- How It Works Section -->
-  <section id="how-it-works" class="relative z-10 py-20">
+  <section id="how-it-works" class="relative z-[1] py-20">
     <div class="container mx-auto px-6">
       <div class="text-center mb-20 fade-in">
-        <h2 class="text-5xl md:text-6xl font-black neon-text mb-6">
-          NASIL ÇALIŞIR?
+        <h2 class="text-5xl md:text-6xl section-neon-title neon-text mb-6" data-i18n="home.howTitle">
+          HOW IT WORKS?
         </h2>
-        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-          4 basit adımda kişiselleştirilmiş öğrenme deneyimini başlat
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-i18n="home.howSubtitle">
+          Start your personalized learning journey in 4 simple steps
         </p>
       </div>
 
@@ -437,10 +659,9 @@
               <span class="text-2xl font-black">1</span>
             </div>
             <div class="text-4xl mb-4">🎯</div>
-            <h3 class="text-xl font-bold neon-text mb-4">Hedefini Belirle</h3>
-            <p class="text-gray-300 text-sm">
-              "Python ileri seviye öğrenmek istiyorum" gibi hedefini sisteme
-              gir
+            <h3 class="text-xl font-bold neon-text mb-4" data-i18n="home.step1Title">Set Your Goal</h3>
+            <p class="text-gray-300 text-sm" data-i18n="home.step1Desc">
+              Enter your goal, e.g. "I want to learn advanced Python"
             </p>
           </div>
         </div>
@@ -452,9 +673,9 @@
               <span class="text-2xl font-black">2</span>
             </div>
             <div class="text-4xl mb-4">🤖</div>
-            <h3 class="text-xl font-bold neon-text mb-4">AI Kurs Önerir</h3>
-            <p class="text-gray-300 text-sm">
-              Gemini AI, BTK Akademi'den en uygun kursları bulup sana önerir
+            <h3 class="text-xl font-bold neon-text mb-4" data-i18n="home.step2Title">AI Recommends Courses</h3>
+            <p class="text-gray-300 text-sm" data-i18n="home.step2Desc">
+              Gemini AI finds the best BTK Academy courses for you
             </p>
           </div>
         </div>
@@ -466,9 +687,9 @@
               <span class="text-2xl font-black">3</span>
             </div>
             <div class="text-4xl mb-4">🗺️</div>
-            <h3 class="text-xl font-bold neon-text mb-4">Yol Haritası</h3>
-            <p class="text-gray-300 text-sm">
-              Kişiselleştirilmiş öğrenme yol haritası ve adım adım rehber
+            <h3 class="text-xl font-bold neon-text mb-4" data-i18n="home.step3Title">Roadmap</h3>
+            <p class="text-gray-300 text-sm" data-i18n="home.step3Desc">
+              Personalized learning roadmap with step-by-step guidance
             </p>
           </div>
         </div>
@@ -480,9 +701,9 @@
               <span class="text-2xl font-black">4</span>
             </div>
             <div class="text-4xl mb-4">⚔️</div>
-            <h3 class="text-xl font-bold neon-text mb-4">Yarış ve Kazan</h3>
-            <p class="text-gray-300 text-sm">
-              Sorularla pekiştir, günlük turnuvalarda diğer öğrencilerle yarış
+            <h3 class="text-xl font-bold neon-text mb-4" data-i18n="home.step4Title">Compete and Win</h3>
+            <p class="text-gray-300 text-sm" data-i18n="home.step4Desc">
+              Reinforce with questions and compete in daily tournaments
             </p>
           </div>
         </div>
@@ -491,12 +712,12 @@
   </section>
 
   <!-- Learning Process Details -->
-  <section class="relative z-10 py-20">
+  <section class="relative z-[1] py-20">
     <div class="container mx-auto px-6">
       <div class="glass-card rounded-3xl p-12 neon-glow">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
           <div class="slide-in-left">
-            <h2 class="text-4xl font-black neon-text mb-8">ÖĞRENME SÜRECİ</h2>
+            <h2 class="text-4xl section-neon-title neon-text mb-8" data-i18n="home.processTitle">LEARNING PROCESS</h2>
             <div class="space-y-8">
               <div class="flex items-start space-x-6">
                 <div
@@ -504,12 +725,11 @@
                   <span class="text-lg">📚</span>
                 </div>
                 <div>
-                  <h4 class="text-xl font-bold text-white mb-2">
-                    1. Ders İzle
+                  <h4 class="text-xl font-bold text-white mb-2" data-i18n="home.process1Title">
+                    1. Watch Lessons
                   </h4>
-                  <p class="text-gray-300">
-                    BTK Akademi'den seçilen kaliteli videolarla adım adım
-                    öğren
+                  <p class="text-gray-300" data-i18n="home.process1Desc">
+                    Learn step by step with quality videos from BTK Academy
                   </p>
                 </div>
               </div>
@@ -520,12 +740,11 @@
                   <span class="text-lg">❓</span>
                 </div>
                 <div>
-                  <h4 class="text-xl font-bold text-white mb-2">
-                    2. Soru Çöz
+                  <h4 class="text-xl font-bold text-white mb-2" data-i18n="home.process2Title">
+                    2. Answer Questions
                   </h4>
-                  <p class="text-gray-300">
-                    Dersten sonra konuyu pekiştirmek için özel sorular çöz ve
-                    turnuvalara katıl
+                  <p class="text-gray-300" data-i18n="home.process2Desc">
+                    Solve custom questions after each lesson and join tournaments
                   </p>
                 </div>
               </div>
@@ -536,11 +755,11 @@
                   <span class="text-lg">📊</span>
                 </div>
                 <div>
-                  <h4 class="text-xl font-bold text-white mb-2">
-                    3. İlerlemeni Takip Et
+                  <h4 class="text-xl font-bold text-white mb-2" data-i18n="home.process3Title">
+                    3. Track Progress
                   </h4>
-                  <p class="text-gray-300">
-                    Detaylı analitiklerle hangi konularda güçlü olduğunu gör
+                  <p class="text-gray-300" data-i18n="home.process3Desc">
+                    See your strengths with detailed analytics
                   </p>
                 </div>
               </div>
@@ -551,12 +770,11 @@
                   <span class="text-lg">🎯</span>
                 </div>
                 <div>
-                  <h4 class="text-xl font-bold text-white mb-2">
-                    4. Sıradaki Ders
+                  <h4 class="text-xl font-bold text-white mb-2" data-i18n="home.process4Title">
+                    4. Next Lesson
                   </h4>
-                  <p class="text-gray-300">
-                    Yol haritandaki bir sonraki derse geç ve öğrenmeye devam
-                    et
+                  <p class="text-gray-300" data-i18n="home.process4Desc">
+                    Move to the next lesson on your roadmap and keep learning
                   </p>
                 </div>
               </div>
@@ -568,9 +786,9 @@
                 class="w-full h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl border border-blue-500/30 flex items-center justify-center">
                 <div class="text-center">
                   <div class="text-8xl mb-4">🧠</div>
-                  <h3 class="text-2xl font-bold neon-text">Akıllı Öğrenme</h3>
-                  <p class="text-gray-300 mt-4">
-                    AI destekli kişiselleştirilmiş deneyim
+                  <h3 class="text-2xl font-bold neon-text" data-i18n="home.smartTitle">Smart Learning</h3>
+                  <p class="text-gray-300 mt-4" data-i18n="home.smartDesc">
+                    AI-powered personalized experience
                   </p>
                 </div>
               </div>
@@ -582,29 +800,28 @@
   </section>
 
   <!-- Tournaments Section -->
-  <section id="tournaments" class="relative z-10 py-20">
+  <section id="tournaments" class="relative z-[1] py-20">
     <div class="container mx-auto px-6">
       <div class="text-center mb-20 fade-in">
-        <h2 class="text-5xl md:text-6xl font-black neon-text mb-6">
-          <span class="trophy-float inline-block">🏆</span> TURNUVALAR
+        <h2 class="text-5xl md:text-6xl section-neon-title neon-text mb-6">
+          <span class="trophy-float inline-block">🏆</span> <span data-i18n="home.tournamentsTitle">TOURNAMENTS</span>
         </h2>
-        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-          Her gün düzenlenen turnuvalarda diğer öğrencilerle yarış,
-          sıralamalarda yüksel!
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-i18n="home.tournamentsDesc">
+          Compete with other students in daily tournaments and climb the rankings!
         </p>
       </div>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section id="features" class="relative z-10 py-20" aria-labelledby="features-heading">
+  <section id="features" class="relative z-[1] py-20" aria-labelledby="features-heading">
     <div class="container mx-auto px-6">
       <div class="text-center mb-20 fade-in visible">
-        <h2 id="features-heading" class="text-5xl md:text-6xl font-black neon-text mb-6">
-          ÖZELLİKLER
+        <h2 id="features-heading" class="text-4xl md:text-5xl section-title-readable mb-6" data-i18n="home.featuresTitle">
+          FEATURES
         </h2>
-        <p class="text-xl text-gray-300 max-w-2xl mx-auto">
-          KNOWLEDGEWAR'ı diğer platformlardan ayıran özel özellikler
+        <p class="text-lg md:text-xl section-subtitle-readable max-w-2xl mx-auto" data-i18n="home.featuresSubtitle">
+          What makes KNOWLEDGEWAR different from other platforms
         </p>
       </div>
 
@@ -612,12 +829,11 @@
         <div class="gradient-border hover-lift fade-in">
           <div class="gradient-border-inner p-8">
             <div class="text-6xl mb-6">🤖</div>
-            <h3 class="text-2xl font-bold neon-text mb-4">
-              Gemini AI Entegrasyonu
+            <h3 class="feature-card-title mb-4" data-i18n="home.feat1Title">
+              Gemini AI Integration
             </h3>
-            <p class="text-gray-300 leading-relaxed">
-              Google'ın Gemini AI'sı ile BTK Akademi kurslarından en uygun
-              içerikleri bulur ve önerir.
+            <p class="feature-card-desc" data-i18n="home.feat1Desc">
+              Google Gemini AI finds and recommends the best content from BTK Academy courses.
             </p>
           </div>
         </div>
@@ -625,12 +841,11 @@
         <div class="gradient-border hover-lift fade-in">
           <div class="gradient-border-inner p-8">
             <div class="text-6xl mb-6">🗺️</div>
-            <h3 class="text-2xl font-bold neon-text mb-4">
-              Kişisel Yol Haritası
+            <h3 class="feature-card-title mb-4" data-i18n="home.feat2Title">
+              Personal Roadmap
             </h3>
-            <p class="text-gray-300 leading-relaxed">
-              Seviyene ve hedeflerine göre özel olarak tasarlanmış adım adım
-              öğrenme planı.
+            <p class="feature-card-desc" data-i18n="home.feat2Desc">
+              A step-by-step learning plan tailored to your level and goals.
             </p>
           </div>
         </div>
@@ -638,12 +853,11 @@
         <div class="gradient-border hover-lift fade-in">
           <div class="gradient-border-inner p-8">
             <div class="text-6xl mb-6">❓</div>
-            <h3 class="text-2xl font-bold neon-text mb-4">
-              Akıllı Soru Sistemi
+            <h3 class="feature-card-title mb-4" data-i18n="home.feat3Title">
+              Smart Question System
             </h3>
-            <p class="text-gray-300 leading-relaxed">
-              istediğin zaman konuyu pekiştiren, seviyene uygun otomatik soru
-              üretimi.
+            <p class="feature-card-desc" data-i18n="home.feat3Desc">
+              Auto-generated questions at your level to reinforce topics anytime.
             </p>
           </div>
         </div>
@@ -651,12 +865,11 @@
         <div class="gradient-border hover-lift fade-in">
           <div class="gradient-border-inner p-8">
             <div class="text-6xl mb-6">⚔️</div>
-            <h3 class="text-2xl font-bold neon-text mb-4">
-              Günlük Turnuvalar
+            <h3 class="feature-card-title mb-4" data-i18n="home.feat4Title">
+              Daily Tournaments
             </h3>
-            <p class="text-gray-300 leading-relaxed">
-              Her gün farklı konularda düzenlenen turnuvalarla eğlenceli
-              rekabet ortamı.
+            <p class="feature-card-desc" data-i18n="home.feat4Desc">
+              Fun competitive environment with tournaments on different topics every day.
             </p>
           </div>
         </div>
@@ -664,12 +877,11 @@
         <div class="gradient-border hover-lift fade-in">
           <div class="gradient-border-inner p-8">
             <div class="text-6xl mb-6">📊</div>
-            <h3 class="text-2xl font-bold neon-text mb-4">
-              Detaylı Analitik
+            <h3 class="feature-card-title mb-4" data-i18n="home.feat5Title">
+              Detailed Analytics
             </h3>
-            <p class="text-gray-300 leading-relaxed">
-              İlerleme takibi, güçlü/zayıf yönlerin analizi ve
-              kişiselleştirilmiş öneriler.
+            <p class="feature-card-desc" data-i18n="home.feat5Desc">
+              Progress tracking, strength/weakness analysis, and personalized recommendations.
             </p>
           </div>
         </div>
@@ -677,10 +889,9 @@
         <div class="gradient-border hover-lift fade-in">
           <div class="gradient-border-inner p-8">
             <div class="text-6xl mb-6">🏆</div>
-            <h3 class="text-2xl font-bold neon-text mb-4">Başarı Sistemi</h3>
-            <p class="text-gray-300 leading-relaxed">
-              Rozetler, seviyeler ve liderlik tabloları ile motive edici ödül
-              sistemi.
+            <h3 class="feature-card-title mb-4" data-i18n="home.feat6Title">Achievement System</h3>
+            <p class="feature-card-desc" data-i18n="home.feat6Desc">
+              Motivating rewards with badges, levels, and leaderboards.
             </p>
           </div>
         </div>
@@ -689,33 +900,33 @@
   </section>
 
   <!-- Stats Section -->
-  <section class="relative z-10 py-20">
+  <section class="relative z-[1] py-20">
     <div class="container mx-auto px-6">
       <div class="glass-card rounded-3xl p-12 neon-glow fade-in">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div>
-            <div class="text-4xl md:text-6xl font-black neon-text mb-2">
+            <div class="text-4xl md:text-6xl section-neon-title neon-text mb-2">
               10K+
             </div>
-            <div class="text-gray-400 text-lg">Aktif Öğrenci</div>
+            <div class="text-gray-400 text-lg" data-i18n="home.statStudents">Active Students</div>
           </div>
           <div>
-            <div class="text-4xl md:text-6xl font-black neon-text mb-2">
+            <div class="text-4xl md:text-6xl section-neon-title neon-text mb-2">
               500+
             </div>
-            <div class="text-gray-400 text-lg">BTK Kursu</div>
+            <div class="text-gray-400 text-lg" data-i18n="home.statCourses">BTK Courses</div>
           </div>
           <div>
-            <div class="text-4xl md:text-6xl font-black neon-text mb-2">
+            <div class="text-4xl md:text-6xl section-neon-title neon-text mb-2">
               95%
             </div>
-            <div class="text-gray-400 text-lg">Başarı Oranı</div>
+            <div class="text-gray-400 text-lg" data-i18n="home.statSuccess">Success Rate</div>
           </div>
           <div>
-            <div class="text-4xl md:text-6xl font-black neon-text mb-2">
+            <div class="text-4xl md:text-6xl section-neon-title neon-text mb-2">
               24/7
             </div>
-            <div class="text-gray-400 text-lg">AI Destek</div>
+            <div class="text-gray-400 text-lg" data-i18n="home.statSupport">AI Support</div>
           </div>
         </div>
       </div>
@@ -723,44 +934,41 @@
   </section>
 
   <!-- CTA Section -->
-  <section class="relative z-10 py-20">
+  <section class="relative z-[1] py-20">
     <div class="container mx-auto px-6 text-center">
       <div class="glass-card rounded-3xl p-16 neon-glow fade-in">
-        <h2 class="text-5xl md:text-6xl font-black neon-text mb-8">
-          HEMEN BAŞLA!
+        <h2 class="text-5xl md:text-6xl section-neon-title neon-text mb-8" data-i18n="home.ctaTitle">
+          GET STARTED NOW!
         </h2>
-        <p class="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-          Öğrenmek istediğin konuyu söyle, yapay zeka sana özel yol haritası
-          çizsin. Günlük turnuvalarda yarış ve zirvede yer al!
+        <p class="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto" data-i18n="home.ctaDesc">
+          Tell us what you want to learn. AI draws your custom roadmap. Compete in daily tournaments and reach the top!
         </p>
 
-        <div class="mt-8 text-gray-400 text-sm">
-          ✨ Ücretsiz hesap oluştur • 🚀 Hemen öğrenmeye başla • 🏆
-          Turnuvalara katıl
+        <div class="mt-8 text-gray-400 text-sm" data-i18n="home.ctaBullets">
+          ✨ Create a free account • 🚀 Start learning now • 🏆 Join tournaments
         </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="relative z-10 py-12 border-t border-white/10">
+  <footer class="relative z-[1] py-12 border-t border-white/10">
     <div class="container mx-auto px-6">
       <div class="flex flex-col md:flex-row justify-between items-center">
-        <div class="text-3xl font-black neon-text mb-4 md:mb-0">KNOWLEDGEWAR</div>
+        <div class="text-3xl brand-logo mb-4 md:mb-0">KNOWLEDGEWAR</div>
         <div class="flex space-x-8">
-          <a href="#" class="text-gray-400 hover:text-white transition-colors">Gizlilik</a>
-          <a href="#" class="text-gray-400 hover:text-white transition-colors">Kullanım Şartları</a>
-          <a href="#" class="text-gray-400 hover:text-white transition-colors">Destek</a>
-          <a href="#" class="text-gray-400 hover:text-white transition-colors">İletişim</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="home.footerPrivacy">Privacy</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="home.footerTerms">Terms of Service</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="home.footerSupport">Support</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="home.footerContact">Contact</a>
         </div>
       </div>
       <div class="mt-8 pt-8 border-t border-white/10 text-center text-gray-400">
-        <p>
-          &copy; 2025 KNOWLEDGEWAR. AI Destekli Öğrenme Platformu. Tüm hakları
-          saklıdır.
+        <p data-i18n="home.footerCopyright">
+          © 2025 KNOWLEDGEWAR. AI-Powered Learning Platform. All rights reserved.
         </p>
-        <p class="mt-2 text-sm">
-          BTK Akademi entegrasyonu ile güçlendirilmiştir.
+        <p class="mt-2 text-sm" data-i18n="home.footerPowered">
+          Powered by BTK Academy integration.
         </p>
       </div>
     </div>
@@ -824,14 +1032,14 @@
       });
     });
 
-    // Add some interactive effects
+    // Subtle parallax on orbs (set transform, don't accumulate)
     document.addEventListener("mousemove", (e) => {
       const orbs = document.querySelectorAll(".floating-orb");
       orbs.forEach((orb, index) => {
-        const speed = (index + 1) * 0.0001;
-        const x = e.clientX * speed;
-        const y = e.clientY * speed;
-        orb.style.transform += ` translate(${x}px, ${y}px)`;
+        const speed = (index + 1) * 0.02;
+        const x = (e.clientX - window.innerWidth / 2) * speed * 0.01;
+        const y = (e.clientY - window.innerHeight / 2) * speed * 0.01;
+        orb.style.transform = `translate(${x}px, ${y}px)`;
       });
     });
 
@@ -845,7 +1053,6 @@
       const userName = document.getElementById("userName");
       const roadmapNavWrapper = document.getElementById("roadmapNavWrapper");
       const tournamentNavWrapper = document.getElementById("tournamentNavWrapper");
-      const navTournamentsLink = document.getElementById("navTournamentsLink");
 
       if (token && userData) {
         const user = JSON.parse(userData);
@@ -853,14 +1060,12 @@
         userButtons.classList.remove("hidden");
         roadmapNavWrapper.classList.remove("hidden");
         tournamentNavWrapper.classList.remove("hidden");
-        navTournamentsLink.classList.remove("hidden");
         userName.textContent = user.first_name || (typeof t === "function" ? t("nav.profile") : "Profile");
       } else {
         guestButtons.classList.remove("hidden");
         userButtons.classList.add("hidden");
         roadmapNavWrapper.classList.add("hidden");
         tournamentNavWrapper.classList.add("hidden");
-        navTournamentsLink.classList.add("hidden");
       }
     }
 

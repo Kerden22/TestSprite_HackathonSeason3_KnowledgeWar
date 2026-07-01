@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KNOWLEDGEWAR - Yol Haritası</title>
+    <title>KNOWLEDGEWAR - Roadmap</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -691,10 +691,37 @@
         .galactic-path {
             z-index: 1 !important;
         }
+
+        /* Footer always pinned to viewport bottom */
+        .roadmap-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            background: rgba(0, 2, 18, 0.92);
+            backdrop-filter: blur(16px);
+        }
+
+        .roadmap-main {
+            padding-bottom: 6rem;
+            min-height: calc(100vh - 5rem);
+        }
+
+        .nav-lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .nav-lang-toggle button {
+            cursor: pointer;
+        }
     </style>
 </head>
 
-<body class="min-h-screen text-white">
+<body class="min-h-screen text-white" data-i18n-page-title="meta.roadmapTitle">
     <!-- Cosmic Background -->
     <div class="cosmic-bg">
         <div class="star-field" id="starField"></div>
@@ -719,23 +746,27 @@
                     <a href="/" class="text-2xl font-bold hologram-text hover:text-cosmic-green transition-colors">KNOWLEDGEWAR</a>
                     <div class="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-white/30 to-transparent">
                     </div>
-                    <div class="text-lg font-medium text-gray-300">Galaktik Öğrenme Yolu</div>
+                    <div class="text-lg font-medium text-gray-300" data-i18n="roadmap.headerSubtitle">Galactic Learning Path</div>
                 </div>
 
 
 
                 <!-- Sağ Taraf - Butonlar ve Profil -->
                 <div class="flex items-center space-x-4">
-
+                    <div id="langToggle" class="nav-lang-toggle text-sm">
+                        <button type="button" id="langEn" class="text-cyan-400 font-semibold">EN</button>
+                        <span class="text-gray-600">|</span>
+                        <button type="button" id="langTr" class="text-gray-400 hover:text-white font-medium">TR</button>
+                    </div>
 
                     <!-- Turnuvalar Butonu -->
-                    <a href="/tournament" id="tournamentBtn" class="cosmic-btn text-base px-6 py-2.5">
-                        🏆 Turnuvalar
+                    <a href="/tournament" id="tournamentBtn" class="cosmic-btn text-base px-6 py-2.5" data-i18n="roadmap.tournamentsBtn">
+                        🏆 Tournaments
                     </a>
 
                     <!-- Profil Butonu -->
-                    <a href="/profile" class="cosmic-btn text-base px-6 py-2.5">
-                        👤 Profil
+                    <a href="/profile" class="cosmic-btn text-base px-6 py-2.5" data-i18n="roadmap.profileBtn">
+                        👤 Profile
                     </a>
 
                     <!-- Ana Buton -->
@@ -750,29 +781,29 @@
     </header>
 
     <!-- Main Content -->
-    <div class="relative z-10 container mx-auto px-6 py-12">
+    <div class="roadmap-main relative z-10 container mx-auto px-6 py-12">
         <!-- Course Header -->
         <div class="text-center mb-16 fade-in-cosmic">
             <p class="text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                 <span class="neon-text">Yapay Zeka</span> tarafından sizin için özel olarak tasarlanmış
-                <span class="text-cosmic-green">kişiselleştirilmiş öğrenme yolu</span>
+                 <span class="neon-text" data-i18n="roadmap.introAi">Artificial Intelligence</span><span data-i18n="roadmap.introPart1"> has designed a </span>
+                <span class="text-cosmic-green" data-i18n="roadmap.introHighlight">personalized learning path</span><span data-i18n="roadmap.introPart2"> just for you</span>
             </p>
 
             <!-- Öğren Butonu -->
             <div class="mb-12">
                 <div class="text-center">
-                    <a href="/learn" id="mainLearnBtn" class="inline-block cosmic-btn text-2xl px-16 py-6 pulse-btn">
-                        🚀 ÖĞRENMEYE BAŞLA
+                    <a href="/learn" id="mainLearnBtn" class="inline-block cosmic-btn text-2xl px-16 py-6 pulse-btn" data-i18n="roadmap.startLearning">
+                        🚀 START LEARNING
                     </a>
                 </div>
-                <p class="text-gray-400 mt-4 font-mono text-center">4 soru ile kişisel yol haritanı oluştur</p>
+                <p class="text-gray-400 mt-4 font-mono text-center" data-i18n="roadmap.createHint">Create your personal roadmap with 4 questions</p>
                 
                 <!-- Test Çöz Butonu -->
                 <div class="text-center mt-6">
                     <a href="/test" id="testButton" class="inline-block cosmic-btn text-lg px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 hover:shadow-lg">
                         <span class="flex items-center gap-2">
                             <span class="text-xl">📝</span>
-                            <span>Test Çöz</span>
+                            <span data-i18n="roadmap.takeTest">Take a Test</span>
                         </span>
                     </a>
                 </div>
@@ -781,15 +812,15 @@
             <!-- Cosmic Progress -->
             <div class="max-w-3xl mx-auto" id="progressSection" style="display: none;">
                 <div class="flex justify-between text-lg mb-4">
-                    <span class="font-mono">Galaktik İlerleme</span>
-                    <span class="neon-text font-bold font-mono" id="progressText">0/1 Seviye Tamamlandı</span>
+                    <span class="font-mono" data-i18n="roadmap.galacticProgress">Galactic Progress</span>
+                    <span class="neon-text font-bold font-mono" id="progressText">0/1 Levels Completed</span>
                 </div>
                 <div class="cosmic-progress">
                     <div class="cosmic-progress-fill" id="progressFill" style="width: 0%"></div>
                 </div>
                 <div class="flex justify-between text-sm text-gray-400 mt-2 font-mono">
-                    <span>Başlangıç Seviyesi</span>
-                    <span>Uzman Seviyesi</span>
+                    <span data-i18n="roadmap.levelBeginner">Beginner Level</span>
+                    <span data-i18n="roadmap.levelExpert">Expert Level</span>
                 </div>
             </div>
         </div>
@@ -807,20 +838,20 @@
                             <div class="step-node step-icon">
                                 <span>🎬</span>
                             </div>
-                            <h3 class="text-xl font-bold mb-3 step-title text-cosmic-green">Başlık</h3>
+                            <h3 class="text-xl font-bold mb-3 step-title text-cosmic-green">Title</h3>
                             <p class="text-gray-300 mb-4 leading-relaxed text-sm step-description">
-                                Açıklama
+                                Description
                             </p>
                             <div class="text-center space-y-2">
                                 <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                                    <a href="#" target="_blank" class="cosmic-btn text-base px-6 py-2 inline-block step-button">
-                                        🚀 Bölüme Git
+                                    <a href="#" target="_blank" class="cosmic-btn text-base px-6 py-2 inline-block step-button" data-i18n="roadmap.goToSection">
+                                        🚀 Go to Section
                                     </a>
                                     <button class="cosmic-btn text-base px-6 py-2 inline-block step-complete-btn transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                             style="background: linear-gradient(45deg, #00ff88, #00cc66); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);">
                                         <span class="flex items-center gap-2">
                                             <span class="text-lg">✅</span>
-                                            <span>Tamamlandı</span>
+                                            <span class="step-complete-label" data-i18n="roadmap.completed">Completed</span>
                                         </span>
                                     </button>
                                 </div>
@@ -835,10 +866,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="relative z-20 glass-card-strong border-t border-white/20 mt-20">
-        <div class="container mx-auto px-6 py-8">
+    <footer class="roadmap-footer glass-card-strong border-t border-white/20">
+        <div class="container mx-auto px-6 py-4">
             <div class="flex flex-col md:flex-row items-center justify-between">
-                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                <div class="flex items-center space-x-4">
                     <div class="text-2xl font-bold hologram-text">KNOWLEDGEWAR</div>
                 </div>
             </div>
@@ -848,7 +879,29 @@
 
 
 
+    <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script>
+        function roadmapBtnLabel(icon, key) {
+            return `<span class="flex items-center gap-2"><span class="text-lg">${icon}</span><span>${t(key)}</span></span>`;
+        }
+
+        function roadmapBtnText(key) {
+            return t(key);
+        }
+
+        function isGenericBtkLink(link) {
+            if (!link || link === '#') return true;
+            const normalized = link.replace(/\/$/, '').toLowerCase();
+            return normalized.endsWith('/portal') || (!normalized.includes('/course/') && !normalized.includes('/egitim/'));
+        }
+
+        function resolveStepLink(step, courseLink) {
+            const candidates = [step.link, courseLink].filter(Boolean);
+            for (const link of candidates) {
+                if (!isGenericBtkLink(link)) return link;
+            }
+            return candidates[0] || '#';
+        }
         // Initialize cosmic background effects
         function createStarField() {
             const starField = document.getElementById('starField');
@@ -919,7 +972,12 @@
         }
 
         // Initialize everything when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof initI18n === 'function') {
+                await initI18n();
+                applyTranslations();
+            }
+
             createStarField();
             createParticleSystem();
             initScrollAnimations();
@@ -977,7 +1035,10 @@
                     const totalCourses = result.courses.length;
                     const completedCourses = 0; // For now, all courses are pending
 
-                    document.getElementById('progressText').textContent = `${completedCourses}/${totalCourses} Seviye Tamamlandı`;
+                    document.getElementById('progressText').textContent = tFormat('roadmap.progressLevels', {
+                        completed: completedCourses,
+                        total: totalCourses
+                    });
                     document.getElementById('progressFill').style.width = `${(completedCourses / totalCourses) * 100}%`;
 
                     // Update roadmap content
@@ -1088,7 +1149,7 @@
                         // Proje kartı için özel butonlar
                         btn.style.display = '';
                         btn.href = '#';
-                        btn.innerHTML = '🎯 Öğrenmeyi Bitir';
+                        btn.innerHTML = roadmapBtnText('roadmap.finishLearning');
                         btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a24)';
                         btn.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.3)';
                         btn.onclick = function(event) {
@@ -1097,27 +1158,17 @@
                         };
                         
                         if (step.status === 'locked') {
-                            completeBtn.innerHTML = '🔒 Önceki Bölümleri Tamamlayın';
+                            completeBtn.innerHTML = roadmapBtnText('roadmap.completePrevious');
                             completeBtn.classList.add('opacity-50', 'cursor-not-allowed');
                             completeBtn.disabled = true;
                         } else if (step.status === 'completed') {
-                            completeBtn.innerHTML = `
-                                <span class="flex items-center gap-2">
-                                    <span class="text-lg">🎉</span>
-                                    <span>Proje Tamamlandı!</span>
-                                </span>
-                            `;
+                            completeBtn.innerHTML = roadmapBtnLabel('🎉', 'roadmap.projectCompleted');
                             completeBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
                             completeBtn.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.3)';
                             completeBtn.classList.add('opacity-75', 'cursor-not-allowed');
                             completeBtn.disabled = true;
                         } else {
-                            completeBtn.innerHTML = `
-                                <span class="flex items-center gap-2">
-                                    <span class="text-lg">✅</span>
-                                    <span>Projeyi Tamamla</span>
-                                </span>
-                            `;
+                            completeBtn.innerHTML = roadmapBtnLabel('✅', 'roadmap.completeProject');
                             completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                             completeBtn.disabled = false;
                         }
@@ -1125,33 +1176,23 @@
                         // Normal kartlar için mevcut butonlar
                         if (step.status === 'locked') {
                             btn.style.display = 'none';
-                            completeBtn.innerHTML = '🔒 Kilitli';
+                            completeBtn.innerHTML = roadmapBtnText('roadmap.locked');
                             completeBtn.classList.add('opacity-50', 'cursor-not-allowed');
                             completeBtn.disabled = true;
                         } else if (step.status === 'completed') {
                             btn.style.display = '';
-                            btn.href = step.link || '#';
-                            btn.innerHTML = '🚀 Bölüme Git';
-                            completeBtn.innerHTML = `
-                                <span class="flex items-center gap-2">
-                                    <span class="text-lg">🎉</span>
-                                    <span>Tamamlandı!</span>
-                                </span>
-                            `;
+                            btn.href = resolveStepLink(step, course.link);
+                            btn.innerHTML = roadmapBtnText('roadmap.goToSection');
+                            completeBtn.innerHTML = roadmapBtnLabel('🎉', 'roadmap.completedExclaim');
                             completeBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
                             completeBtn.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.3)';
                             completeBtn.classList.add('opacity-75', 'cursor-not-allowed');
                             completeBtn.disabled = true;
                         } else {
                             btn.style.display = '';
-                            btn.href = step.link || '#';
-                            btn.innerHTML = '🚀 Bölüme Git';
-                            completeBtn.innerHTML = `
-                                <span class="flex items-center gap-2">
-                                    <span class="text-lg">✅</span>
-                                    <span>Tamamlandı</span>
-                                </span>
-                            `;
+                            btn.href = resolveStepLink(step, course.link);
+                            btn.innerHTML = roadmapBtnText('roadmap.goToSection');
+                            completeBtn.innerHTML = roadmapBtnLabel('✅', 'roadmap.completed');
                             completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                             completeBtn.disabled = false;
                         }
@@ -1164,13 +1205,8 @@
                             completeProject();
                         } else {
                             // Normal kartlar için mevcut mantık
-                            const clickedButton = event.target;
-                            clickedButton.innerHTML = `
-                                <span class="flex items-center gap-2">
-                                    <span class="text-xl animate-pulse">🎉</span>
-                                    <span>Tamamlandı!</span>
-                                </span>
-                            `;
+                            const clickedButton = event.target.closest('.step-complete-btn') || event.target;
+                            clickedButton.innerHTML = roadmapBtnLabel('🎉', 'roadmap.completedExclaim');
                             clickedButton.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
                             clickedButton.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.5)';
                             clickedButton.style.transform = 'scale(1.05)';
@@ -1187,7 +1223,10 @@
                 // İlerleme durumunu güncelle
                 const totalSteps = course.roadmap_steps.length;
                 const completedSteps = course.roadmap_steps.filter(step => step.status === 'completed').length;
-                document.getElementById('progressText').textContent = `${completedSteps}/${totalSteps} Bölüm Tamamlandı`;
+                document.getElementById('progressText').textContent = tFormat('roadmap.progressSections', {
+                    completed: completedSteps,
+                    total: totalSteps
+                });
                 document.getElementById('progressFill').style.width = `${(completedSteps / totalSteps) * 100}%`;
                 document.getElementById('overallProgress').textContent = `${Math.round((completedSteps / totalSteps) * 100)}%`;
                 
@@ -1239,18 +1278,18 @@
                     });
                     
                     if (response.ok) {
-                        showNotification('İlerleme kaydedildi!', 'success');
+                        showNotification(t('roadmap.progressSaved'), 'success');
                     } else {
-                        showNotification('İlerleme kaydedilemedi!', 'error');
+                        showNotification(t('roadmap.progressSaveFailed'), 'error');
                     }
                 }
                 
                 // Kullanıcıya bildirim göster
                 const isProject = steps[stepIndex] && ['🚀', '💻', '🎮', '📊', '🌐', '🤖', '📱', '🎨'].includes(steps[stepIndex].icon);
                 if (isProject) {
-                    showNotification('Proje tamamlandı! Tebrikler! 🎉', 'success');
+                    showNotification(t('roadmap.projectDoneCongrats'), 'success');
                 } else {
-                    showNotification('Bölüm tamamlandı! Bir sonraki bölüm açıldı.', 'success');
+                    showNotification(t('roadmap.sectionDoneNext'), 'success');
                 }
                 
                 // Kısa bir gecikme ile kartları güncelle
@@ -1260,7 +1299,7 @@
                 
             } catch (error) {
                 console.error('Error completing step:', error);
-                showNotification('Bir hata oluştu!', 'error');
+                showNotification(t('roadmap.errorGeneric'), 'error');
             }
         }
 
@@ -1269,7 +1308,7 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    showNotification('Giriş yapmanız gerekiyor!', 'error');
+                    showNotification(t('roadmap.loginRequired'), 'error');
                     return;
                 }
 
@@ -1284,7 +1323,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    showNotification('🎉 Tebrikler! Öğrenme süreciniz tamamlandı!', 'success');
+                    showNotification(t('roadmap.courseCompleteCongrats'), 'success');
                     
                     // 2 saniye sonra sayfayı yenile (sıfırla)
                     setTimeout(() => {
@@ -1292,11 +1331,11 @@
                     }, 2000);
                 } else {
                     const error = await response.json();
-                    showNotification(error.error || 'Bir hata oluştu!', 'error');
+                    showNotification(error.error || t('roadmap.errorGeneric'), 'error');
                 }
             } catch (error) {
                 console.error('Proje tamamlama hatası:', error);
-                showNotification('Bir hata oluştu!', 'error');
+                showNotification(t('roadmap.errorGeneric'), 'error');
             }
         }
 

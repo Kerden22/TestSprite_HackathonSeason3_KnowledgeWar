@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KNOWLEDGEWAR - Turnuvalar</title>
+    <title>KNOWLEDGEWAR - Tournaments</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -165,29 +165,62 @@
         .text-danger { color: #ef4444; }
         .text-purple { color: #8b5cf6; }
         .text-cyan { color: #06b6d4; }
+
+        .nav-lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            position: relative;
+            z-index: 10001;
+            flex-shrink: 0;
+        }
+        .nav-lang-toggle button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            position: relative;
+            z-index: 10001;
+            pointer-events: auto;
+        }
+
+        .tournament-nav {
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+            isolation: isolate;
+            pointer-events: auto;
+        }
     </style>
 </head>
 
-<body class="min-h-screen">
+<body class="min-h-screen" data-i18n-page-title="meta.tournamentTitle">
     <!-- Cosmic Background -->
     <div class="cosmic-bg">
         <div class="star-field" id="starField"></div>
     </div>
 
     <!-- Header -->
-    <header class="relative z-20 glass-card-strong border-b border-white/20">
-        <div class="container mx-auto px-6 py-6">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-6">
-                    <a href="/" class="text-3xl font-bold hover:text-blue-400 transition-colors cursor-pointer">⚔️ KNOWLEDGEWAR</a>
+    <header class="tournament-nav glass-card-strong border-b border-white/20">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+                <div class="flex items-center space-x-6 flex-shrink-0">
+                    <a href="/" class="text-2xl md:text-3xl font-bold hover:text-blue-400 transition-colors cursor-pointer">⚔️ KNOWLEDGEWAR</a>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors">
-                        🗺️ Yol Haritası
+                <div class="flex items-center flex-wrap gap-4 md:gap-6 ml-auto">
+                    <div id="langToggle" class="nav-lang-toggle text-sm" role="group" aria-label="Language">
+                        <button type="button" id="langEn" class="text-cyan-400 font-semibold">EN</button>
+                        <span class="text-gray-500">|</span>
+                        <button type="button" id="langTr" class="text-gray-400 hover:text-white font-medium">TR</button>
+                    </div>
+                    <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors whitespace-nowrap" data-i18n="tournament.roadmapLink">
+                        🗺️ Roadmap
                     </a>
-                    <a href="/profile" class="text-gray-300 hover:text-white transition-colors">
-                        👤 Profil
+                    <a href="/profile" class="text-gray-300 hover:text-white transition-colors whitespace-nowrap" data-i18n="tournament.profileLink">
+                        👤 Profile
                     </a>
+                </div>
             </div>
         </div>
     </header>
@@ -196,8 +229,8 @@
     <div class="relative z-10 container mx-auto px-6 py-8">
         <!-- Tournament Header -->
         <div class="text-center mb-12 fade-in-cosmic">
-            <h1 class="text-5xl md:text-7xl font-bold mb-4">
-                Turnuva
+            <h1 class="text-5xl md:text-7xl font-bold mb-4" data-i18n="tournament.pageHeading">
+                Tournament
             </h1>
         </div>
 
@@ -206,22 +239,22 @@
             <div class="flex items-center justify-center space-x-8 flex-wrap">
                 <div class="text-center">
                     <div class="text-5xl font-bold font-mono text-accent" id="hours">14</div>
-                    <div class="text-sm text-gray-400 uppercase tracking-wider">Saat</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider" data-i18n="tournament.hours">Hours</div>
                 </div>
                 <div class="text-4xl text-gray-500">:</div>
                 <div class="text-center">
                     <div class="text-5xl font-bold font-mono text-accent" id="minutes">32</div>
-                    <div class="text-sm text-gray-400 uppercase tracking-wider">Dakika</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider" data-i18n="tournament.minutes">Minutes</div>
                 </div>
                 <div class="text-4xl text-gray-500">:</div>
                 <div class="text-center">
                     <div class="text-5xl font-bold font-mono text-accent" id="seconds">18</div>
-                    <div class="text-sm text-gray-400 uppercase tracking-wider">Saniye</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider" data-i18n="tournament.seconds">Seconds</div>
                 </div>
             </div>
             <div class="text-center mt-6">
-                <div class="text-lg text-gray-300">🔥 Bugünkü turnuva bitimine kalan süre</div>
-                <div class="text-sm text-gray-400 mt-2">Katılım için son dakikalar!</div>
+                <div class="text-lg text-gray-300" id="countdownTitle" data-i18n="tournament.countdownEndsToday">🔥 Time left until today's tournament ends</div>
+                <div class="text-sm text-gray-400 mt-2" id="countdownSubtitle" data-i18n="tournament.countdownLastChance">Last chance to join!</div>
             </div>
         </div>
 
@@ -231,49 +264,27 @@
             <div class="lg:col-span-2">
                 <div class="tournament-card rounded-3xl p-8 mb-8 fade-in-cosmic">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-3xl font-bold">🎯 Bugünkü Savaş Alanı</h2>
+                        <h2 class="text-3xl font-bold" data-i18n="tournament.todayBattlefield">🎯 Today's Battlefield</h2>
                     </div>
                     
-                    <div class="glass-card p-6 mb-6">
-                        <div class="flex items-center space-x-4 mb-4">
-                            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 flex items-center justify-center text-2xl">
-                                🧬
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold">Data Structures Mastery</h3>
-                                <p class="text-gray-400">Lists, Dictionaries, Sets ve Tuples ile algoritma çözümleri</p>
-                            </div>
+                    <div class="glass-card p-6 mb-6" id="tournamentChallengeCard">
+                        <div class="text-center py-8 text-gray-400" id="tournamentChallengeLoading">
+                            <div class="text-3xl mb-4">⚔️</div>
+                            <div class="text-lg font-bold mb-2" data-i18n="tournament.challengeLoading">Loading tournament...</div>
+                            <div class="text-sm" data-i18n="tournament.challengeLoadingHint">Please wait</div>
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div class="glass-card p-3 text-center">
-                                <div class="text-sm text-gray-400">Sorular</div>
-                                <div class="text-xl font-bold text-cyan" id="tournamentQuestionCount">-</div>
-                            </div>
-                            <div class="glass-card p-3 text-center">
-                                <div class="text-sm text-gray-400">Süre</div>
-                                <div class="text-xl font-bold text-success" id="tournamentDuration">- dk</div>
-                            </div>
-                        </div>
-                        
-                        <button class="battle-btn w-full mb-4" onclick="joinTournament()" id="joinTournamentBtn">
-                            ⚔️ Savaşa Katıl!
-                        </button>
-                        
-
                     </div>
                 </div>
 
                 <!-- Weekly Calendar -->
                 <div class="tournament-card rounded-3xl p-8 fade-in-cosmic">
-                    <h3 class="text-2xl font-bold mb-6">📅 Haftalık Kazanan Listesi</h3>
+                    <h3 class="text-2xl font-bold mb-6" data-i18n="tournament.weeklyWinners">📅 Weekly Winners</h3>
                     
                     <div id="weeklyCalendarContainer" class="grid grid-cols-7 gap-2">
-                        <!-- Haftalık takvim verileri buraya yüklenecek -->
                         <div class="text-center text-gray-400 py-8 col-span-7">
                             <div class="text-3xl mb-4">📅</div>
-                            <div class="text-lg font-bold mb-2">Takvim Yükleniyor...</div>
-                            <div class="text-sm">Lütfen bekleyin</div>
+                            <div class="text-lg font-bold mb-2" data-i18n="tournament.calendarLoading">Loading Calendar...</div>
+                            <div class="text-sm" data-i18n="tournament.pleaseWait">Please wait</div>
                         </div>
                     </div>
                     
@@ -286,16 +297,15 @@
                 <!-- Live Leaderboard -->
                 <div class="tournament-card rounded-3xl p-6 fade-in-cosmic">
                     <h3 class="text-xl font-bold mb-6 flex items-center">
-                        🏆 Canlı Sıralama
+                        <span data-i18n="tournament.liveLeaderboard">🏆 Live Leaderboard</span>
                         <span class="ml-2 w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
                     </h3>
                     
                     <div id="leaderboardContainer" class="space-y-3">
-                        <!-- Sıralama verileri buraya yüklenecek -->
                         <div class="text-center text-gray-400 py-8">
                             <div class="text-3xl mb-4">🏆</div>
-                            <div class="text-lg font-bold mb-2">Sıralama Yükleniyor...</div>
-                            <div class="text-sm">Lütfen bekleyin</div>
+                            <div class="text-lg font-bold mb-2" data-i18n="tournament.leaderboardLoading">Loading Leaderboard...</div>
+                            <div class="text-sm" data-i18n="tournament.pleaseWait">Please wait</div>
                         </div>
                     </div>
                     
@@ -303,15 +313,14 @@
                 </div>
 
                 <!-- Tournament Stats -->
-                <div class="tournament-card rounded-3xl p-6 fade-in-cosmic">
-                    <h3 class="text-xl font-bold mb-6">📈 Turnuva İstatistikleri</h3>
+                <div class="tournament-card rounded-3xl p-6 fade-in-cosmic" id="tournamentStatsCard">
+                    <h3 class="text-xl font-bold mb-6" data-i18n="tournament.tournamentStats">📈 Tournament Statistics</h3>
                     
                     <div id="tournamentStatsContainer" class="space-y-4">
-                        <!-- İstatistikler buraya yüklenecek -->
                         <div class="text-center text-gray-400 py-8">
                             <div class="text-3xl mb-4">📊</div>
-                            <div class="text-lg font-bold mb-2">İstatistikler Yükleniyor...</div>
-                            <div class="text-sm">Lütfen bekleyin</div>
+                            <div class="text-lg font-bold mb-2" data-i18n="tournament.statsLoading">Loading Statistics...</div>
+                            <div class="text-sm" data-i18n="tournament.pleaseWait">Please wait</div>
                         </div>
                     </div>
                 </div>
@@ -321,18 +330,16 @@
         </div>
 
         <!-- Tournament Results Section -->
-        <div id="tournamentResultsSection" class="mt-12 fade-in-cosmic">
+        <div id="tournamentResultsSection" class="mt-12 fade-in-cosmic hidden">
             <div class="tournament-card rounded-3xl p-8">
-                <h2 class="text-3xl font-bold mb-8 text-center">🏆 TURNUVA SONUÇLARI</h2>
+                <h2 class="text-3xl font-bold mb-8 text-center" data-i18n="tournament.resultsTitle">🏆 TOURNAMENT RESULTS</h2>
                 
-                <!-- Current Tournament Results -->
-                <div id="currentTournamentResults" class="mb-8">
-                    <!-- Results will be loaded here -->
-                </div>
+                <div id="currentTournamentResults" class="mb-8"></div>
+                <div id="performanceDetails" class="mb-8 hidden"></div>
 
                 <!-- Leaderboard -->
                 <div id="tournamentLeaderboard" class="mb-8">
-                    <h3 class="text-2xl font-bold mb-6 text-center">📊 Sıralama</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-center" data-i18n="tournament.rankingTitle">📊 Rankings</h3>
                     <div id="leaderboardTable" class="glass-card rounded-2xl p-6">
                         <!-- Leaderboard will be loaded here -->
                     </div>
@@ -351,19 +358,19 @@
             <button id="closeQuizModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" onclick="closeQuizModal()">&times;</button>
             
             <div class="text-center mb-8">
-                <h3 class="text-3xl font-bold">⚔️ TURNUVA BAŞLADI!</h3>
+                <h3 class="text-3xl font-bold" data-i18n="tournament.quizStarted">⚔️ TOURNAMENT STARTED!</h3>
                 <p class="text-gray-400" id="tournamentTitle">Data Structures Mastery Challenge</p>
                 <div class="mt-4 flex items-center justify-center space-x-4">
                     <div class="glass-card px-4 py-2">
-                        <div class="text-sm text-gray-400">Soru</div>
+                        <div class="text-sm text-gray-400" data-i18n="tournament.question">Question</div>
                         <div class="text-xl font-bold text-cyan" id="currentQuestion">1/5</div>
                     </div>
                     <div class="glass-card px-4 py-2">
-                        <div class="text-sm text-gray-400">Süre</div>
+                        <div class="text-sm text-gray-400" data-i18n="tournament.time">Time</div>
                         <div class="text-xl font-bold text-warning" id="quizTimer">45:00</div>
                     </div>
                     <div class="glass-card px-4 py-2">
-                        <div class="text-sm text-gray-400">Skor</div>
+                        <div class="text-sm text-gray-400" data-i18n="tournament.score">Score</div>
                         <div class="text-xl font-bold text-success" id="quizScore">0</div>
                     </div>
                 </div>
@@ -374,18 +381,32 @@
             </div>
             
             <div class="text-center mt-8">
-                <button id="nextQuestionBtn" class="battle-btn text-xl px-12 py-4 hidden" onclick="nextQuestion()">
-                    Sonraki Soru →
+                <button id="nextQuestionBtn" class="battle-btn text-xl px-12 py-4 hidden" onclick="nextQuestion()" data-i18n="tournament.nextQuestion">
+                    Next Question →
                 </button>
-                <button id="finishQuizBtn" class="battle-btn text-xl px-12 py-4 hidden" onclick="finishQuiz()">
-                    Turnuvayı Bitir 🏆
+                <button id="finishQuizBtn" class="battle-btn text-xl px-12 py-4 hidden" onclick="finishQuiz()" data-i18n="tournament.finishTournament">
+                    Finish Tournament 🏆
                 </button>
             </div>
         </div>
     </div>
 
 
+    <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script>
+        function swalWarning(text) {
+            return Swal.fire({
+                icon: 'warning',
+                title: t('common.warning'),
+                text: text,
+                confirmButtonText: t('common.ok')
+            });
+        }
+
+        function formatDuration(minutes) {
+            return tFormat('tournament.durationUnit', { n: minutes || 45 });
+        }
+
         function createStarField() {
             const starField = document.getElementById('starField');
             const starCount = 100;
@@ -403,8 +424,8 @@
             const hoursEl = document.getElementById('hours');
             const minutesEl = document.getElementById('minutes');
             const secondsEl = document.getElementById('seconds');
-            const countdownTitleEl = document.querySelector('.text-lg.text-gray-300');
-            const countdownSubtitleEl = document.querySelector('.text-sm.text-gray-400.mt-2');
+            const countdownTitleEl = document.getElementById('countdownTitle');
+            const countdownSubtitleEl = document.getElementById('countdownSubtitle');
             
             try {
                 // Aktif turnuvayı al
@@ -418,12 +439,11 @@
                 const result = await response.json();
                 
                 if (!result.success || result.tournaments.length === 0) {
-                    // Turnuva yoksa varsayılan değerler
                     hoursEl.textContent = '00';
                     minutesEl.textContent = '00';
                     secondsEl.textContent = '00';
-                    countdownTitleEl.textContent = '🔥 Aktif turnuva bulunmuyor';
-                    countdownSubtitleEl.textContent = 'Admin panelinden turnuva oluşturun';
+                    countdownTitleEl.textContent = t('tournament.countdownNoActive');
+                    countdownSubtitleEl.textContent = t('tournament.countdownCreateAdmin');
                     return;
                 }
                 
@@ -436,24 +456,21 @@
                 let isCountingToStart = false;
                 
                 if (currentTime < startTime) {
-                    // Turnuva henüz başlamadı, başlangıç zamanına geri say
                     targetTime = startTime;
                     isCountingToStart = true;
-                    countdownTitleEl.textContent = '🔥 Turnuvanın başlamasına kalan süre';
-                    countdownSubtitleEl.textContent = 'Turnuva henüz başlamadı!';
+                    countdownTitleEl.textContent = t('tournament.countdownStartsIn');
+                    countdownSubtitleEl.textContent = t('tournament.countdownNotStarted');
                 } else if (currentTime >= startTime && currentTime <= endTime) {
-                    // Turnuva aktif, bitiş zamanına geri say
                     targetTime = endTime;
                     isCountingToStart = false;
-                    countdownTitleEl.textContent = '🔥 Bugünkü turnuva bitimine kalan süre';
-                    countdownSubtitleEl.textContent = 'Katılım için son dakikalar!';
+                    countdownTitleEl.textContent = t('tournament.countdownEndsToday');
+                    countdownSubtitleEl.textContent = t('tournament.countdownLastChance');
                 } else {
-                    // Turnuva süresi dolmuş
                     hoursEl.textContent = '00';
                     minutesEl.textContent = '00';
                     secondsEl.textContent = '00';
-                    countdownTitleEl.textContent = '🔥 Turnuva süresi dolmuş';
-                    countdownSubtitleEl.textContent = 'Yeni turnuva bekleniyor';
+                    countdownTitleEl.textContent = t('tournament.countdownExpired');
+                    countdownSubtitleEl.textContent = t('tournament.countdownWaitingNew');
                     return;
                 }
                 
@@ -467,15 +484,14 @@
                         secondsEl.textContent = '00';
                         
                         if (isCountingToStart) {
-                            countdownTitleEl.textContent = '🔥 Turnuva başladı!';
-                            countdownSubtitleEl.textContent = 'Şimdi katılabilirsiniz!';
-                            // Sayfayı yenile veya turnuva durumunu güncelle
+                            countdownTitleEl.textContent = t('tournament.countdownStarted');
+                            countdownSubtitleEl.textContent = t('tournament.countdownCanJoin');
                             setTimeout(() => {
                                 location.reload();
                             }, 2000);
                         } else {
-                            countdownTitleEl.textContent = '🔥 Turnuva süresi dolmuş';
-                            countdownSubtitleEl.textContent = 'Sonuçlar yakında açıklanacak';
+                            countdownTitleEl.textContent = t('tournament.countdownExpired');
+                            countdownSubtitleEl.textContent = t('tournament.countdownResultsSoon');
                         }
                         return;
                     }
@@ -494,12 +510,11 @@
                 
             } catch (error) {
                 console.error('Countdown başlatılırken hata:', error);
-                // Hata durumunda varsayılan değerler
                 hoursEl.textContent = '00';
                 minutesEl.textContent = '00';
                 secondsEl.textContent = '00';
-                countdownTitleEl.textContent = '🔥 Hata oluştu';
-                countdownSubtitleEl.textContent = 'Lütfen sayfayı yenileyin';
+                countdownTitleEl.textContent = t('tournament.countdownError');
+                countdownSubtitleEl.textContent = t('tournament.countdownRefresh');
             }
         }
 
@@ -530,18 +545,12 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Turnuvaya katılmak için giriş yapmanız gerekiyor',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {
+                    swalWarning(t('tournament.loginToJoin')).then(() => {
                         window.location.href = '/login';
                     });
                     return;
                 }
 
-                // Aktif turnuvaları al
                 const response = await fetch('/api/tournaments', {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -551,12 +560,7 @@
                 const result = await response.json();
                 
                 if (!result.success || result.tournaments.length === 0) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Şu anda aktif turnuva bulunmuyor. Admin panelinden turnuva oluşturun.',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {});
+                    swalWarning(t('tournament.noTournamentAdmin'));
                     return;
                 }
 
@@ -578,12 +582,7 @@
                     const status = statusResult.status;
                     
                     if (status.is_completed) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Uyarı',
-                            text: 'Bu turnuvayı zaten tamamladınız!',
-                            confirmButtonText: 'Tamam'
-                        }).then(() => {});
+                        swalWarning(t('tournament.alreadyCompleted'));
                         await loadTournamentResults();
                         return;
                     }
@@ -603,27 +602,12 @@
                             const timeDiff = startTime - currentTime;
                             const hours = Math.floor(timeDiff / (1000 * 60 * 60));
                             const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Uyarı',
-                                text: `Turnuva henüz başlamadı! Başlamasına ${hours} saat ${minutes} dakika kaldı.`,
-                                confirmButtonText: 'Tamam'
-                            }).then(() => {});
+                            swalWarning(tFormat('tournament.notStartedYet', { hours, minutes }));
                             return;
                         } else if (currentTime > endTime) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Uyarı',
-                                text: 'Turnuva süresi dolmuş',
-                                confirmButtonText: 'Tamam'
-                            }).then(() => {});
+                            swalWarning(t('tournament.tournamentExpired'));
                         } else {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Uyarı',
-                                text: 'Turnuva şu anda aktif değil',
-                                confirmButtonText: 'Tamam'
-                            }).then(() => {});
+                            swalWarning(t('tournament.tournamentNotActive'));
                         }
                         return;
                     }
@@ -648,22 +632,12 @@
                     // Başarıyla katıldı, savaş sayfasına yönlendir
                     window.location.href = `/battle?tournament_id=${currentTournament.id}`;
                 } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Turnuvaya katılırken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {});
+                    swalWarning(t('tournament.joinError'));
                 }
 
             } catch (error) {
                 console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Bir hata oluştu',
-                        confirmButtonText: 'Tamam'
-                }).then(() => {});
+                swalWarning(t('tournament.genericError'));
             }
         }
 
@@ -695,22 +669,12 @@
                     startQuizTimer();
                     showQuestion(0);
                 } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Sorular yüklenirken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                }).then(() => {});
+                    swalWarning(t('tournament.questionsLoadError'));
                 }
 
             } catch (error) {
                 console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Sorular yüklenirken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                }).then(() => {});
+                swalWarning(t('tournament.questionsLoadError'));
             }
         }
 
@@ -772,7 +736,7 @@
             
             container.innerHTML = `
                 <div class="glass-card rounded-2xl p-6">
-                    <h4 class="text-xl font-bold mb-6">Soru ${index + 1}</h4>
+                    <h4 class="text-xl font-bold mb-6">${tFormat('tournament.questionN', { n: index + 1 })}</h4>
                     <p class="text-lg text-gray-300 mb-6">${question.question}</p>
                     
                     <div class="space-y-4">
@@ -904,12 +868,7 @@
                     // Sonuçları göster
                     showResults(score, completeResult.correct_answers, timeString, totalXP);
                 } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Turnuva tamamlanırken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                }).then(() => {});
+                    swalWarning(t('tournament.completeError'));
                 }
                 
                 // Timer'ı durdur
@@ -922,12 +881,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Sonuç kaydedilirken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                }).then(() => {});
+                swalWarning(t('tournament.saveResultsError'));
             }
         }
 
@@ -942,21 +896,21 @@
             const currentResults = document.getElementById('currentTournamentResults');
             const performanceDetails = document.getElementById('performanceDetails');
             
-            // Mevcut turnuva sonuçlarını göster
+            if (!currentResults || !performanceDetails) return;
             currentResults.innerHTML = `
                 <div class="glass-card rounded-2xl p-6 mb-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div class="text-center">
                             <div class="text-3xl font-bold text-success">${score}%</div>
-                            <div class="text-sm text-gray-400">Final Skor</div>
+                            <div class="text-sm text-gray-400">${t('tournament.finalScore')}</div>
                         </div>
                         <div class="text-center">
                             <div class="text-3xl font-bold text-cyan">${correctCount}/${currentQuestions.length}</div>
-                            <div class="text-sm text-gray-400">Doğru Cevap</div>
+                            <div class="text-sm text-gray-400">${t('tournament.correctAnswers')}</div>
                         </div>
                         <div class="text-center">
                             <div class="text-3xl font-bold text-warning">${timeString}</div>
-                            <div class="text-sm text-gray-400">Tamamlama Süresi</div>
+                            <div class="text-sm text-gray-400">${t('tournament.completionTime')}</div>
                         </div>
 
                     </div>
@@ -964,14 +918,14 @@
                     <div class="space-y-2">
                         ${score === 100 ? `
                             <div class="glass-card rounded-lg p-3 border border-yellow-500/50">
-                                <div class="font-bold text-yellow-400">🏆 Perfect Score</div>
-                                <div class="text-sm text-gray-400">Mükemmel performans!</div>
+                                <div class="font-bold text-yellow-400">${t('tournament.perfectScore')}</div>
+                                <div class="text-sm text-gray-400">${t('tournament.perfectDesc')}</div>
                             </div>
                         ` : ''}
                         ${score >= 80 ? `
                             <div class="glass-card rounded-lg p-3 border border-green-500/50">
-                                <div class="font-bold text-green-400">⭐ Excellent</div>
-                                <div class="text-sm text-gray-400">Harika bir sonuç!</div>
+                                <div class="font-bold text-green-400">${t('tournament.excellent')}</div>
+                                <div class="text-sm text-gray-400">${t('tournament.excellentDesc')}</div>
                             </div>
                         ` : ''}
                     </div>
@@ -982,28 +936,25 @@
             performanceDetails.innerHTML = `
                 <div class="space-y-4">
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Final Skor:</span>
+                        <span class="text-gray-400">${t('tournament.finalScore')}:</span>
                         <span class="font-bold text-success">${score}%</span>
                     </div>
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Tamamlama Süresi:</span>
+                        <span class="text-gray-400">${t('tournament.completionTime')}:</span>
                         <span class="font-bold text-cyan">${timeString}</span>
                     </div>
                     
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Doğru Cevaplar:</span>
+                        <span class="text-gray-400">${t('tournament.correctAnswers')}:</span>
                         <span class="font-bold text-warning">${correctCount}/${currentQuestions.length}</span>
                     </div>
-                    
-
                 </div>
             `;
+            performanceDetails.classList.remove('hidden');
             
-            // Sonuçlar bölümünü göster
             resultsSection.classList.remove('hidden');
             
-            // Sayfayı sonuçlar bölümüne kaydır
             resultsSection.scrollIntoView({ behavior: 'smooth' });
             
             // Turnuva sonuçlarını yükle
@@ -1042,17 +993,19 @@
                 
                 if (result.success) {
                     const leaderboardTable = document.getElementById('leaderboardTable');
+                    const resultsSection = document.getElementById('tournamentResultsSection');
                     
                     if (result.participants && result.participants.length > 0) {
+                        resultsSection?.classList.remove('hidden');
                         leaderboardTable.innerHTML = `
                             <div class="overflow-x-auto">
                                 <table class="w-full">
                                     <thead>
                                         <tr class="border-b border-gray-700">
-                                            <th class="text-left py-3 px-4 text-gray-400">Sıra</th>
-                                            <th class="text-left py-3 px-4 text-gray-400">Kullanıcı</th>
-                                            <th class="text-center py-3 px-4 text-gray-400">Skor</th>
-                                            <th class="text-center py-3 px-4 text-gray-400">Doğru</th>
+                                            <th class="text-left py-3 px-4 text-gray-400">${t('tournament.rank')}</th>
+                                            <th class="text-left py-3 px-4 text-gray-400">${t('tournament.user')}</th>
+                                            <th class="text-center py-3 px-4 text-gray-400">${t('tournament.score')}</th>
+                                            <th class="text-center py-3 px-4 text-gray-400">${t('tournament.correct')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1080,8 +1033,8 @@
                         leaderboardTable.innerHTML = `
                             <div class="text-center text-gray-400 py-8">
                                 <div class="text-3xl mb-4">🏆</div>
-                                <div class="text-lg font-bold mb-2">Henüz Katılımcı Yok</div>
-                                <div class="text-sm">Turnuvaya katılan ilk kişi sen ol!</div>
+                                <div class="text-lg font-bold mb-2">${t('tournament.noParticipants')}</div>
+                                <div class="text-sm">${t('tournament.beFirst')}</div>
                             </div>
                         `;
                     }
@@ -1089,13 +1042,15 @@
             } catch (error) {
                 console.error('Error loading tournament results:', error);
                 const leaderboardTable = document.getElementById('leaderboardTable');
-                leaderboardTable.innerHTML = `
+                if (leaderboardTable) {
+                    leaderboardTable.innerHTML = `
                     <div class="text-center text-red-400 py-8">
                         <div class="text-3xl mb-4">❌</div>
-                        <div class="text-lg font-bold mb-2">Hata Oluştu</div>
-                        <div class="text-sm">Sonuçlar yüklenirken bir hata oluştu.</div>
+                        <div class="text-lg font-bold mb-2">${t('tournament.errorOccurred')}</div>
+                        <div class="text-sm">${t('tournament.resultsLoadError')}</div>
                     </div>
                 `;
+                }
             }
         }
 
@@ -1103,12 +1058,7 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Sonuçları görmek için giriş yapmanız gerekiyor',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {
+                    swalWarning(t('tournament.loginForResults')).then(() => {
                         window.location.href = '/login';
                     });
                     return;
@@ -1124,12 +1074,7 @@
                 const result = await response.json();
                 
                 if (!result.success || result.tournaments.length === 0) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Şu anda aktif turnuva bulunmuyor. Admin panelinden turnuva oluşturun.',
-                        confirmButtonText: 'Tamam'
-                }).then(() => {});
+                    swalWarning(t('tournament.noTournamentAdmin'));
                     return;
                 }
 
@@ -1168,62 +1113,64 @@
                 
                 // Kullanıcının performans detaylarını göster
                 const performanceDetails = document.getElementById('performanceDetails');
-                if (statusResult.success && statusResult.status.has_joined) {
-                    if (statusResult.status.is_completed) {
-                        performanceDetails.innerHTML = `
+                if (performanceDetails) {
+                    if (statusResult.success && statusResult.status.has_joined) {
+                        if (statusResult.status.is_completed) {
+                            performanceDetails.innerHTML = `
                             <div class="space-y-4">
                                 <div class="flex justify-between">
-                                    <span class="text-gray-400">Final Skor:</span>
+                                    <span class="text-gray-400">${t('tournament.finalScore')}:</span>
                                     <span class="font-bold text-success">${statusResult.status.total_score}%</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-400">Doğru Cevaplar:</span>
+                                    <span class="text-gray-400">${t('tournament.correctAnswers')}:</span>
                                     <span class="font-bold text-cyan">${statusResult.status.correct_answers}/${statusResult.status.total_questions}</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-400">Durum:</span>
-                                    <span class="font-bold text-success">✅ Tamamlandı</span>
+                                    <span class="text-gray-400">${t('tournament.statusLabel')}</span>
+                                    <span class="font-bold text-success">${t('tournament.statusCompleted')}</span>
                                 </div>
                                 
                                 <div class="mt-4 p-3 bg-green-500/20 rounded-lg border border-green-500/50">
-                                    <div class="text-success font-bold text-sm">🏆 Tebrikler!</div>
-                                    <div class="text-white">Turnuvayı başarıyla tamamladınız!</div>
+                                    <div class="text-success font-bold text-sm">${t('tournament.congrats')}</div>
+                                    <div class="text-white">${t('tournament.completedSuccess')}</div>
                                 </div>
                             </div>
                         `;
-                    } else {
-                        performanceDetails.innerHTML = `
+                        } else {
+                            performanceDetails.innerHTML = `
                             <div class="space-y-4">
                                 <div class="flex justify-between">
-                                    <span class="text-gray-400">Durum:</span>
-                                    <span class="font-bold text-warning">🔄 Devam Ediyor</span>
+                                    <span class="text-gray-400">${t('tournament.statusLabel')}</span>
+                                    <span class="font-bold text-warning">${t('tournament.statusInProgress')}</span>
                                 </div>
                                 
                                 <div class="flex justify-between">
-                                    <span class="text-gray-400">Cevaplanan:</span>
+                                    <span class="text-gray-400">${t('tournament.answered')}</span>
                                     <span class="font-bold text-cyan">${statusResult.status.correct_answers || 0}/${statusResult.status.total_questions || 0}</span>
                                 </div>
                                 
                                 <div class="mt-4 p-3 bg-blue-500/20 rounded-lg border border-blue-500/50">
-                                    <div class="text-blue-400 font-bold text-sm">💡 İpucu</div>
-                                    <div class="text-white">Turnuvayı tamamlamak için tüm soruları cevaplayın!</div>
+                                    <div class="text-blue-400 font-bold text-sm">${t('tournament.tip')}</div>
+                                    <div class="text-white">${t('tournament.tipCompleteAll')}</div>
                                 </div>
                             </div>
                         `;
-                    }
-                } else {
-                    performanceDetails.innerHTML = `
+                        }
+                    } else {
+                        performanceDetails.innerHTML = `
                         <div class="text-center text-gray-400 py-4">
                             <div class="text-3xl mb-4">🏆</div>
-                            <div class="text-lg font-bold mb-2">Henüz Katılmadınız</div>
-                            <div class="text-sm">Turnuvaya katılmak için "Savaşa Katıl" butonuna tıklayın!</div>
+                            <div class="text-lg font-bold mb-2">${t('tournament.notJoinedYet')}</div>
+                            <div class="text-sm">${t('tournament.joinHint')}</div>
                         </div>
                     `;
+                    }
+                    performanceDetails.classList.remove('hidden');
                 }
                 
-                // Sayfayı sonuçlar bölümüne kaydır
                 resultsSection.scrollIntoView({ behavior: 'smooth' });
                 
                 // Turnuva sonuçlarını yükle
@@ -1231,12 +1178,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Uyarı',
-                        text: 'Sonuçlar yüklenirken hata oluştu',
-                        confirmButtonText: 'Tamam'
-                }).then(() => {});
+                swalWarning(t('tournament.resultsLoadError'));
             }
         }
 
@@ -1284,92 +1226,71 @@
         }
 
         function updateTournamentCard(tournament) {
-            const tournamentCard = document.querySelector('.tournament-card .glass-card');
+            const tournamentCard = document.getElementById('tournamentChallengeCard');
             if (!tournamentCard) {
                 console.log('Tournament card not found');
                 return;
             }
 
             if (!tournament) {
-                // Turnuva yoksa
                 tournamentCard.innerHTML = `
                     <div class="text-center py-8">
                         <div class="text-3xl mb-4">🏆</div>
-                        <div class="text-xl font-bold mb-2">Aktif Turnuva Yok</div>
-                        <div class="text-gray-400 mb-4">Şu anda aktif turnuva bulunmuyor</div>
-                        <div class="text-sm text-gray-500">Admin panelinden yeni turnuva oluşturulmasını bekleyin</div>
+                        <div class="text-xl font-bold mb-2">${t('tournament.noActiveTournament')}</div>
+                        <div class="text-gray-400 mb-4">${t('tournament.noActiveDesc')}</div>
+                        <div class="text-sm text-gray-500">${t('tournament.waitAdmin')}</div>
                     </div>
                 `;
                 
-                // Statik alanları da güncelle
-                document.getElementById('tournamentQuestionCount').textContent = '-';
-                document.getElementById('tournamentDuration').textContent = '- dk';
-                
-                // Katılımcı sayısını sıfırla
                 const participantCountEl = document.getElementById('participantCount');
                 if (participantCountEl) {
-                    participantCountEl.textContent = '0 Savaşçı Tamamladı';
+                    participantCountEl.textContent = tFormat('tournament.warriorsCompleted', { count: 0 });
                 }
                 return;
             }
 
-            // Turnuva zamanını kontrol et
             const currentTime = new Date();
             const startTime = new Date(tournament.start_time);
             const endTime = new Date(tournament.end_time);
             const isActive = currentTime >= startTime && currentTime <= endTime;
             
-            // Buton durumunu belirle
             let buttonHtml = '';
             if (isActive) {
-                buttonHtml = `<button class="battle-btn w-full mb-4" onclick="joinTournament()" id="joinTournamentBtn">
-                    ⚔️ Savaşa Katıl!
-                </button>`;
+                buttonHtml = `<button class="battle-btn w-full mb-4" onclick="joinTournament()" id="joinTournamentBtn">${t('tournament.joinBattle')}</button>`;
             } else if (currentTime < startTime) {
                 const timeDiff = startTime - currentTime;
                 const hours = Math.floor(timeDiff / (1000 * 60 * 60));
                 const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                buttonHtml = `<button class="battle-btn w-full mb-4 opacity-50 cursor-not-allowed" disabled>
-                    ⏰ ${hours}s ${minutes}dk sonra başlayacak
-                </button>`;
+                buttonHtml = `<button class="battle-btn w-full mb-4 opacity-50 cursor-not-allowed" disabled>${tFormat('tournament.startsIn', { hours, minutes })}</button>`;
             } else {
-                buttonHtml = `<button class="battle-btn w-full mb-4 opacity-50 cursor-not-allowed" disabled>
-                    ❌ Turnuva süresi dolmuş
-                </button>`;
+                buttonHtml = `<button class="battle-btn w-full mb-4 opacity-50 cursor-not-allowed" disabled>${t('tournament.tournamentEndedBtn')}</button>`;
             }
 
-            // Turnuva varsa kartı güncelle
             tournamentCard.innerHTML = `
                 <div class="flex items-center space-x-4 mb-4">
                     <div class="w-16 h-16 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 flex items-center justify-center text-2xl">
                         🧬
                     </div>
                     <div>
-                        <h3 class="text-2xl font-bold">${tournament.title || 'Turnuva Adı'}</h3>
-                        <p class="text-gray-400">${tournament.content || 'Turnuva açıklaması'}</p>
+                        <h3 class="text-2xl font-bold">${tournament.title || t('tournament.tournamentNameFallback')}</h3>
+                        <p class="text-gray-400">${tournament.content || t('tournament.descFallback')}</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="glass-card p-3 text-center">
-                        <div class="text-sm text-gray-400">Sorular</div>
+                        <div class="text-sm text-gray-400">${t('tournament.questions')}</div>
                         <div class="text-xl font-bold text-cyan">${tournament.question_count || 15}</div>
                     </div>
                     <div class="glass-card p-3 text-center">
-                        <div class="text-sm text-gray-400">Süre</div>
-                        <div class="text-xl font-bold text-success">${tournament.duration_minutes || 45} dk</div>
+                        <div class="text-sm text-gray-400">${t('tournament.duration')}</div>
+                        <div class="text-xl font-bold text-success">${formatDuration(tournament.duration_minutes || 45)}</div>
                     </div>
                 </div>
                 
                 ${buttonHtml}
             `;
             
-            // Statik alanları da güncelle
-            document.getElementById('tournamentQuestionCount').textContent = tournament.question_count || 15;
-            document.getElementById('tournamentDuration').textContent = (tournament.duration_minutes || 45) + ' dk';
-            
-            // Katılımcı sayısını güncelle
-            console.log('updateTournamentCard içinde updateParticipantCount çağrılıyor, tournament.id:', tournament.id);
             updateParticipantCount(tournament.id);
         }
 
@@ -1385,7 +1306,7 @@
                     const participantCountEl = document.getElementById('participantCount');
                     console.log('participantCountEl bulundu:', participantCountEl);
                     if (participantCountEl) {
-                        participantCountEl.textContent = `${result.participant_count} Savaşçı Tamamladı`;
+                        participantCountEl.textContent = tFormat('tournament.warriorsCompleted', { count: result.participant_count });
                         console.log('Katılımcı sayısı güncellendi:', result.participant_count);
                     } else {
                         console.error('participantCountEl elementi bulunamadı');
@@ -1394,14 +1315,14 @@
                     console.error('Katılımcı sayısı alınamadı:', result.error);
                     const participantCountEl = document.getElementById('participantCount');
                     if (participantCountEl) {
-                        participantCountEl.textContent = '0 Savaşçı Tamamladı';
+                        participantCountEl.textContent = tFormat('tournament.warriorsCompleted', { count: 0 });
                     }
                 }
             } catch (error) {
                 console.error('Katılımcı sayısı güncellenirken hata:', error);
                 const participantCountEl = document.getElementById('participantCount');
                 if (participantCountEl) {
-                    participantCountEl.textContent = '0 Savaşçı Tamamladı';
+                    participantCountEl.textContent = tFormat('tournament.warriorsCompleted', { count: 0 });
                 }
             }
         }
@@ -1436,8 +1357,8 @@
                 container.innerHTML = `
                     <div class="text-center text-gray-400 py-8">
                         <div class="text-3xl mb-4">🏆</div>
-                        <div class="text-lg font-bold mb-2">Henüz Katılımcı Yok</div>
-                        <div class="text-sm">Turnuvaya katılan ilk kişi sen ol!</div>
+                        <div class="text-lg font-bold mb-2">${t('tournament.noParticipants')}</div>
+                        <div class="text-sm">${t('tournament.beFirst')}</div>
                     </div>
                 `;
                 return;
@@ -1489,9 +1410,9 @@
                     <div class="leaderboard-item ${rankClass} rounded-lg p-4 flex items-center space-x-4 ${userClass}">
                         <div class="text-2xl">${rankIcon}</div>
                         <div class="flex-1">
-                            <div class="font-bold ${usernameClass}">${user.username}${isCurrentUser ? ' (Sen)' : ''}</div>
+                            <div class="font-bold ${usernameClass}">${user.username}${isCurrentUser ? ' ' + t('tournament.you') : ''}</div>
                             <div class="text-sm text-gray-400">
-                                ${user.correct_answers}/${user.total_questions} doğru • ${user.total_score}% skor
+                                ${tFormat('tournament.correctSummary', { correct: user.correct_answers, total: user.total_questions, score: user.total_score })}
                             </div>
                         </div>
                         <div class="text-cyan font-bold">${user.correct_answers}</div>
@@ -1505,10 +1426,10 @@
             container.innerHTML = `
                 <div class="text-center text-red-400 py-8">
                     <div class="text-3xl mb-4">❌</div>
-                    <div class="text-lg font-bold mb-2">Hata Oluştu</div>
-                    <div class="text-sm">Sıralama yüklenirken bir hata oluştu.</div>
+                    <div class="text-lg font-bold mb-2">${t('tournament.errorOccurred')}</div>
+                    <div class="text-sm">${t('tournament.leaderboardLoadError')}</div>
                     <button onclick="loadLeaderboard(currentTournament?.id)" class="mt-4 glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
-                        🔄 Tekrar Dene
+                        ${t('tournament.retry')}
                     </button>
                 </div>
             `;
@@ -1544,8 +1465,8 @@
                 container.innerHTML = `
                     <div class="text-center text-gray-400 py-8">
                         <div class="text-3xl mb-4">📊</div>
-                        <div class="text-lg font-bold mb-2">İstatistik Bulunamadı</div>
-                        <div class="text-sm">Turnuva verileri mevcut değil</div>
+                        <div class="text-lg font-bold mb-2">${t('tournament.statsNotFound')}</div>
+                        <div class="text-sm">${t('tournament.statsNoData')}</div>
                     </div>
                 `;
                 return;
@@ -1554,21 +1475,21 @@
             container.innerHTML = `
                 <div class="glass-card rounded-lg p-4">
                     <div class="flex items-center justify-between">
-                        <div class="text-gray-400">Toplam Katılımcı</div>
+                        <div class="text-gray-400">${t('tournament.totalParticipants')}</div>
                         <div class="text-2xl font-bold text-cyan">${stats.total_participants}</div>
                     </div>
                 </div>
                 
                 <div class="glass-card rounded-lg p-4">
                     <div class="flex items-center justify-between">
-                        <div class="text-gray-400">Ortalama Skor</div>
+                        <div class="text-gray-400">${t('tournament.averageScore')}</div>
                         <div class="text-2xl font-bold text-success">${stats.average_score}%</div>
                     </div>
                 </div>
                 
                 <div class="glass-card rounded-lg p-4">
                     <div class="flex items-center justify-between">
-                        <div class="text-gray-400">En Yüksek Skor</div>
+                        <div class="text-gray-400">${t('tournament.highestScore')}</div>
                         <div class="text-2xl font-bold text-warning">${stats.highest_score}%</div>
                     </div>
                 </div>
@@ -1582,10 +1503,10 @@
             container.innerHTML = `
                 <div class="text-center text-red-400 py-8">
                     <div class="text-3xl mb-4">❌</div>
-                    <div class="text-lg font-bold mb-2">Hata Oluştu</div>
-                    <div class="text-sm">Turnuva istatistikleri yüklenirken bir hata oluştu.</div>
+                    <div class="text-lg font-bold mb-2">${t('tournament.errorOccurred')}</div>
+                    <div class="text-sm">${t('tournament.statsLoadError')}</div>
                     <button onclick="loadTournamentStats(currentTournament?.id)" class="mt-4 glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
-                        🔄 Tekrar Dene
+                        ${t('tournament.retry')}
                     </button>
                 </div>
             `;
@@ -1621,8 +1542,8 @@
                 container.innerHTML = `
                     <div class="text-center text-gray-400 py-8 col-span-7">
                         <div class="text-3xl mb-4">📅</div>
-                        <div class="text-lg font-bold mb-2">Takvim Verisi Bulunamadı</div>
-                        <div class="text-sm">Bu hafta için turnuva verisi mevcut değil</div>
+                        <div class="text-lg font-bold mb-2">${t('tournament.calendarNoData')}</div>
+                        <div class="text-sm">${t('tournament.calendarNoWeekData')}</div>
                     </div>
                 `;
                 return;
@@ -1654,22 +1575,13 @@
             container.innerHTML = `
                 <div class="text-center text-red-400 py-8 col-span-7">
                     <div class="text-3xl mb-4">❌</div>
-                    <div class="text-lg font-bold mb-2">Hata Oluştu</div>
-                    <div class="text-sm">Haftalık takvim yüklenirken bir hata oluştu.</div>
+                    <div class="text-lg font-bold mb-2">${t('tournament.errorOccurred')}</div>
+                    <div class="text-sm">${t('tournament.calendarLoadError')}</div>
                     <button onclick="loadWeeklyCalendar()" class="mt-4 glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
-                        🔄 Tekrar Dene
+                        ${t('tournament.retry')}
                     </button>
                 </div>
             `;
-        }
-
-        function showEmailPreview() {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Uyarı',
-                    text: 'Email önizleme özelliği yakında eklenecek!',
-                    confirmButtonText: 'Tamam'
-            }).then(() => {});
         }
 
         // Event listeners - Butonlar onclick ile çalışıyor, event listener'a gerek yok
@@ -1689,6 +1601,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof initI18n === 'function') {
+                await initI18n();
+                applyTranslations();
+            }
+
             const token = localStorage.getItem('authToken');
             if (!token) {
                 window.location.href = '/login';
@@ -1742,18 +1659,6 @@
             setTimeout(() => {
                 loadWeeklyCalendar();
             }, 2500);
-            
-            setTimeout(() => {
-                const emailBtn = document.createElement('button');
-                emailBtn.textContent = '📧 Email Önizlemesi';
-                emailBtn.className = 'glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all mt-4';
-                emailBtn.onclick = showEmailPreview;
-                
-                const statsCard = document.querySelector('.tournament-card:has(h3:contains("Turnuva İstatistikleri"))');
-                if (statsCard) {
-                    statsCard.appendChild(emailBtn);
-                }
-            }, 2000);
             
             // Her 30 saniyede bir katılımcı sayısını güncelle
             setInterval(() => {

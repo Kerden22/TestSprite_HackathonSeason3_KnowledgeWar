@@ -1,0 +1,18 @@
+{
+  "testId": "28118134-b833-4b6f-ba20-38efd0bff083",
+  "status": "failed",
+  "startedAt": null,
+  "finishedAt": "2026-07-01T14:08:52.595Z",
+  "videoUrl": "https://testsprite-videos.s3.us-east-1.amazonaws.com/34d8d448-8021-7076-ae6b-533705641a44/1782914370147683//tmp/22b22495-da86-4845-a08b-c92982013e8e/result.webm",
+  "failureAnalysisUrl": null,
+  "snapshotId": "snap_b7c6f69ca1235165",
+  "runIdIfAvailable": "317ed1b6-5f91-47cd-9b91-6ec4a1e1b7ce",
+  "codeVersion": null,
+  "targetUrl": "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com",
+  "targetUrlSource": "run",
+  "failedStepIndex": 1,
+  "failureKind": "unknown",
+  "verdict": "failed",
+  "executionStatus": "completed",
+  "summary": "Failed: The hosted app likely differs from the tested expected state: the “Tournaments” button may not be rendered on the home page in production, may be hidden by a CSS/responsive layout issue, or may fail to appear because client-side JavaScript or data fetching is broken on the hosting side. A common deployment-side cause is a failed build/runtime config mismatch causing the navigation component or its styles to not load, so the test cannot verify the button’s visibility. Underlying error: E…"
+}

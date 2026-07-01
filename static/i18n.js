@@ -33,6 +33,14 @@ function t(key) {
   return typeof node === 'string' ? node : key;
 }
 
+function tFormat(key, vars = {}) {
+  let str = t(key);
+  Object.entries(vars).forEach(([k, v]) => {
+    str = str.replaceAll(`{${k}}`, String(v));
+  });
+  return str;
+}
+
 async function loadDictionary(lang) {
   const response = await fetch(`/static/i18n/${lang}.json`);
   if (!response.ok) throw new Error(`Failed to load i18n/${lang}.json`);
@@ -95,6 +103,16 @@ function updateLangToggleUI() {
 }
 
 function setupLangToggle() {
+  const langToggle = document.getElementById('langToggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (btn.id === 'langEn') setLang('en');
+      if (btn.id === 'langTr') setLang('tr');
+    });
+    return;
+  }
   const enBtn = document.getElementById('langEn');
   const trBtn = document.getElementById('langTr');
   if (enBtn) enBtn.addEventListener('click', () => setLang('en'));

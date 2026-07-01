@@ -1,0 +1,9 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "Guest cannot access profile page",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /profile as a guest without logging in" },
+    { "type": "assertion", "description": "Verify the browser is redirected away from /profile to the homepage at /" }
+  ]
+}

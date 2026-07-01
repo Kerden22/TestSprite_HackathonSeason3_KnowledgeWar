@@ -1,0 +1,11 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "Roadmap page loads in English",
+  "planSteps": [
+    { "type": "action", "description": "Log in with the configured test account and navigate to /roadmap" },
+    { "type": "assertion", "description": "Verify the URL is /roadmap" },
+    { "type": "assertion", "description": "Verify the text 'Galactic Learning Path' is visible" },
+    { "type": "assertion", "description": "Verify the EN | TR language toggle is visible in the header" }
+  ]
+}

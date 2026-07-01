@@ -1,0 +1,11 @@
+{
+  "projectId": "50dc7e80-8d2d-4933-8c55-5361fab9ebb2",
+  "type": "frontend",
+  "name": "i18n: Tournament page switches to Turkish",
+  "planSteps": [
+    { "type": "action", "description": "Log in with the configured test account and navigate to /tournament" },
+    { "type": "action", "description": "Click the TR button in the EN | TR language toggle" },
+    { "type": "assertion", "description": "Verify the page heading 'Turnuva' is visible" },
+    { "type": "assertion", "description": "Verify the text 'Haftalık Kazanan Listesi' is visible on the page" }
+  ]
+}

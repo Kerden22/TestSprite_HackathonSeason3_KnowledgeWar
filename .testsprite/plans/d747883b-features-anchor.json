@@ -1,0 +1,7 @@
+{
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage as a guest" },
+    { "type": "action", "description": "Click the 'Features' link in the top navigation" },
+    { "type": "assertion", "description": "Verify the features section with id 'features' is visible on the page" }
+  ]
+}
