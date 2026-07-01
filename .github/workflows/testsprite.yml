@@ -40,6 +40,8 @@ jobs:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
         run: |
           testsprite setup --from-env
+          set +e
+          FAIL=0
           for ID in \
             b14b87e9-49c8-434d-b054-86fb37fcf94a \
             73374ea0-00ce-4307-9275-2b98f264bf33 \
@@ -66,8 +68,9 @@ jobs:
             a5b1c09f-26f1-4451-a0ee-1961bae0aef1 \
             c2d5d7c3-0e8f-4247-a384-ff80c45d4dc4 \
             302da8b4-76f4-4ea4-b8a4-dbe4e1482c82; do
-            testsprite test run "$ID" --wait
+            testsprite test run "$ID" --wait || FAIL=1
           done
+          exit $FAIL
 
       - name: Run TestSprite Backend Suite
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_backend == 'true'
