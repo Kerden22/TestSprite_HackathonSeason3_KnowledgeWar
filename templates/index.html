@@ -328,13 +328,13 @@
             <a href="#how-it-works" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Nasıl
               Çalışır</a>
             <a href="#features" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Özellikler</a>
-            <a href="#tournaments"
-              class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
+            <a href="#tournaments" id="navTournamentsLink"
+              class="hidden text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <!-- Navigation Buttons -->
-          <div class="flex items-center space-x-4 mr-6">
+          <!-- Navigation Buttons (logged-in users only) -->
+          <div id="authNavButtons" class="hidden flex items-center space-x-4 mr-6">
             <button id="roadmapBtn"
               class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
               🗺️ Yol Haritası
@@ -813,17 +813,21 @@
       const guestButtons = document.getElementById("guestButtons");
       const userButtons = document.getElementById("userButtons");
       const userName = document.getElementById("userName");
+      const authNavButtons = document.getElementById("authNavButtons");
+      const navTournamentsLink = document.getElementById("navTournamentsLink");
 
       if (token && userData) {
-        // Kullanıcı giriş yapmış
         const user = JSON.parse(userData);
         guestButtons.classList.add("hidden");
         userButtons.classList.remove("hidden");
+        authNavButtons.classList.remove("hidden");
+        navTournamentsLink.classList.remove("hidden");
         userName.textContent = user.first_name || "Profil";
       } else {
-        // Kullanıcı giriş yapmamış
         guestButtons.classList.remove("hidden");
         userButtons.classList.add("hidden");
+        authNavButtons.classList.add("hidden");
+        navTournamentsLink.classList.add("hidden");
       }
     }
 
@@ -853,38 +857,12 @@
       window.location.reload();
     });
 
-    roadmapBtn.addEventListener("click", function (e) {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        window.location.href = "/roadmap";
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Uyarı',
-          text: 'Yol haritasına erişmek için giriş yapmanız gerekiyor!',
-          confirmButtonText: 'Tamam'
-        }).then(() => {
-          window.location.href = '/login';
-        });
-        return;
-      }
+    roadmapBtn.addEventListener("click", function () {
+      window.location.href = "/roadmap";
     });
 
-    tournamentBtn.addEventListener("click", function (e) {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        window.location.href = "/tournament";
-      } else {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Uyarı',
-          text: 'Turnuvalara erişmek için giriş yapmanız gerekiyor!',
-          confirmButtonText: 'Tamam'
-        }).then(() => {
-          window.location.href = '/login';
-        });
-        return;
-      }
+    tournamentBtn.addEventListener("click", function () {
+      window.location.href = "/tournament";
     });
 
     // Sayfa yüklendiğinde kullanıcı durumunu kontrol et

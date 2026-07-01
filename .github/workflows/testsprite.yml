@@ -3,6 +3,7 @@ name: TestSprite CI/CD Verification
 on:
   push:
     branches: [ master, main ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -11,10 +12,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Install TestSprite CLI
         run: pip install testsprite
+
+      - name: Wake live app
+        run: |
+          curl -sf --retry 5 --retry-delay 15 \
+            https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/ \
+            || true
 
       - name: Run TestSprite Tests
         env:
           TESTSPRITE_TOKEN: ${{ secrets.TESTSPRITE_TOKEN }}
-        run: testsprite run --all
+        run: testsprite test run --all --project ${{ secrets.TESTSPRITE_PROJECT_ID }} --wait
