@@ -27,6 +27,19 @@ https://github.com/Kerden22/TestSprite_HackathonSeason3_KnowledgeWar
 - Soru cevaplama / battle (`/battle`)
 - Profil sayfası (`/profile`)
 
+## Deploy on Render
+
+After pushing to `master`, Render auto-redeploys. If needed: Dashboard → **Manual Deploy** → Deploy latest commit.
+
+**Required Environment Variables** (Render → Environment):
+
+| Key | Required |
+|-----|----------|
+| `GEMINI_API_KEY` | Yes |
+| `SECRET_KEY` | Recommended |
+
+Start Command: `gunicorn app:app`
+
 ## Local Setup
 
 ```bash

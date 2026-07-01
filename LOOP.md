@@ -14,10 +14,13 @@
 | 2 | Deployed to Render (free tier) | — | Live at https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com |
 | 3 | User added gunicorn to requirements.txt; first deploy failed (`gunicorn: command not found`) | — | **FAILED** |
 | 4 | **FIX:** gunicorn in requirements + Start Command `gunicorn app:app` | `requirements.txt` | Render redeploy **PASSED** — service live |
-| 5 | **FIX:** `script.js` API_BASE_URL localhost → `/api` | `static/script.js:76` | Login/register works on live URL |
-| 6 | **FIX:** `SECRET_KEY` from env; production `app.run` (PORT, debug=False) | `app.py:37,2981-2983` | Production-ready |
-| 7 | Added Procfile, runtime.txt, README with live URL | — | Deploy config complete |
-| 8 | Awaiting TestSprite baseline tests on live URL | — | Pending |
+| 5 | **FIX:** `script.js` API_BASE_URL localhost → `/api` | `static/script.js:76` | Committed in `811729c`; Render redeploy pending |
+| 6 | **FIX:** `SECRET_KEY` from env; production `app.run` (PORT, debug=False) | `app.py:37,2981-2983` | Committed in `811729c` |
+| 7 | Added Procfile, runtime.txt, `.env.example`, README with live URL | — | Committed in `811729c` |
+| 8 | Pushed deploy prep to GitHub (`811729c`) | — | **PASSED** — `master` updated |
+| 9 | Live smoke test: `/` and `/login` return 200 | Manual | **PASSED** |
+| 10 | Render Environment: set `GEMINI_API_KEY`, `SECRET_KEY` in dashboard | — | User action required |
+| 11 | Awaiting TestSprite baseline tests on live URL | — | Pending |
 
 ---
 
