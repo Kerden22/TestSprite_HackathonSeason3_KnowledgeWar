@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>KNOWLEDGEWAR - Ana Sayfa</title>
+      <title>KNOWLEDGEWAR - Home</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
@@ -324,7 +324,7 @@
   </style>
 </head>
 
-<body class="min-h-screen text-white">
+<body class="min-h-screen text-white" data-i18n-page-title="meta.homeTitle">
   <!-- Animated Background -->
   <div class="stars" id="stars"></div>
   <div class="floating-orb orb-1"></div>
@@ -338,13 +338,12 @@
         <div class="flex items-center space-x-4">
           <div class="text-3xl font-black neon-text">KNOWLEDGEWAR</div>
           <div class="flex items-center space-x-3 md:space-x-8 ml-4 md:ml-12 text-sm md:text-base">
-            <a href="#home" class="text-white hover:text-cyan-400 transition-colors font-medium">Anasayfa</a>
-            <a href="#how-it-works" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Nasıl
-              Çalışır</a>
+            <a href="#home" class="text-white hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.home">Home</a>
+            <a href="#how-it-works" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.howItWorks">How it works</a>
             <a href="#features" id="navFeaturesLink"
-              class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Özellikler</a>
+              class="text-gray-300 hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.features">Features</a>
             <a href="#tournaments" id="navTournamentsLink"
-              class="hidden text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
+              class="hidden text-gray-300 hover:text-cyan-400 transition-colors font-medium" data-i18n="nav.tournaments">Tournaments</a>
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -352,27 +351,36 @@
           <div class="flex items-center space-x-4 mr-6">
             <div id="roadmapNavWrapper" class="hidden">
               <button id="roadmapBtn"
-                class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-                🗺️ Yol Haritası
+                class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300"
+                data-i18n="nav.roadmapBtn">
+                🗺️ Roadmap
               </button>
             </div>
             <div id="tournamentNavWrapper" class="hidden">
-              <button id="tournamentBtn" type="button" aria-label="Turnuvalar Tournaments"
-                class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-                ⚔️ Turnuvalar
+              <button id="tournamentBtn" type="button" data-i18n-aria="nav.tournamentsAria"
+                class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300"
+                data-i18n="nav.tournamentsBtn">
+                ⚔️ Tournaments
               </button>
             </div>
           </div>
 
-          <div id="authButtons" class="ml-8">
+          <div id="langToggle" class="flex items-center space-x-1 text-sm mr-2">
+            <button type="button" id="langEn" class="text-cyan-400 font-bold">EN</button>
+            <span class="text-gray-600">|</span>
+            <button type="button" id="langTr" class="text-gray-400 hover:text-white font-medium">TR</button>
+          </div>
+
+          <div id="authButtons" class="ml-4">
             <!-- Giriş yapmamış kullanıcılar için -->
             <div id="guestButtons">
-              <button id="loginBtn" class="me-3 ml-6 text-gray-300 hover:text-white transition-colors font-medium">
-                Giriş Yap
+              <button id="loginBtn" class="me-3 ml-6 text-gray-300 hover:text-white transition-colors font-medium" data-i18n="nav.login">
+                Log in
               </button>
               <button id="registerBtn"
-                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-                Üye Ol
+                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300"
+                data-i18n="nav.register">
+                Sign up
               </button>
             </div>
             <!-- Giriş yapmış kullanıcılar için -->
@@ -381,8 +389,8 @@
                 class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
                 <span id="userName">Profil</span>
               </button>
-              <button id="logoutBtn" class="text-gray-300 hover:text-red-400 transition-colors font-medium ml-6">
-                Çıkış Yap
+              <button id="logoutBtn" class="text-gray-300 hover:text-red-400 transition-colors font-medium ml-6" data-i18n="nav.logout">
+                Log out
               </button>
             </div>
           </div>
@@ -757,6 +765,7 @@
       </div>
     </div>
   </footer>
+  <script src="{{ url_for('static', filename='i18n.js') }}"></script>
   <script>
     // Create animated stars
     function createStars() {
@@ -845,7 +854,7 @@
         roadmapNavWrapper.classList.remove("hidden");
         tournamentNavWrapper.classList.remove("hidden");
         navTournamentsLink.classList.remove("hidden");
-        userName.textContent = user.first_name || "Profil";
+        userName.textContent = user.first_name || (typeof t === "function" ? t("nav.profile") : "Profile");
       } else {
         guestButtons.classList.remove("hidden");
         userButtons.classList.add("hidden");
@@ -890,7 +899,11 @@
     });
 
     // Sayfa yüklendiğinde kullanıcı durumunu kontrol et
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", async function () {
+      if (typeof initI18n === "function") {
+        await initI18n();
+        applyTranslations();
+      }
       checkUserStatus();
     });
   </script>

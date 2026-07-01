@@ -12,6 +12,20 @@ function createStars() {
 }
 createStars();
 
+function msg(key, fallback) {
+    return typeof t === 'function' ? t(key) : fallback;
+}
+
+function loadingSpinnerHtml(label) {
+    return `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        ${label}
+    `;
+}
+
 // Form switching functionality
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
@@ -60,14 +74,21 @@ function checkPasswordStrength(password) {
     strength = checks.filter(check => check).length;
 
     const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
-    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+    const labels = [
+        msg('auth.strengthVeryWeak', 'Very Weak'),
+        msg('auth.strengthWeak', 'Weak'),
+        msg('auth.strengthFair', 'Fair'),
+        msg('auth.strengthGood', 'Good'),
+        msg('auth.strengthStrong', 'Strong')
+    ];
 
     strengthBars.forEach((bar, index) => {
         bar.className = `h-1 w-1/4 rounded ${index < strength ? colors[strength - 1] : 'bg-gray-600'}`;
     });
 
     if (strengthText) {
-        strengthText.textContent = `Password strength: ${strength > 0 ? labels[strength - 1] : 'Too short'}`;
+        const label = strength > 0 ? labels[strength - 1] : msg('auth.strengthTooShort', 'Too short');
+        strengthText.textContent = `${msg('auth.passwordStrengthPrefix', 'Password strength:')} ${label}`;
         strengthText.className = `text-xs ${strength > 2 ? 'text-green-400' : strength > 0 ? 'text-yellow-400' : 'text-red-400'}`;
     }
 }
@@ -88,7 +109,7 @@ async function registerUser(userData) {
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Kayıt işlemi başarısız');
+            throw new Error(data.error || msg('auth.registerFailed', 'Registration failed'));
         }
 
         return data;
@@ -110,7 +131,7 @@ async function loginUser(userData) {
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Giriş işlemi başarısız');
+            throw new Error(data.error || msg('auth.loginFailed', 'Login failed'));
         }
 
         return data;
@@ -155,13 +176,7 @@ loginFormElement.addEventListener('submit', async function (e) {
     // Add loading state
     const submitBtn = loginFormElement.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.innerHTML = `
-        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Giriş yapılıyor...
-    `;
+    submitBtn.innerHTML = loadingSpinnerHtml(msg('auth.loggingIn', 'Logging in...'));
     submitBtn.disabled = true;
 
     try {
@@ -171,7 +186,7 @@ loginFormElement.addEventListener('submit', async function (e) {
         localStorage.setItem('authToken', result.token);
         localStorage.setItem('userData', JSON.stringify(result.user));
         
-        showNotification('Giriş başarılı!', 'success');
+        showNotification(msg('auth.loginSuccess', 'Logged in successfully!'), 'success');
         
         const urlParams = new URLSearchParams(window.location.search);
         const next = urlParams.get('next');
@@ -200,20 +215,14 @@ registerFormElement.addEventListener('submit', async function (e) {
 
     // Password confirmation check
     if (password !== confirmPassword) {
-        showNotification('Şifreler eşleşmiyor!', 'error');
+        showNotification(msg('auth.passwordMismatch', 'Passwords do not match!'), 'error');
         return;
     }
 
     // Add loading state
     const submitBtn = registerFormElement.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.innerHTML = `
-        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Kayıt yapılıyor...
-    `;
+    submitBtn.innerHTML = loadingSpinnerHtml(msg('auth.registering', 'Signing up...'));
     submitBtn.disabled = true;
 
     try {
@@ -228,7 +237,7 @@ registerFormElement.addEventListener('submit', async function (e) {
         localStorage.setItem('authToken', result.token);
         localStorage.setItem('userData', JSON.stringify(result.user));
         
-        showNotification('Kayıt başarılı!', 'success');
+        showNotification(msg('auth.registerSuccess', 'Registration successful!'), 'success');
         
         // Show success message
         registerForm.classList.add('slide-out-left');
@@ -281,7 +290,12 @@ function logout() {
 }
 
 // Check auth status on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    if (typeof initI18n === 'function') {
+        await initI18n();
+        if (typeof applyTranslations === 'function') applyTranslations();
+    }
+
     checkAuthStatus();
     
     // Check URL parameter for form type
@@ -289,7 +303,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const formType = urlParams.get('form');
     
     if (formType === 'register') {
-        // Show register form directly
         switchToRegister();
     }
 });

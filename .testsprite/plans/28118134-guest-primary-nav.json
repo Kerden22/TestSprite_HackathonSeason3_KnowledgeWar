@@ -1,9 +1,9 @@
 {
   "planSteps": [
     { "type": "action", "description": "Navigate to the homepage as a guest (not logged in)" },
-    { "type": "assertion", "description": "Verify the 'Özellikler' (Features) link is visible in the top navigation" },
-    { "type": "assertion", "description": "Verify the 'Giriş Yap' button is visible in the header" },
-    { "type": "assertion", "description": "Verify tournament navigation (Turnuvalar link and ⚔️ Turnuvalar button) is hidden for guests" },
-    { "type": "assertion", "description": "Verify the 'Anasayfa' home link is visible in navigation" }
+    { "type": "assertion", "description": "Verify the 'Features' link is visible in the top navigation" },
+    { "type": "assertion", "description": "Verify the 'Log in' button is visible in the header" },
+    { "type": "assertion", "description": "Verify tournament navigation (Tournaments link and ⚔️ Tournaments button) is hidden for guests" },
+    { "type": "assertion", "description": "Verify the 'Home' link is visible in navigation" }
   ]
 }

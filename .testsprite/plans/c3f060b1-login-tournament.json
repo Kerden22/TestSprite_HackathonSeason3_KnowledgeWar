@@ -1,10 +1,10 @@
 {
   "planSteps": [
     { "type": "action", "description": "Navigate to the homepage" },
-    { "type": "action", "description": "Click 'Giriş Yap' and log in with the configured test account credentials" },
+    { "type": "action", "description": "Click 'Log in' and log in with the configured test account credentials" },
     { "type": "assertion", "description": "Verify the user lands on the home page after login (URL is /, not /tournament)" },
-    { "type": "assertion", "description": "Verify the '⚔️ Turnuvalar' button and '🗺️ Yol Haritası' button are visible after login" },
-    { "type": "action", "description": "Click the '⚔️ Turnuvalar' button" },
+    { "type": "assertion", "description": "Verify the '⚔️ Tournaments' button and '🗺️ Roadmap' button are visible after login" },
+    { "type": "action", "description": "Click the '⚔️ Tournaments' button" },
     { "type": "assertion", "description": "Verify the tournaments page opens at /tournament with tournament content visible" }
   ]
 }
