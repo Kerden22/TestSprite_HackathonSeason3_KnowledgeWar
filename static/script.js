@@ -176,7 +176,7 @@ loginFormElement.addEventListener('submit', async function (e) {
         // Redirect to main page
         setTimeout(() => {
             window.location.href = '/';
-        }, 1500);
+        }, 500);
         
     } catch (error) {
         showNotification(error.message, 'error');

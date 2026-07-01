@@ -25,6 +25,11 @@
       overflow-x: hidden;
     }
 
+    /* Scroll offset for fixed nav (anchor links / TestSprite) */
+    section[id] {
+      scroll-margin-top: 6rem;
+    }
+
     /* Animated Background */
     .stars {
       position: fixed;
@@ -323,11 +328,12 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div class="text-3xl font-black neon-text">KNOWLEDGEWAR</div>
-          <div class="hidden md:flex items-center space-x-8 ml-12">
+          <div class="flex items-center space-x-3 md:space-x-8 ml-4 md:ml-12 text-sm md:text-base">
             <a href="#home" class="text-white hover:text-cyan-400 transition-colors font-medium">Anasayfa</a>
             <a href="#how-it-works" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Nasıl
               Çalışır</a>
-            <a href="#features" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Özellikler</a>
+            <a href="#features" id="navFeaturesLink"
+              class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Özellikler</a>
             <a href="#tournaments" id="navTournamentsLink"
               class="hidden text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
           </div>
@@ -570,10 +576,10 @@
   </section>
 
   <!-- Features Section -->
-  <section id="features" class="relative z-10 py-20">
+  <section id="features" class="relative z-10 py-20" aria-labelledby="features-heading">
     <div class="container mx-auto px-6">
-      <div class="text-center mb-20 fade-in">
-        <h2 class="text-5xl md:text-6xl font-black neon-text mb-6">
+      <div class="text-center mb-20 fade-in visible">
+        <h2 id="features-heading" class="text-5xl md:text-6xl font-black neon-text mb-6">
           ÖZELLİKLER
         </h2>
         <p class="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -780,14 +786,16 @@
       initScrollAnimations();
     });
 
-    // Smooth scrolling for navigation links
+    // Anchor navigation — instant scroll + hash for E2E agents
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       anchor.addEventListener("click", function (e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute("href"));
+        const href = this.getAttribute("href");
+        const target = document.querySelector(href);
         if (target) {
+          history.pushState(null, "", href);
           target.scrollIntoView({
-            behavior: "smooth",
+            behavior: "auto",
             block: "start",
           });
         }

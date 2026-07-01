@@ -43,6 +43,11 @@
 | 24 | Portal last status (pre-CLI rerun): 3 passed / 2 failed / 2 blocked | UI suite | Tournament tests still **failed** (guest, pre-auth-nav-fix runs) |
 | 25 | Next: run FE tests individually via CLI; update TestSprite plan for login-first | — | Pending |
 | 26 | **FIX:** `seed_default_test_user()` on startup — `k.erden03@gmail.com` / `123456` | `app.py` (after `init_db`) | Render ephemeral DB; user recreated each deploy |
+| 27 | Retest after seed: live login **PASSED** (user confirmed) | Manual | **PASSED** |
+| 28 | CLI/portal retest: still 3 passed / 2 failed / 2 blocked | UI suite | Tournament: guest, `tournamentBtn` hidden; Features: anchor/mobile scroll |
+| 29 | **FIX:** Features nav always visible; `#features` hash scroll + heading id | `templates/index.html` | Pending retest |
+| 30 | **FIX:** Login form `name`/`autocomplete`/`loginSubmitBtn`; faster redirect | `login-register.html`, `script.js` | Helps TestSprite Authentication |
+| 31 | User action: TestSprite → Data → **Authentication** + correct live URL | Portal | `k.erden03@gmail.com` / `123456`; verify URL is `xk2p` not `slk2p` |
 
 **GitHub Secrets (user action):** Add `TESTSPRITE_PROJECT_ID` in repo Settings → Secrets. Find ID in TestSprite dashboard URL (`proj_…`) or run `testsprite project list` locally with `TESTSPRITE_TOKEN` set. `TESTSPRITE_TOKEN` should already exist.
 
