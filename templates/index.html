@@ -335,7 +335,7 @@
             <a href="#features" id="navFeaturesLink"
               class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Özellikler</a>
             <a href="#tournaments" id="navTournamentsLink"
-              class="hidden text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
+              class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -829,14 +829,14 @@
         guestButtons.classList.add("hidden");
         userButtons.classList.remove("hidden");
         authNavButtons.classList.remove("hidden");
-        navTournamentsLink.classList.remove("hidden");
         userName.textContent = user.first_name || "Profil";
       } else {
         guestButtons.classList.remove("hidden");
         userButtons.classList.add("hidden");
         authNavButtons.classList.add("hidden");
-        navTournamentsLink.classList.add("hidden");
       }
+      // Turnuvalar anchor link — always visible (scrolls to #tournaments section)
+      navTournamentsLink.classList.remove("hidden");
     }
 
     // Buton event listener'ları
