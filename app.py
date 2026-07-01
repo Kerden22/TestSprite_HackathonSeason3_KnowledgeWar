@@ -34,7 +34,7 @@ if GEMINI_API_KEY != "your_gemini_api_key_here":
     genai.configure(api_key=GEMINI_API_KEY)
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'btk-auth-secret-key-2024'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'btk-auth-secret-key-2024')
 CORS(app)
 
 # Veritabanı oluşturma
@@ -2979,4 +2979,5 @@ def get_active_course():
         return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False) 
