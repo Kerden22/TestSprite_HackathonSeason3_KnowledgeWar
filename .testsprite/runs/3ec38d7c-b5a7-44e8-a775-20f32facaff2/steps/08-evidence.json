@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "snapshot",
+    "stepIndex": 8,
+    "summary": "Step 8 'The tournaments area is visible and shows the 'No Active Tournament' content.' failed. Error: TEST BLOCKED: Result summary:\n- Navigation and login: The test account (k.erden03@gmail.com) was used to sign in successfully. The session recorded that after login the user landed on the home page ('/').\n- Navigation entries visible: The navigation contained the '🗺️ Roadmap' link and the '⚔️ Tournaments' entry was present and clickable after login.\n- Tournaments page: Clicking the '⚔️ Tournaments' navigation opened https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/tournament. The page displays a prominent \"Tournament\" heading, a countdown showing \"00 : 00 : 00\", and the message \"No active tournament\" as well as sections titled \"Today's Battlefield\" and \"Live Leaderboard\" — confirming the tournaments area is reachable and the tournaments experience is available (no active tournament currently).\nAll required assertions from the task were observed during this session. No blockers were encountered.\nOutcome: PASS — the tournaments area becomes available after using the primary navigation entry point.",
+    "path": "steps/08-snapshot.html"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "testId": "28118134-b833-4b6f-ba20-38efd0bff083",
+  "status": "failed",
+  "startedAt": "2026-07-01T18:32:50.260Z",
+  "finishedAt": "2026-07-01T18:41:40.130Z",
+  "videoUrl": "https://testsprite-videos.s3.us-east-1.amazonaws.com/34d8d448-8021-7076-ae6b-533705641a44/1782931186917827//tmp/6ec245b9-310a-45a6-b9ad-328ce3142d19/result.webm",
+  "failureAnalysisUrl": null,
+  "snapshotId": "snap_1303a15e59b0fe87",
+  "runIdIfAvailable": "91231f87-41a9-43dc-808f-fc6e4cfc3a64",
+  "codeVersion": null,
+  "targetUrl": "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com",
+  "targetUrlSource": "run",
+  "failedStepIndex": 15,
+  "failureKind": "assertion",
+  "verdict": "failed",
+  "executionStatus": "completed",
+  "summary": "Failed (assertion): TEST FAILURE\n\nThe 'Tournaments' navigation link is visible to guests but the test expected it to be hidden.\n\nObservations:\n- The header navigation shows a 'Tournaments' link alongside 'Home', 'Features', and 'Log in'.\n- The hero section is visible and displays the expected 'AI-POWERED' text."
+}

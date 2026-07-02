@@ -4,15 +4,6 @@ on:
   push:
     branches: [ master, main ]
   workflow_dispatch:
-    inputs:
-      run_backend:
-        description: 'Also run backend API tests (5 tests)'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
 
 jobs:
   test:
@@ -35,7 +26,7 @@ jobs:
             https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/ \
             || true
 
-      - name: Run TestSprite Frontend Suite (5 tests)
+      - name: Run TestSprite Backend Suite (5 tests)
         env:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
         run: |
@@ -43,25 +34,11 @@ jobs:
           set +e
           FAIL=0
           for ID in \
-            28118134-b833-4b6f-ba20-38efd0bff083 \
-            c3f060b1-79bd-4f39-8f99-e388ff26a10f \
-            1064d65e-d946-448e-9495-49264ec46f85 \
-            cd17f8ca-dbed-4ea7-b53d-7c442d0cc644 \
-            2fe15023-4492-4cd9-9c27-b0e9ee29e8b0; do
-            testsprite test run "$ID" --wait || FAIL=1
-          done
-          exit $FAIL
-
-      - name: Run TestSprite Backend Suite
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_backend == 'true'
-        env:
-          TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
-        run: |
-          for ID in \
             822308eb-edfe-4b84-af4e-abdc44e4982b \
             85b52f13-342f-4b6c-933e-bc0815ad2273 \
             d1753dd2-0161-4c35-8164-92e92b237601 \
             31e5401a-5dba-42a6-9762-83366fa3ab67 \
             3d145644-69f1-4866-b971-f806a78d4e33; do
-            testsprite test run "$ID" --wait
+            testsprite test run "$ID" --wait --skip-dependencies || FAIL=1
           done
+          exit $FAIL

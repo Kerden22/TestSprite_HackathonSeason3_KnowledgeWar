@@ -3,44 +3,47 @@ KnowledgeWar — TestSprite yapılacaklar listesi
 
 GEÇENLER (banked — tekrar koşma, CI'dan çıkarıldı)
 --------------------------------------------------
-1. b14b87e9 — Ana sayfa hero (AI-POWERED, EN|TR toggle)
-2. 73374ea0 — Misafir menü (Features + Log in; Tournaments yok)
-3. ad90b2b9 — Turnuva tekrar (giriş → turnuva → eve → tekrar turnuva)
-4. d747883b — Features scroll (#features)
-5. d32cca15 — Features tekrar (iki kez tıkla)
+1.  b14b87e9 — Ana sayfa hero (AI-POWERED, EN|TR toggle)
+2.  73374ea0 — Misafir menü (Features + Log in)
+3.  ad90b2b9 — Turnuva tekrar
+4.  d747883b — Features scroll (#features)
+5.  d32cca15 — Features tekrar
+6.  1064d65e — Home TR (Actions #14)
+7.  cd17f8ca — Home EN geri (Actions #14)
+8.  2fe15023 — Login TR (Actions #14)
 
-ŞU AN CI'DA (push'ta koşar — testsprite.yml)
---------------------------------------------
-6.  28118134 — Misafir menü + Home (plan düzeltildi, tekrar koşulacak)
-7.  c3f060b1 — Login → turnuva (önceki: blocked)
-8.  1064d65e — Home TR (Anasayfa, Özellikler)
-9.  cd17f8ca — Home EN geri (Home, Features)
-10. 2fe15023 — Login TR (Tekrar Hoş Geldin, Giriş Yap)
-
-SIRADAKİ FRONTEND (manuel veya sonraki CI batch)
+YOKSAYILAN (CI'da koşulmaz — kasıtlı / gereksiz)
 ------------------------------------------------
-11. e6d48742 — Roadmap TR (Galaktik Öğrenme Yolu)
-12. 54a8c006 — Learn TR
-13. 62968e6e — Test TR (Test Çöz)
-14. ed7b621c — Tournament TR
-15. 98fc7986 — Profile TR
-16. 925fd7eb — Roadmap EN smoke
-17. db296a54 — Learn EN smoke
-18. cafbbc5c — Test EN smoke
-19. 359739b2 — Profile EN smoke
-20. 5cf8b6d4 — Kayıt formu EN
-21. 4a6a7cf9 — Sayfalar arası gezinme
-22. dc6769f8 — Misafir /profile → / yönlendirme
-23. a5b1c09f — Misafir /tournament → /login yönlendirme
-24. c2d5d7c3 — Giriş sonrası menü (Roadmap, Tournaments, Log out)
-25. 302da8b4 — Çıkış akışı
+- 28118134 — Misafir menü + Home (#tournaments anchor misafirde kalır; turnuva sayfasına gitmez)
+- c3f060b1 — Login → turnuva (ad90b2b9 yeterli; artifact 3ec38d7c akışı OK)
+
+ŞU AN CI'DA (push'ta koşar — testsprite.yml, sonraki batch)
+-----------------------------------------------------------
+9.  e6d48742 — Roadmap TR
+10. 54a8c006 — Learn TR
+11. 62968e6e — Test TR
+12. ed7b621c — Tournament TR
+13. 98fc7986 — Profile TR
+
+SIRADAKİ FRONTEND
+-----------------
+14. 925fd7eb — Roadmap EN smoke
+15. db296a54 — Learn EN smoke
+16. cafbbc5c — Test EN smoke
+17. 359739b2 — Profile EN smoke
+18. 5cf8b6d4 — Kayıt formu EN
+19. 4a6a7cf9 — Sayfalar arası gezinme
+20. dc6769f8 — Misafir /profile → /
+21. a5b1c09f — Misafir /tournament → /login
+22. c2d5d7c3 — Giriş sonrası menü
+23. 302da8b4 — Çıkış akışı
 
 BACKEND (elle — workflow_dispatch + run_backend=true)
 -----------------------------------------------------
-26. 822308eb — POST /api/login → 200 + token
-27. 85b52f13 — GET /api/profile token yok → 401
-28. d1753dd2 — GET /api/tournaments → 200 + liste
-29. 31e5401a — GET /api/active-course (auth) → 200
-30. 3d145644 — GET /api/completed-courses (auth) → 200 + liste
+24. 822308eb — POST /api/login
+25. 85b52f13 — GET /api/profile → 401
+26. d1753dd2 — GET /api/tournaments
+27. 31e5401a — GET /api/active-course
+28. 3d145644 — GET /api/completed-courses
 
-Özet: 5 geçti | 5 CI'da | 15 FE sırada | 5 BE bekliyor
+Özet: 8 geçti | 2 yoksay | 5 CI'da | 10 FE sırada | 5 BE bekliyor

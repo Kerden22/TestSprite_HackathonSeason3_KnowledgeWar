@@ -1,0 +1,18 @@
+{
+  "testId": "c3f060b1-79bd-4f39-8f99-e388ff26a10f",
+  "status": "blocked",
+  "startedAt": "2026-07-01T18:41:41.316Z",
+  "finishedAt": "2026-07-01T18:44:32.089Z",
+  "videoUrl": "https://testsprite-videos.s3.us-east-1.amazonaws.com/34d8d448-8021-7076-ae6b-533705641a44/1782931471767668//tmp/13333b9f-d39a-4da8-b4e3-79ab22527441/result.webm",
+  "failureAnalysisUrl": null,
+  "snapshotId": "snap_cc9de958da10bbbd",
+  "runIdIfAvailable": "3ec38d7c-b5a7-44e8-a775-20f32facaff2",
+  "codeVersion": null,
+  "targetUrl": "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com",
+  "targetUrlSource": "run",
+  "failedStepIndex": 7,
+  "failureKind": null,
+  "verdict": "blocked",
+  "executionStatus": "completed",
+  "summary": "Blocked before a verdict could be produced: TEST BLOCKED: Result summary:\n- Navigation and login: The test account (k.erden03@gmail.com) was used to sign in successfully. The session recorded that after login the user landed on the home page ('/').\n- Navigation entries visible: The navigation contained the '🗺️ Roadmap' link and the '⚔️ Tournaments' entry was present and clickable after login.\n- Tournaments page: Clicking the '⚔️ Tournaments' navigation opened https://testsprite-hackathonseason…"
+}

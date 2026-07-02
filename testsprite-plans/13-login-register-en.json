@@ -5,6 +5,6 @@
   "planSteps": [
     { "type": "action", "description": "Navigate to /login?form=register as a guest" },
     { "type": "assertion", "description": "Verify the heading 'Join the journey' is visible on the register form" },
-    { "type": "assertion", "description": "Verify the 'Create account' submit button is visible on the register form" }
+      { "type": "assertion", "description": "Verify the 'Create account' submit button is visible on the register form" }
   ]
 }

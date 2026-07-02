@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "snapshot",
+    "stepIndex": 16,
+    "summary": "Step 16 'Expected 'Log in' button to be visible in the header.' failed. Error: TEST FAILURE\n\nThe 'Tournaments' navigation link is visible to guests but the test expected it to be hidden.\n\nObservations:\n- The header navigation shows a 'Tournaments' link alongside 'Home', 'Features', and 'Log in'.\n- The hero section is visible and displays the expected 'AI-POWERED' text.",
+    "path": "steps/16-snapshot.html"
+  }
+]
