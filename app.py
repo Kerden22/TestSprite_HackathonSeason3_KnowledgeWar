@@ -3,7 +3,7 @@ from flask_cors import CORS
 import sqlite3
 import hashlib
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import requests
 import json
@@ -27,6 +27,16 @@ from dotenv import load_dotenv
 
 # .env dosyasını yükleme
 load_dotenv()
+
+TR_TZ = timezone(timedelta(hours=3))
+
+def now_tr():
+    """TR duvar-saati (naive) — DB'deki naive değerlerle karşılaştırmak için."""
+    return datetime.now(TR_TZ).replace(tzinfo=None)
+
+def now_tr_str():
+    """SQLite CURRENT_TIMESTAMP ile aynı format, TR saatiyle."""
+    return now_tr().strftime('%Y-%m-%d %H:%M:%S')
 
 # Gemini API konfigürasyonu
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "your_gemini_api_key_here")
@@ -1294,9 +1304,9 @@ def add_course_to_roadmap():
         roadmap_steps = create_dynamic_roadmap(data['course_title'], course_link, sections, skill, level)
         
         cursor.execute('''
-            INSERT INTO user_courses (user_id, course_title, course_link, course_description, roadmap_sections)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (payload['user_id'], data['course_title'], course_link, data['course_description'], json.dumps(roadmap_steps)))
+            INSERT INTO user_courses (user_id, course_title, course_link, course_description, roadmap_sections, added_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (payload['user_id'], data['course_title'], course_link, data['course_description'], json.dumps(roadmap_steps), now_tr_str()))
         
         conn.commit()
         conn.close()
@@ -1509,9 +1519,9 @@ def complete_course():
         # Kursu tamamlandı olarak işaretle
         cursor.execute('''
             UPDATE user_courses 
-            SET status = 'completed', completed_at = CURRENT_TIMESTAMP
+            SET status = 'completed', completed_at = ?
             WHERE id = ?
-        ''', (course_id,))
+        ''', (now_tr_str(), course_id))
         
         conn.commit()
         conn.close()
@@ -2139,7 +2149,7 @@ def join_tournament():
         try:
             start_time = datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
             end_time = datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
-            current_time = datetime.now()
+            current_time = now_tr()
             
             # Turnuva bitmişse katılıma izin verme
             if current_time > end_time:
@@ -2161,9 +2171,9 @@ def join_tournament():
         
         # Katılımı kaydet
         cursor.execute('''
-            INSERT INTO tournament_participants (user_id, tournament_id, total_questions, correct_answers)
-            VALUES (?, ?, 0, 0)
-        ''', (payload['user_id'], data['tournament_id']))
+            INSERT INTO tournament_participants (user_id, tournament_id, total_questions, correct_answers, joined_at)
+            VALUES (?, ?, 0, 0, ?)
+        ''', (payload['user_id'], data['tournament_id'], now_tr_str()))
         
         conn.commit()
         conn.close()
@@ -2281,7 +2291,7 @@ def answer_question():
             return jsonify({'error': 'Turnuva bulunamadı'}), 404
         
         end_time = datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
-        current_time = datetime.now()
+        current_time = now_tr()
         
         # Turnuva bitmişse cevap vermeye izin verme
         if current_time > end_time:
@@ -2391,10 +2401,10 @@ def complete_tournament():
         # Turnuvayı tamamla
         cursor.execute('''
             UPDATE tournament_participants 
-            SET completed_at = CURRENT_TIMESTAMP,
+            SET completed_at = ?,
                 total_score = ?
             WHERE user_id = ? AND tournament_id = ?
-        ''', (final_score, payload['user_id'], data['tournament_id']))
+        ''', (now_tr_str(), final_score, payload['user_id'], data['tournament_id']))
         
         conn.commit()
         conn.close()
@@ -2518,7 +2528,7 @@ def get_user_tournament_status(tournament_id):
         participant = cursor.fetchone()
         conn.close()
         
-        current_time = datetime.now()
+        current_time = now_tr()
         
         # Zaman kontrolü (daha esnek)
         try:
@@ -2962,7 +2972,7 @@ def get_tournament_stats(tournament_id):
         highest_score = round(max_score, 1) if max_score else 0
         
         # Kalan süre hesapla
-        now = datetime.now()
+        now = now_tr()
         end_datetime = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
         
         if end_datetime > now:
@@ -3002,7 +3012,7 @@ def get_weekly_tournament_calendar():
         cursor = conn.cursor()
         
         # Bu haftanın başlangıç ve bitiş tarihlerini hesapla
-        now = datetime.now()
+        now = now_tr()
         start_of_week = now - timedelta(days=now.weekday())
         start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_week = start_of_week + timedelta(days=7)
@@ -3368,7 +3378,7 @@ def get_completed_courses():
             
             # Ne kadar zaman önce tamamlandığını hesapla
             if completed_date:
-                now = datetime.now()
+                now = now_tr()
                 time_diff = now - completed_date
                 
                 if time_diff.days > 0:
