@@ -26,6 +26,21 @@ jobs:
             https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/ \
             || true
 
+      - name: Run TestSprite Frontend Suite (2 tests)
+        continue-on-error: true
+        env:
+          TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
+        run: |
+          testsprite setup --from-env
+          set +e
+          FAIL=0
+          for ID in \
+            c3f060b1-79bd-4f39-8f99-e388ff26a10f \
+            28118134-b833-4b6f-ba20-38efd0bff083; do
+            testsprite test run "$ID" --wait || FAIL=1
+          done
+          exit $FAIL
+
       - name: Run TestSprite Backend Suite (5 tests)
         env:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
@@ -39,6 +54,6 @@ jobs:
             d1753dd2-0161-4c35-8164-92e92b237601 \
             31e5401a-5dba-42a6-9762-83366fa3ab67 \
             3d145644-69f1-4866-b971-f806a78d4e33; do
-            testsprite test run "$ID" --wait --skip-dependencies || FAIL=1
+            testsprite test run "$ID" --wait || FAIL=1
           done
           exit $FAIL

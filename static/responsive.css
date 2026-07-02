@@ -1,0 +1,70 @@
+/* Global zoom / resolution guards — safe on all pages */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.flex > *,
+.grid > *,
+[class*="flex"] > *,
+[class*="grid"] > * {
+    min-width: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+a,
+label,
+td,
+th,
+li {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+table {
+    max-width: 100%;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    h1 {
+        font-size: clamp(1.5rem, 8vw, 2.5rem) !important;
+    }
+
+    h2 {
+        font-size: clamp(1.25rem, 6vw, 2rem) !important;
+    }
+}

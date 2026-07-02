@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='responsive.css') }}">
     <title>KNOWLEDGEWAR - Roadmap</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -740,9 +741,9 @@
     <!-- Header -->
     <header class="relative z-20 glass-card-strong border-b border-white/20">
         <div class="container mx-auto px-8 py-4">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-4 flex-wrap">
                 <!-- Sol Taraf - Logo ve Başlık -->
-                <div class="flex items-center space-x-8">
+                <div class="flex items-center gap-4 md:gap-8 flex-wrap min-w-0">
                     <a href="/" class="text-2xl font-bold hologram-text hover:text-cosmic-green transition-colors">KNOWLEDGEWAR</a>
                     <div class="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-white/30 to-transparent">
                     </div>
@@ -752,7 +753,7 @@
 
 
                 <!-- Sağ Taraf - Butonlar ve Profil -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center gap-3 md:gap-4 flex-wrap ml-auto justify-end">
                     <div id="langToggle" class="nav-lang-toggle text-sm">
                         <button type="button" id="langEn" class="text-cyan-400 font-semibold">EN</button>
                         <span class="text-gray-600">|</span>

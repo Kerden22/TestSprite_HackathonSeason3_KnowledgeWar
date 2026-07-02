@@ -239,21 +239,58 @@ for ID in a5b1c09f-26f1-4451-a0ee-1961bae0aef1 c2d5d7c3-0e8f-4247-a384-ff80c45d4
 
 ---
 
+### Iteration 9 — Responsive + Admin i18n + CI (2 FE + 5 BE)
+
+| # | Action | TestSprite | Result |
+|---|--------|-----------|--------|
+| 49 | **FIX:** Global zoom/resolution guards (`responsive.css` on all pages) | `static/responsive.css` | Committed |
+| 50 | **FIX:** Home + roadmap header wrap at high zoom (175%) | `index.html`, `roadmap.html` | Committed |
+| 51 | **FEAT:** Tournament admin EN/TR i18n | `tournament-admin.html`, `i18n/*.json` | Committed |
+| 52 | **CI:** Push = 2 FE (first, `continue-on-error`) + 5 BE | `.github/workflows/testsprite.yml` | Committed |
+| 53 | **FIX:** Removed invalid `--skip-dependencies` flag (CLI unknown option) | `.github/workflows/testsprite.yml` | Committed |
+
+#### CI push scope — 2 FE + 5 BE
+
+| Type | Test ID | Name | Prior status |
+|------|---------|------|--------------|
+| FE | `c3f060b1` | Login → tournament | **BLOCKED** — re-run in CI |
+| FE | `28118134` | Guest nav + Home | **FAILED** — re-run in CI |
+| BE | `822308eb` | API: login returns token | pending |
+| BE | `85b52f13` | API: profile requires auth | pending |
+| BE | `d1753dd2` | API: tournaments list | pending |
+| BE | `31e5401a` | API: active course with auth | pending |
+| BE | `3d145644` | API: completed courses with auth | pending |
+
+#### Backend — portal baseline (before this push)
+
+Manual **Rerun all** on Endpoint Tests (2026-07-01):
+
+| Verdict | Test ID | Name |
+|---------|---------|------|
+| **PASS** | `822308eb` | API: login returns token |
+| **PASS** | `85b52f13` | API: profile requires auth |
+| **PASS** | `d1753dd2` | API: tournaments list |
+| **BLOCKED** | `31e5401a` | API: active course with auth — `AUTH_TOKEN` not produced by login test |
+| **BLOCKED** | `3d145644` | API: completed courses with auth — same dependency starvation |
+
+**Score: 3 PASS / 2 BLOCKED** — blocked pair need dependency removed or `auth_token` wiring fixed; CI runs each BE test individually (no `--skip-dependencies`).
+
+---
+
 ## Summary
 
 | Metric | Count |
 |--------|:---:|
-| Total iterations | 8 |
+| Total iterations | 9 |
 | FAIL → FIX cycles | **2** (home navigation, guest tournamentBtn) |
 | Tests created | **30** (25 FE + 5 BE) |
 | Banked (do not re-run) | **8** FE passes |
-| Waived (excluded from CI) | **2** (`28118134`, `c3f060b1`) |
+| CI FE on push | **2** (`28118134`, `c3f060b1`) — re-run after fixes |
+| CI BE on push | **5** — all run each push |
+| Backend portal baseline | **3/5 PASS**, 2 BLOCKED (`AUTH_TOKEN`) |
 | Remaining FE to run | **15** draft tests |
-| Backend tests run | **0/5** — pending manual run |
-| TestSprite reruns | 20+ (CLI + Actions) |
-| Features shipped | Full i18n (7 pages) + 25 FE suite + 5 BE API tests + CI |
-| Commits | 18+ (`fcd7901` latest) |
-| CI/CD integrated | Yes — push = **5 FE batch**; banked tests skipped |
+| Features shipped | i18n (8 pages incl. admin) + responsive guards + header wrap |
+| CI/CD integrated | Yes — push = **2 FE + 5 BE** |
 
 **Evidence:** https://github.com/Kerden22/TestSprite_HackathonSeason3_KnowledgeWar/commits/master  
 **Live URL:** https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com  

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KNOWLEDGEWAR - Turnuva Admin</title>
+    <title>KNOWLEDGEWAR - Tournament Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -166,22 +166,47 @@
             border-color: #ef4444 !important;
             background: rgba(239, 68, 68, 0.1) !important;
         }
+
+        .nav-lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-lang-toggle button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .admin-header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem 1rem;
+        }
     </style>
 </head>
-<body class="cosmic-bg min-h-screen overflow-y-auto">
+<body class="cosmic-bg min-h-screen overflow-y-auto" data-i18n-page-title="meta.tournamentAdminTitle">
     <!-- Header -->
     <header class="cosmic-header">
         <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
-                    <span class="text-xl font-semibold text-cosmic-blue">🏆 Turnuva Admin Paneli</span>
+                    <span class="text-xl font-semibold text-cosmic-blue" data-i18n="tournamentAdmin.headerBadge">🏆 Tournament Admin Panel</span>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/tournament" class="text-gray-300 hover:text-white transition-colors">
-                        ← Turnuva Sayfasına Dön
+                <div class="admin-header-actions">
+                    <div id="langToggle" class="nav-lang-toggle text-sm" role="group" aria-label="Language">
+                        <button type="button" id="langEn" class="text-cyan-400 font-semibold">EN</button>
+                        <span class="text-gray-500">|</span>
+                        <button type="button" id="langTr" class="text-gray-400 hover:text-white font-medium">TR</button>
+                    </div>
+                    <a href="/tournament" class="text-gray-300 hover:text-white transition-colors whitespace-nowrap" data-i18n="tournamentAdmin.backToTournament">
+                        ← Back to Tournament Page
                     </a>
-                    <a href="/" class="text-gray-300 hover:text-white transition-colors">
-                        🏠 Ana Sayfa
+                    <a href="/" class="text-gray-300 hover:text-white transition-colors whitespace-nowrap" data-i18n="tournamentAdmin.backToHome">
+                        🏠 Home
                     </a>
                 </div>
             </div>
@@ -193,10 +218,10 @@
         <div class="max-w-6xl mx-auto pb-12">
             <!-- Page Title -->
             <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4">
-                    🎯 Turnuva Yönetim Paneli
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4" data-i18n="tournamentAdmin.pageTitle">
+                    🎯 Tournament Management Panel
                 </h1>
-                <p class="text-gray-400 text-lg">Gemini AI ile otomatik soru üretimi ve turnuva yönetimi arayüzü yapıyorum</p>
+                <p class="text-gray-400 text-lg" data-i18n="tournamentAdmin.pageSubtitle">Gemini AI powered automatic question generation and tournament management interface</p>
             </div>
 
             <!-- Form Container -->
@@ -204,52 +229,54 @@
                 <form id="tournamentForm" class="space-y-8">
                     <!-- Tournament Title -->
                     <div class="space-y-4">
-                        <label class="block text-xl font-semibold text-white">
+                        <label class="block text-xl font-semibold text-white" data-i18n="tournamentAdmin.labelTitle">
                             🏆 Turnuva Başlığı
                         </label>
                         <input type="text" name="title" required 
                                class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                               data-i18n-placeholder="tournamentAdmin.placeholderTitle"
                                placeholder="Örnek: Python Data Structures Mastery Challenge">
                     </div>
 
                     <!-- Tournament Content -->
                     <div class="space-y-4">
-                        <label class="block text-xl font-semibold text-white">
+                        <label class="block text-xl font-semibold text-white" data-i18n="tournamentAdmin.labelContent">
                             📝 Turnuva İçeriği (Soru Üretimi İçin)
                         </label>
                         <textarea name="content" required rows="4"
                                   class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                                  data-i18n-placeholder="tournamentAdmin.placeholderContent"
                                   placeholder="Örnek: Python programlama dili, değişkenler, döngüler, fonksiyonlar, listeler, sözlükler, dosya işlemleri, hata yönetimi, nesne yönelimli programlama, modüller ve paketler hakkında sorular hazırla"></textarea>
-                        <p class="text-sm text-gray-400">Bu alana yazdığınız konulara göre AI sorular üretecektir.</p>
+                        <p class="text-sm text-gray-400" data-i18n="tournamentAdmin.hintContent">Bu alana yazdığınız konulara göre AI sorular üretecektir.</p>
                     </div>
 
                     <!-- Tournament Settings -->
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-4">
-                            <label class="block text-xl font-semibold text-white">
+                            <label class="block text-xl font-semibold text-white" data-i18n="tournamentAdmin.labelQuestionCount">
                                 🔢 Soru Sayısı
                             </label>
                             <input type="number" name="question_count" min="5" max="50" value="15" required 
                                    class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
                                    placeholder="15">
-                            <p class="text-sm text-gray-400">Turnuvada kaç soru olacağını belirleyin (5-50 arası)</p>
+                            <p class="text-sm text-gray-400" data-i18n="tournamentAdmin.hintQuestionCount">Turnuvada kaç soru olacağını belirleyin (5-50 arası)</p>
                         </div>
                         
                         <div class="space-y-4">
-                            <label class="block text-xl font-semibold text-white">
+                            <label class="block text-xl font-semibold text-white" data-i18n="tournamentAdmin.labelDuration">
                                 ⏱️ Süre (Dakika)
                             </label>
                             <input type="number" name="duration_minutes" min="10" max="180" value="45" required 
                                    class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
                                    placeholder="45">
-                            <p class="text-sm text-gray-400">Turnuva süresi (10-180 dakika arası)</p>
+                            <p class="text-sm text-gray-400" data-i18n="tournamentAdmin.hintDuration">Turnuva süresi (10-180 dakika arası)</p>
                         </div>
                     </div>
 
                     <!-- Date and Time Selection -->
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-4">
-                            <label class="block text-xl font-semibold text-white">
+                            <label class="block text-xl font-semibold text-white" data-i18n="tournamentAdmin.labelStartTime">
                                 🕐 Başlangıç Zamanı
                             </label>
                             <input type="datetime-local" name="start_time" required 
@@ -257,7 +284,7 @@
                         </div>
                         
                         <div class="space-y-4">
-                            <label class="block text-xl font-semibold text-white">
+                            <label class="block text-xl font-semibold text-white" data-i18n="tournamentAdmin.labelEndTime">
                                 🕐 Bitiş Zamanı
                             </label>
                             <input type="datetime-local" name="end_time" required 
@@ -268,7 +295,8 @@
                     <!-- Generate Questions Button -->
                     <div class="text-center pt-6">
                         <button type="submit" 
-                                class="cosmic-btn text-xl px-12 py-4 pulse-btn">
+                                class="cosmic-btn text-xl px-12 py-4 pulse-btn"
+                                data-i18n="tournamentAdmin.generateBtn">
                             🤖 AI ile Soru Üret
                         </button>
                     </div>
@@ -279,26 +307,24 @@
             <div id="loadingContainer" class="glass-card p-8 rounded-3xl hidden">
                 <div class="text-center space-y-6">
                     <div class="text-3xl">🚀</div>
-                    <h3 class="text-2xl font-bold text-white">Sorular Üretiliyor...</h3>
-                    <p class="text-gray-400">Gemini AI en uygun soruları hazırlıyor</p>
+                    <h3 class="text-2xl font-bold text-white" data-i18n="tournamentAdmin.loadingTitle">Sorular Üretiliyor...</h3>
+                    <p class="text-gray-400" data-i18n="tournamentAdmin.loadingSubtitle">Gemini AI en uygun soruları hazırlıyor</p>
                     
                     <!-- Progress Bar -->
                     <div class="w-full bg-gray-700 rounded-full h-3">
                         <div class="cosmic-progress-fill h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                     
-                    <p class="text-sm text-gray-500">Bu işlem birkaç saniye sürebilir</p>
+                    <p class="text-sm text-gray-500" data-i18n="tournamentAdmin.loadingHint">Bu işlem birkaç saniye sürebilir</p>
                 </div>
             </div>
 
             <!-- Questions Container -->
             <div id="questionsContainer" class="glass-card p-8 rounded-3xl hidden">
                 <div class="space-y-8">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-2xl font-bold text-white">📝 Üretilen Sorular</h3>
-                        <div class="text-sm text-gray-400">
-                            <span id="questionCount">0</span> soru üretildi
-                        </div>
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <h3 class="text-2xl font-bold text-white" data-i18n="tournamentAdmin.generatedQuestions">📝 Üretilen Sorular</h3>
+                        <div class="text-sm text-gray-400" id="questionsProducedLabel">0 soru üretildi</div>
                     </div>
 
                     <div id="questionsList" class="space-y-6">
@@ -308,11 +334,13 @@
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row gap-4 pt-6">
                         <button id="saveTournamentBtn" 
-                                class="cosmic-btn cosmic-btn-success text-lg px-8 py-3 flex-1">
+                                class="cosmic-btn cosmic-btn-success text-lg px-8 py-3 flex-1"
+                                data-i18n="tournamentAdmin.saveTournament">
                             💾 Turnuvayı Kaydet
                         </button>
                         <button onclick="resetForm()" 
-                                class="cosmic-btn cosmic-btn-danger text-lg px-8 py-3 flex-1">
+                                class="cosmic-btn cosmic-btn-danger text-lg px-8 py-3 flex-1"
+                                data-i18n="tournamentAdmin.newTournament">
                             🔄 Yeni Turnuva
                         </button>
                     </div>
@@ -321,9 +349,9 @@
 
             <!-- Existing Tournaments -->
             <div class="glass-card p-8 rounded-3xl mt-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-2xl font-bold text-white">📋 Mevcut Turnuvalar</h3>
-                    <button onclick="loadExistingTournaments()" class="text-cosmic-blue hover:text-white transition-colors text-sm px-3 py-1 rounded bg-blue-500/20">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <h3 class="text-2xl font-bold text-white" data-i18n="tournamentAdmin.existingTournaments">📋 Mevcut Turnuvalar</h3>
+                    <button onclick="loadExistingTournaments()" class="text-cosmic-blue hover:text-white transition-colors text-sm px-3 py-1 rounded bg-blue-500/20" data-i18n="tournamentAdmin.refresh">
                         🔄 Yenile
                     </button>
                 </div>
@@ -333,14 +361,99 @@
             </div>
         </div>
     </main>
+    <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script>
-        // Form submission
+        function localeForLang() {
+            return (typeof getLang === 'function' && getLang() === 'tr') ? 'tr-TR' : 'en-US';
+        }
+
+        function showAdminSwal(icon, titleKey, text) {
+            return Swal.fire({
+                icon,
+                title: t(titleKey),
+                text: text || t('tournamentAdmin.genericError'),
+                confirmButtonText: t('common.ok')
+            });
+        }
+
+        function updateQuestionsProducedLabel(count) {
+            const el = document.getElementById('questionsProducedLabel');
+            if (el) el.textContent = tFormat('tournamentAdmin.questionsProduced', { n: count });
+        }
+
+        function setSaveButtonLabel(isUpdate) {
+            const btn = document.getElementById('saveTournamentBtn');
+            if (btn) btn.textContent = t(isUpdate ? 'tournamentAdmin.updateTournament' : 'tournamentAdmin.saveTournament');
+        }
+
+        function buildQuestionCardHtml(question, index) {
+            const esc = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+            return `
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <h4 class="text-lg font-bold text-white">${tFormat('tournamentAdmin.questionN', { n: index + 1 })}</h4>
+                    <button type="button" onclick="editQuestion(${index})" class="text-cosmic-blue hover:text-white transition-colors">
+                        ${t('tournamentAdmin.edit')}
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">${t('tournamentAdmin.questionText')}</label>
+                        <textarea class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400"
+                                  rows="3" data-question="${index}">${esc(question.question)}</textarea>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">${t('tournamentAdmin.optionA')}</label>
+                            <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400"
+                                   value="${esc(question.options[0])}" data-option="${index}-0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">${t('tournamentAdmin.optionB')}</label>
+                            <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400"
+                                   value="${esc(question.options[1])}" data-option="${index}-1">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">${t('tournamentAdmin.optionC')}</label>
+                            <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400"
+                                   value="${esc(question.options[2])}" data-option="${index}-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">${t('tournamentAdmin.optionD')}</label>
+                            <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400"
+                                   value="${esc(question.options[3])}" data-option="${index}-3">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">${t('tournamentAdmin.correctOption')}</label>
+                        <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400"
+                                data-correct="${index}">
+                            <option value="A" ${question.correct_option === 'A' ? 'selected' : ''}>A</option>
+                            <option value="B" ${question.correct_option === 'B' ? 'selected' : ''}>B</option>
+                            <option value="C" ${question.correct_option === 'C' ? 'selected' : ''}>C</option>
+                            <option value="D" ${question.correct_option === 'D' ? 'selected' : ''}>D</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQuestionsList(questions) {
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+            questions.forEach((question, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card rounded-xl p-6';
+                questionCard.innerHTML = buildQuestionCardHtml(question, index);
+                questionsList.appendChild(questionCard);
+            });
+            updateQuestionsProducedLabel(questions.length);
+        }
+
         document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             await generateQuestions();
         });
 
-        // Save tournament button
         document.getElementById('saveTournamentBtn').addEventListener('click', async () => {
             await saveTournament();
         });
@@ -348,40 +461,31 @@
         async function generateQuestions() {
             const form = document.getElementById('tournamentForm');
             const formData = new FormData(form);
-            
+
             const data = {
                 title: formData.get('title'),
                 content: formData.get('content'),
-                question_count: parseInt(formData.get('question_count')),
-                duration_minutes: parseInt(formData.get('duration_minutes')),
+                question_count: parseInt(formData.get('question_count'), 10),
+                duration_minutes: parseInt(formData.get('duration_minutes'), 10),
                 start_time: formData.get('start_time'),
                 end_time: formData.get('end_time')
             };
-            
-            console.log('Sending data:', data);
-            
-            // Show loading
+
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('loadingContainer').classList.remove('hidden');
-            
-            // Simulate loading animation
+
             const progressBar = document.querySelector('#loadingContainer .cosmic-progress-fill');
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 5;
                 progressBar.style.width = progress + '%';
-                if (progress >= 90) {
-                    clearInterval(interval);
-                }
+                if (progress >= 90) clearInterval(interval);
             }, 100);
-            
+
             try {
                 const token = localStorage.getItem('authToken');
-                if (!token) {
-                    throw new Error('Giriş yapmanız gerekiyor');
-                }
-                
-                console.log('Making API request...');
+                if (!token) throw new Error(t('tournamentAdmin.loginRequired'));
+
                 const response = await fetch('/api/generate-questions', {
                     method: 'POST',
                     headers: {
@@ -390,157 +494,59 @@
                     },
                     body: JSON.stringify(data)
                 });
-                
-                console.log('Response status:', response.status);
+
                 const result = await response.json();
-                console.log('Response data:', result);
-                
                 if (result.success) {
                     showQuestions(result.questions, data);
                 } else {
-                    throw new Error(result.error || 'Bir hata oluştu');
+                    throw new Error(result.error || t('tournamentAdmin.genericError'));
                 }
-                
             } catch (error) {
                 console.error('Error:', error);
-                
-                // Hide loading and show form again
                 document.getElementById('loadingContainer').classList.add('hidden');
                 document.getElementById('formContainer').classList.remove('hidden');
-                
-                // Show error message
-                const errorMessage = error.message || 'Bilinmeyen bir hata oluştu';
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Uyarı',
-                    text: 'Hata',
-                    confirmButtonText: 'Tamam'
-                }).then(() => {});
-                return;
+                showAdminSwal('warning', 'common.warning', error.message || t('tournamentAdmin.unknownError'));
             }
         }
 
         function showQuestions(questions, tournamentData) {
-            console.log('Showing questions:', questions);
-            
-            // Complete the progress bar
             const progressBar = document.querySelector('#loadingContainer .cosmic-progress-fill');
             progressBar.style.width = '100%';
-            
-            // Hide loading and show questions
+
             setTimeout(() => {
                 document.getElementById('loadingContainer').classList.add('hidden');
                 document.getElementById('questionsContainer').classList.remove('hidden');
-                
-                // Update question count
-                document.getElementById('questionCount').textContent = questions.length;
-                
-                // Show questions
-                const questionsList = document.getElementById('questionsList');
-                questionsList.innerHTML = '';
-                
-                questions.forEach((question, index) => {
-                    const questionCard = document.createElement('div');
-                    questionCard.className = 'question-card rounded-xl p-6';
-                    questionCard.innerHTML = `
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-lg font-bold text-white">Soru ${index + 1}</h4>
-                            <button onclick="editQuestion(${index})" class="text-cosmic-blue hover:text-white transition-colors">
-                                ✏️ Düzenle
-                            </button>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-300 mb-2">Soru Metni:</label>
-                                <textarea class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                          rows="3" data-question="${index}">${question.question}</textarea>
-                            </div>
-                            
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-300 mb-2">A Şıkkı:</label>
-                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                           value="${question.options[0]}" data-option="${index}-0">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-300 mb-2">B Şıkkı:</label>
-                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                           value="${question.options[1]}" data-option="${index}-1">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-300 mb-2">C Şıkkı:</label>
-                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                           value="${question.options[2]}" data-option="${index}-2">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-300 mb-2">D Şıkkı:</label>
-                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                           value="${question.options[3]}" data-option="${index}-3">
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-300 mb-2">Doğru Şık:</label>
-                                <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                        data-correct="${index}">
-                                    <option value="A" ${question.correct_option === 'A' ? 'selected' : ''}>A</option>
-                                    <option value="B" ${question.correct_option === 'B' ? 'selected' : ''}>B</option>
-                                    <option value="C" ${question.correct_option === 'C' ? 'selected' : ''}>C</option>
-                                    <option value="D" ${question.correct_option === 'D' ? 'selected' : ''}>D</option>
-                                </select>
-                            </div>
-                        </div>
-                    `;
-                    questionsList.appendChild(questionCard);
-                });
-                
-                // Store tournament data for later use
-                window.currentTournament = {
-                    ...tournamentData,
-                    questions: questions
-                };
-                
+                renderQuestionsList(questions);
+                setSaveButtonLabel(false);
+                window.currentTournament = { ...tournamentData, questions };
             }, 500);
         }
 
         async function saveTournament() {
             if (!window.currentTournament) {
-                Swal.fire({
-                icon: 'warning',
-                title: 'Uyarı',
-                text: 'Önce sorular üretin',
-                confirmButtonText: 'Tamam'
-                }).then(() => {});
+                showAdminSwal('warning', 'common.warning', t('tournamentAdmin.generateFirst'));
                 return;
             }
 
-            // Collect updated questions
             const updatedQuestions = [];
             const questionCount = window.currentTournament.questions.length;
-            
+
             for (let i = 0; i < questionCount; i++) {
-                const questionText = document.querySelector(`[data-question="${i}"]`).value;
-                const options = [
-                    document.querySelector(`[data-option="${i}-0"]`).value,
-                    document.querySelector(`[data-option="${i}-1"]`).value,
-                    document.querySelector(`[data-option="${i}-2"]`).value,
-                    document.querySelector(`[data-option="${i}-3"]`).value
-                ];
-                const correctOption = document.querySelector(`[data-correct="${i}"]`).value;
-                
                 updatedQuestions.push({
-                    question: questionText,
-                    options: options,
-                    correct_option: correctOption
+                    question: document.querySelector(`[data-question="${i}"]`).value,
+                    options: [
+                        document.querySelector(`[data-option="${i}-0"]`).value,
+                        document.querySelector(`[data-option="${i}-1"]`).value,
+                        document.querySelector(`[data-option="${i}-2"]`).value,
+                        document.querySelector(`[data-option="${i}-3"]`).value
+                    ],
+                    correct_option: document.querySelector(`[data-correct="${i}"]`).value
                 });
             }
 
             try {
                 const token = localStorage.getItem('authToken');
-                if (!token) {
-                    throw new Error('Giriş yapmanız gerekiyor');
-                }
+                if (!token) throw new Error(t('tournamentAdmin.loginRequired'));
 
                 const response = await fetch('/api/save-tournament', {
                     method: 'POST',
@@ -560,34 +566,22 @@
                 });
 
                 const result = await response.json();
-                
                 if (result.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Başarılı!',
-                        text: 'Turnuva başarıyla kaydedildi!',
-                        confirmButtonText: 'Tamam'
+                        title: t('tournamentAdmin.successTitle'),
+                        text: t('tournamentAdmin.saveSuccess'),
+                        confirmButtonText: t('common.ok')
                     }).then(() => {
-                        // Kısa bir gecikme ile turnuva listesini yenile (veritabanı işleminin tamamlanması için)
-                        setTimeout(() => {
-                            loadExistingTournaments();
-                        }, 500);
-                        // Formu sıfırla
+                        setTimeout(() => loadExistingTournaments(), 500);
                         resetForm();
                     });
                 } else {
-                    throw new Error(result.error || 'Turnuva kaydedilirken hata oluştu');
+                    throw new Error(result.error || t('tournamentAdmin.saveError'));
                 }
-
             } catch (error) {
                 console.error('Error:', error);
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Uyarı',
-                    text: 'Hata',
-                    confirmButtonText: 'Tamam'
-                }).then(() => {});
-                return;
+                showAdminSwal('warning', 'common.warning', error.message || t('tournamentAdmin.saveError'));
             }
         }
 
@@ -595,179 +589,95 @@
             document.getElementById('questionsContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('tournamentForm').reset();
-            document.getElementById('saveTournamentBtn').textContent = '💾 Turnuvayı Kaydet';
+            setSaveButtonLabel(false);
             window.currentTournament = null;
         }
 
         function displayQuestions(questions) {
-            // Update question count
-            document.getElementById('questionCount').textContent = questions.length;
-            
-            // Show questions
-            const questionsList = document.getElementById('questionsList');
-            questionsList.innerHTML = '';
-            
-            questions.forEach((question, index) => {
-                const questionCard = document.createElement('div');
-                questionCard.className = 'question-card rounded-xl p-6';
-                questionCard.innerHTML = `
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-bold text-white">Soru ${index + 1}</h4>
-                        <button onclick="editQuestion(${index})" class="text-cosmic-blue hover:text-white transition-colors">
-                            ✏️ Düzenle
-                        </button>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">Soru Metni:</label>
-                            <textarea class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                      rows="3" data-question="${index}">${question.question}</textarea>
-                        </div>
-                        
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-300 mb-2">A Şıkkı:</label>
-                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                       value="${question.options[0]}" data-option="${index}-0">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-300 mb-2">B Şıkkı:</label>
-                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                       value="${question.options[1]}" data-option="${index}-1">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-300 mb-2">C Şıkkı:</label>
-                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                       value="${question.options[2]}" data-option="${index}-2">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-300 mb-2">D Şıkkı:</label>
-                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                       value="${question.options[3]}" data-option="${index}-3">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">Doğru Şık:</label>
-                            <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
-                                    data-correct="${index}">
-                                <option value="A" ${question.correct_option === 'A' ? 'selected' : ''}>A</option>
-                                <option value="B" ${question.correct_option === 'B' ? 'selected' : ''}>B</option>
-                                <option value="C" ${question.correct_option === 'C' ? 'selected' : ''}>C</option>
-                                <option value="D" ${question.correct_option === 'D' ? 'selected' : ''}>D</option>
-                            </select>
-                        </div>
-                    </div>
-                `;
-                questionsList.appendChild(questionCard);
-            });
-            
-            // Store tournament data for later use
+            renderQuestionsList(questions);
             window.currentTournament = {
                 ...window.currentTournament,
-                questions: questions
+                questions
             };
         }
 
         async function loadExistingTournaments() {
             try {
-                console.log('Loading existing tournaments...');
                 const token = localStorage.getItem('authToken');
-                if (!token) {
-                    console.log('No auth token found');
-                    return;
-                }
+                if (!token) return;
 
-                // Show loading indicator
                 const container = document.getElementById('existingTournaments');
                 container.innerHTML = `
                     <div class="text-center text-gray-400 py-8">
                         <div class="text-3xl mb-4">⏳</div>
-                        <div class="text-lg font-bold mb-2">Turnuvalar Yükleniyor...</div>
-                        <div class="text-sm">Lütfen bekleyin</div>
+                        <div class="text-lg font-bold mb-2">${t('tournamentAdmin.loadingTournaments')}</div>
+                        <div class="text-sm">${t('tournamentAdmin.pleaseWait')}</div>
                     </div>
                 `;
 
                 const response = await fetch('/api/tournaments', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                console.log('Tournaments API response status:', response.status);
                 const result = await response.json();
-                console.log('Loaded tournaments:', result);
-                
-                if (result.success) {
-                    const container = document.getElementById('existingTournaments');
-                    container.innerHTML = '';
-                    
-                    console.log('Tournament count:', result.tournaments.length);
-                    
-                    if (result.tournaments.length === 0) {
-                        container.innerHTML = `
-                            <div class="text-center text-gray-400 py-8">
-                                <div class="text-3xl mb-4">🏆</div>
-                                <div class="text-lg font-bold mb-2">Henüz Turnuva Yok</div>
-                                <div class="text-sm">Yukarıdaki formu kullanarak ilk turnuvanızı oluşturun!</div>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    result.tournaments.forEach(tournament => {
-                        const startDate = new Date(tournament.start_time).toLocaleString('tr-TR');
-                        const endDate = new Date(tournament.end_time).toLocaleString('tr-TR');
-                        const isActive = new Date() >= new Date(tournament.start_time) && new Date() <= new Date(tournament.end_time);
-                        
-                        const tournamentCard = document.createElement('div');
-                        tournamentCard.className = 'question-card rounded-xl p-6 mb-4';
-                        tournamentCard.innerHTML = `
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <h4 class="text-lg font-bold text-white mb-2">${tournament.title}</h4>
-                                    <p class="text-gray-400 text-sm mb-2">${tournament.content}</p>
-                                    <div class="grid grid-cols-2 gap-4 text-xs text-gray-500">
-                                        <div>
-                                            <strong>Başlangıç:</strong> ${startDate}
-                                        </div>
-                                        <div>
-                                            <strong>Bitiş:</strong> ${endDate}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-right ml-4">
-                                    <div class="text-cosmic-green font-bold mb-2">
-                                        ${isActive ? '🟢 Aktif' : '🔴 Pasif'}
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button onclick="editTournament(${tournament.id})" class="text-cosmic-blue hover:text-white transition-colors text-sm px-3 py-1 rounded bg-blue-500/20">
-                                            ✏️ Düzenle
-                                        </button>
-                                        <button onclick="deleteTournament(${tournament.id})" class="text-cosmic-red hover:text-white transition-colors text-sm px-3 py-1 rounded bg-red-500/20">
-                                            🗑️ Sil
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        container.appendChild(tournamentCard);
-                    });
-                    
-                    console.log('Tournaments loaded successfully');
-                } else {
-                    console.error('API returned error:', result.error);
-                    throw new Error(result.error || 'Turnuvalar yüklenirken hata oluştu');
+                if (!result.success) {
+                    throw new Error(result.error || t('tournamentAdmin.genericError'));
                 }
+
+                container.innerHTML = '';
+                if (result.tournaments.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-gray-400 py-8">
+                            <div class="text-3xl mb-4">🏆</div>
+                            <div class="text-lg font-bold mb-2">${t('tournamentAdmin.noTournaments')}</div>
+                            <div class="text-sm">${t('tournamentAdmin.noTournamentsHint')}</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const locale = localeForLang();
+                result.tournaments.forEach((tournament) => {
+                    const startDate = new Date(tournament.start_time).toLocaleString(locale);
+                    const endDate = new Date(tournament.end_time).toLocaleString(locale);
+                    const isActive = new Date() >= new Date(tournament.start_time) && new Date() <= new Date(tournament.end_time);
+                    const tournamentCard = document.createElement('div');
+                    tournamentCard.className = 'question-card rounded-xl p-6 mb-4';
+                    tournamentCard.innerHTML = `
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-lg font-bold text-white mb-2">${tournament.title}</h4>
+                                <p class="text-gray-400 text-sm mb-2">${tournament.content}</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500">
+                                    <div><strong>${t('tournamentAdmin.startLabel')}</strong> ${startDate}</div>
+                                    <div><strong>${t('tournamentAdmin.endLabel')}</strong> ${endDate}</div>
+                                </div>
+                            </div>
+                            <div class="text-right ml-0 sm:ml-4">
+                                <div class="text-cosmic-green font-bold mb-2">
+                                    ${isActive ? t('tournamentAdmin.statusActive') : t('tournamentAdmin.statusInactive')}
+                                </div>
+                                <div class="flex flex-wrap gap-2 justify-end">
+                                    <button type="button" onclick="editTournament(${tournament.id})" class="text-cosmic-blue hover:text-white transition-colors text-sm px-3 py-1 rounded bg-blue-500/20">
+                                        ${t('tournamentAdmin.edit')}
+                                    </button>
+                                    <button type="button" onclick="deleteTournament(${tournament.id})" class="text-cosmic-red hover:text-white transition-colors text-sm px-3 py-1 rounded bg-red-500/20">
+                                        ${t('tournamentAdmin.deleteBtn')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(tournamentCard);
+                });
             } catch (error) {
                 console.error('Error loading tournaments:', error);
                 const container = document.getElementById('existingTournaments');
                 container.innerHTML = `
                     <div class="text-center text-red-400 py-8">
                         <div class="text-3xl mb-4">❌</div>
-                        <div class="text-lg font-bold mb-2">Hata Oluştu</div>
-                        <div class="text-sm">Turnuvalar yüklenirken bir hata oluştu: ${error.message}</div>
+                        <div class="text-lg font-bold mb-2">${t('tournamentAdmin.errorOccurred')}</div>
+                        <div class="text-sm">${tFormat('tournamentAdmin.tournamentsLoadError', { message: error.message })}</div>
                     </div>
                 `;
             }
@@ -776,124 +686,88 @@
         async function editTournament(tournamentId) {
             try {
                 const token = localStorage.getItem('authToken');
-                if (!token) {
-                    throw new Error('Giriş yapmanız gerekiyor');
-                }
+                if (!token) throw new Error(t('tournamentAdmin.loginRequired'));
 
                 const response = await fetch(`/api/tournaments/${tournamentId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const result = await response.json();
-                
-                if (result.success) {
-                    const tournament = result.tournament;
-                    
-                    // Form alanlarını doldur
-                    document.querySelector('input[name="title"]').value = tournament.title;
-                    document.querySelector('textarea[name="content"]').value = tournament.content;
-                    document.querySelector('input[name="start_time"]').value = tournament.start_time.replace('Z', '');
-                    document.querySelector('input[name="end_time"]').value = tournament.end_time.replace('Z', '');
-                    
-                    // Soruları yükle
-                    window.currentTournament = {
-                        id: tournament.id,
-                        title: tournament.title,
-                        content: tournament.content,
-                        start_time: tournament.start_time,
-                        end_time: tournament.end_time,
-                        questions: tournament.questions || []
-                    };
-                    
-                    displayQuestions(tournament.questions);
-                    
-                    // Buton metnini güncelle
-                    document.getElementById('saveTournamentBtn').textContent = '💾 Turnuvayı Güncelle';
-                    
-                    // Formu gizle, soruları göster
-                    document.getElementById('formContainer').classList.add('hidden');
-                    document.getElementById('questionsContainer').classList.remove('hidden');
-                    
-                } else {
-                    throw new Error(result.error || 'Turnuva bilgileri alınırken hata oluştu');
+                if (!result.success) {
+                    throw new Error(result.error || t('tournamentAdmin.loadError'));
                 }
 
+                const tournament = result.tournament;
+                document.querySelector('input[name="title"]').value = tournament.title;
+                document.querySelector('textarea[name="content"]').value = tournament.content;
+                document.querySelector('input[name="start_time"]').value = tournament.start_time.replace('Z', '');
+                document.querySelector('input[name="end_time"]').value = tournament.end_time.replace('Z', '');
+
+                window.currentTournament = {
+                    id: tournament.id,
+                    title: tournament.title,
+                    content: tournament.content,
+                    start_time: tournament.start_time,
+                    end_time: tournament.end_time,
+                    questions: tournament.questions || []
+                };
+
+                displayQuestions(tournament.questions || []);
+                setSaveButtonLabel(true);
+                document.getElementById('formContainer').classList.add('hidden');
+                document.getElementById('questionsContainer').classList.remove('hidden');
             } catch (error) {
                 console.error('Error:', error);
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Uyarı',
-                    text: 'Hata',
-                    confirmButtonText: 'Tamam'
-                }).then(() => {});
-                return;
+                showAdminSwal('warning', 'common.warning', error.message || t('tournamentAdmin.loadError'));
             }
         }
 
         async function deleteTournament(tournamentId) {
-            if (!confirm('Bu turnuvayı silmek istediğinizden emin misiniz?')) {
-                return;
-            }
+            if (!confirm(t('tournamentAdmin.deleteConfirm'))) return;
 
             try {
                 const token = localStorage.getItem('authToken');
-                if (!token) {
-                    throw new Error('Giriş yapmanız gerekiyor');
-                }
+                if (!token) throw new Error(t('tournamentAdmin.loginRequired'));
 
                 const response = await fetch(`/api/tournaments/${tournamentId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const result = await response.json();
-                
                 if (result.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Başarılı',
-                        text: 'Turnuva başarıyla silindi!',
-                        confirmButtonText: 'Tamam'
-                    }).then(() => {
-                        // Turnuva listesini yenile
-                        loadExistingTournaments();
-                    });
+                        title: t('tournamentAdmin.successTitle'),
+                        text: t('tournamentAdmin.deleteSuccess'),
+                        confirmButtonText: t('common.ok')
+                    }).then(() => loadExistingTournaments());
                 } else {
-                    throw new Error(result.error || 'Turnuva silinirken hata oluştu');
+                    throw new Error(result.error || t('tournamentAdmin.deleteError'));
                 }
-
             } catch (error) {
                 console.error('Error:', error);
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Uyarı',
-                    text: 'Hata',
-                    confirmButtonText: 'Tamam'
-                }).then(() => {});
-                return;
+                showAdminSwal('warning', 'common.warning', error.message || t('tournamentAdmin.deleteError'));
             }
         }
 
-        // Check authentication and load existing tournaments on page load
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof initI18n === 'function') {
+                await initI18n();
+                applyTranslations();
+                updateQuestionsProducedLabel(0);
+                setSaveButtonLabel(false);
+            }
+
             const token = localStorage.getItem('authToken');
             if (!token) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Uyarı',
-                    text: 'Bu sayfayı kullanmak için giriş yapmanı gerekiyor',
-                    confirmButtonText: 'Tamam'
-                }).then(() => {
+                showAdminSwal('warning', 'common.warning', t('tournamentAdmin.loginRequiredPage')).then(() => {
                     window.location.href = '/login';
                 });
                 return;
-            } else {
-                loadExistingTournaments();
             }
+
+            loadExistingTournaments();
         });
     </script>
 </body>
