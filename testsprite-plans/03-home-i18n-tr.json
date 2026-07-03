@@ -1,0 +1,11 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Home page switches to Turkish",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage (/) as a guest" },
+    { "type": "action", "description": "Click the 'TR' button in the EN | TR language toggle in the header" },
+    { "type": "assertion", "description": "Verify the navigation shows 'Anasayfa', 'Nasıl Çalışır' and 'Özellikler'" },
+    { "type": "assertion", "description": "Verify the 'Giriş Yap' button is visible in the header" }
+  ]
+}

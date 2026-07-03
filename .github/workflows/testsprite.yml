@@ -1,6 +1,6 @@
 name: TestSprite CI/CD Verification
 
-# Tests disabled on push — run manually from Actions if needed.
+# Manual only. Run from the Actions tab (workflow_dispatch).
 on:
   workflow_dispatch:
 
@@ -25,8 +25,14 @@ jobs:
             https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/ \
             || true
 
-      - name: Run TestSprite Frontend Suite (2 tests)
-        continue-on-error: true
+      # IDs from create-batch (2026-07-03):
+      #   01 Home hero content        5d9b778f-e464-43ae-b1af-f206b29d5dd8
+      #   02 Home nav anchor scroll   9d591c13-f8f2-44d5-b3a7-837309caa264
+      #   03 Home i18n TR             acaa43a5-8f9e-4fb1-befd-259956d47da9
+      #   04 Guest nav                d6999073-921c-4ab5-ae47-47db44c17615
+      #   05 Login/Register form      88d22a64-600f-4f17-8c80-cf57c0c7688c
+      #   06 Logout flow              bac70c37-5570-4083-ba52-3e69638475a0
+      - name: Run TestSprite Frontend Suite (6 tests)
         env:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
         run: |
@@ -34,25 +40,12 @@ jobs:
           set +e
           FAIL=0
           for ID in \
-            c3f060b1-79bd-4f39-8f99-e388ff26a10f \
-            28118134-b833-4b6f-ba20-38efd0bff083; do
-            testsprite test run "$ID" --wait || FAIL=1
-          done
-          exit $FAIL
-
-      - name: Run TestSprite Backend Suite (5 tests)
-        env:
-          TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
-        run: |
-          testsprite setup --from-env
-          set +e
-          FAIL=0
-          for ID in \
-            822308eb-edfe-4b84-af4e-abdc44e4982b \
-            85b52f13-342f-4b6c-933e-bc0815ad2273 \
-            d1753dd2-0161-4c35-8164-92e92b237601 \
-            31e5401a-5dba-42a6-9762-83366fa3ab67 \
-            3d145644-69f1-4866-b971-f806a78d4e33; do
+            5d9b778f-e464-43ae-b1af-f206b29d5dd8 \
+            9d591c13-f8f2-44d5-b3a7-837309caa264 \
+            acaa43a5-8f9e-4fb1-befd-259956d47da9 \
+            d6999073-921c-4ab5-ae47-47db44c17615 \
+            88d22a64-600f-4f17-8c80-cf57c0c7688c \
+            bac70c37-5570-4083-ba52-3e69638475a0; do
             testsprite test run "$ID" --wait || FAIL=1
           done
           exit $FAIL

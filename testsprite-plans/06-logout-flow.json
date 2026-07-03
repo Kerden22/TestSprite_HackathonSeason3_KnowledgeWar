@@ -1,0 +1,12 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Logout returns to guest view",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "assertion", "description": "Verify after login the header shows the 'Log out' button" },
+    { "type": "action", "description": "Click the 'Log out' button in the header" },
+    { "type": "assertion", "description": "Verify the 'Log in' button is visible again in the header" },
+    { "type": "assertion", "description": "Verify no '⚔️ Tournaments' button is visible (guest view restored)" }
+  ]
+}

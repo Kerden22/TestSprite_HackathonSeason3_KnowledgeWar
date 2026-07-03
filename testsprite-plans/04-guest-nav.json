@@ -1,0 +1,12 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Guest navigation shows only public links",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage (/) as a guest without logging in" },
+    { "type": "assertion", "description": "Verify the header navigation shows 'Home', 'How it works' and 'Features'" },
+    { "type": "assertion", "description": "Verify the 'Log in' and 'Sign up' buttons are visible in the header" },
+    { "type": "assertion", "description": "Verify there is NO 'Tournaments' link and NO '⚔️ Tournaments' button in the header" },
+    { "type": "assertion", "description": "Verify there is NO 'Profile' link or user account menu in the header" }
+  ]
+}

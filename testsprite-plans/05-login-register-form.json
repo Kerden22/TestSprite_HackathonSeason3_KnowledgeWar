@@ -1,0 +1,15 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Login and register forms render in English",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login as a guest" },
+    { "type": "assertion", "description": "Verify the 'Welcome back' login heading is visible" },
+    { "type": "assertion", "description": "Verify the email and password input fields are visible on the login form" },
+    { "type": "assertion", "description": "Verify the 'Log in' submit button is visible" },
+    { "type": "action", "description": "Navigate to /login?form=register to open the register form" },
+    { "type": "assertion", "description": "Verify the 'Join the journey' register heading is visible" },
+    { "type": "assertion", "description": "Verify the first name, last name, email and password fields are visible on the register form" },
+    { "type": "assertion", "description": "Verify the 'Create account' submit button is visible" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Home hero content and language toggle render",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage (/) as a guest" },
+    { "type": "assertion", "description": "Verify the hero heading shows 'AI-POWERED' and 'LEARNING PLATFORM'" },
+    { "type": "assertion", "description": "Verify the hero description contains the text 'personalized roadmap'" },
+    { "type": "assertion", "description": "Verify the 'EN | TR' language toggle is visible in the header" }
+  ]
+}

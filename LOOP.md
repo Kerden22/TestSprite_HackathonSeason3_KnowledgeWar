@@ -2,7 +2,7 @@
 
 > **Agent-written verification log.** Write → Verify → Fix → Verify.  
 > **Maker:** Cursor · **Checker:** TestSprite CLI  
-> **Project:** `50dc7e80-8d2d-4933-8c55-5361fab9ebb2`
+> **Project:** `1839c68e-2f6e-497e-a25f-7c9b798a7c1a`
 
 ---
 
@@ -72,4 +72,4 @@
 
 **Evidence:** https://github.com/Kerden22/TestSprite_HackathonSeason3_KnowledgeWar/commits/master  
 **Live URL:** https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com  
-**TestSprite Dashboard:** https://www.testsprite.com/dashboard/tests/50dc7e80-8d2d-4933-8c55-5361fab9ebb2
+**TestSprite Dashboard:** https://www.testsprite.com/dashboard/tests/1839c68e-2f6e-497e-a25f-7c9b798a7c1a

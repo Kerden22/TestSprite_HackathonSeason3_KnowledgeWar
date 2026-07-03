@@ -1,0 +1,14 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Home navigation links scroll to their sections",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage (/) as a guest" },
+    { "type": "action", "description": "Click the 'How it works' link in the header navigation" },
+    { "type": "assertion", "description": "Verify the 'How it works' section is scrolled into view" },
+    { "type": "action", "description": "Click the 'Features' link in the header navigation" },
+    { "type": "assertion", "description": "Verify the 'FEATURES' section is scrolled into view" },
+    { "type": "action", "description": "Click the 'Home' link in the header navigation" },
+    { "type": "assertion", "description": "Verify the hero section with 'LEARNING PLATFORM' is back in view" }
+  ]
+}
