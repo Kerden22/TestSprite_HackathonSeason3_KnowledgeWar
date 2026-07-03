@@ -1,7 +1,9 @@
 name: TestSprite CI/CD Verification
 
-# Manual only. Run from the Actions tab (workflow_dispatch).
+# Runs automatically on push to master, and manually from the Actions tab.
 on:
+  push:
+    branches: [master]
   workflow_dispatch:
 
 jobs:
