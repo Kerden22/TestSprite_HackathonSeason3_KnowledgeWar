@@ -1,0 +1,13 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Roadmap Turkish translation applies and persists",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /roadmap" },
+    { "type": "action", "description": "Click the 'TR' button in the language toggle" },
+    { "type": "assertion", "description": "Verify the header subtitle now reads 'Galaktik Öğrenme Yolu'" },
+    { "type": "action", "description": "Navigate to /roadmap again to confirm the language preference is remembered" },
+    { "type": "assertion", "description": "Verify the main learning button still reads '🚀 ÖĞRENMEYE BAŞLA'" }
+  ]
+}

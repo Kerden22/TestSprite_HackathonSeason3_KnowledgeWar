@@ -71,6 +71,47 @@
 
 ---
 
+### Iteration 3 — Auth gates + logged-in nav (6 new FE)
+
+> _Why:_ Enforce the product rule (guests can't reach tournament/profile/roadmap → redirected to /login), verify the logged-in header, and check the language toggle on a hash-anchored URL. CI now runs only the current iteration's new tests (banked passes are not re-run).
+
+| # | Action | TestSprite | Result |
+|---|--------|-----------|--------|
+| 17 | **FIX:** Guest `/profile` redirect `/` → `/login` (consistent with tournament) | `templates/profile.html` | Committed |
+| 18 | **FIX:** Guest `/roadmap` now guarded — no token → `/login` (was public) | `templates/roadmap.html` | Committed |
+| 19 | Authored 6 new FE plans (07–12); single concrete final assertions | CLI `create-batch` | **6 created / 0 failed** |
+| 20 | **CI policy:** run only new iteration tests; bank iter-2 passes | `.github/workflows/testsprite.yml` | Committed |
+| 21 | GitHub Actions on push | Actions | **4 PASS / 1 FAILED / 1 BLOCKED** |
+| 22 | Pulled bundles; `ebe0b04d` = real bug (hash URL toggle), `64381628` = false blocked | `artifact get` | See below |
+| 23 | **FIX:** `setLang()` forces reload when target only differs by hash | `static/i18n.js` | Committed — verify next run |
+
+#### Frontend results — GitHub Actions (2026-07-03)
+
+| Verdict | Test ID | Name | Purpose |
+|---------|---------|------|---------|
+| **PASS** | `bebca88c` | Guest → /tournament redirect | Guest hitting /tournament lands on /login ('Welcome back') |
+| **PASS** | `3053ece4` | Guest → /profile redirect | Guest hitting /profile lands on /login ('Welcome back') |
+| **PASS** | `fe10d08c` | Guest → /roadmap redirect | Guest hitting /roadmap lands on /login ('Welcome back') |
+| **FAILED** | `ebe0b04d` | Language toggle on hash URL | TR toggle on /#how-it-works must switch nav to 'Anasayfa' — real bug, fixed in `static/i18n.js` |
+| **PASS** | `f2742156` | Logged-in home nav | Logged-in header shows 🗺️ Roadmap and ⚔️ Tournaments |
+| **BLOCKED** | `64381628` | Logged-in tournament + roadmap | Logged-in user opens /tournament and /roadmap (false blocked — steps 7/7 passed) |
+
+**Score: 4 PASS / 1 FAILED / 1 BLOCKED.** The FAIL is a genuine bug (language toggle didn't apply on hash-anchored URLs); the BLOCKED is a false positive (agent completed all steps, wrote a summary instead of a formal PASS).
+
+#### Root cause — `ebe0b04d` (FAILED, real bug)
+
+`setLang()` reloaded via `window.location.href = url`. When the URL has a hash (e.g. `/#how-it-works`), assigning the same URL does **not** reload the page — the browser only scrolls to the anchor. So `lang=tr` was stored but the header never re-rendered. Plain `/` worked (Iteration 2 `acaa43a5` PASS) because there the assignment triggered a reload.
+
+**Fix (committed):** `setLang()` now calls `window.location.reload()` when the target URL only differs by (or shares) a hash fragment. To be re-verified on the next CI run.
+
+#### Waived — false blocked (app works, not a bug)
+
+| Test ID | Name | Purpose | Reason |
+|---------|------|---------|--------|
+| `64381628` | Logged-in tournament + roadmap | Logged-in user opens /tournament and /roadmap | Agent summary: "All requested steps were completed and verified" — 7/7 steps passed; verdict box got a summary instead of a formal PASS |
+
+---
+
 <!-- ŞABLON: Yeni iterasyonları aşağıdaki şema (sütun yapısı) ile ekleyin. Testler yapılacak.txt'ten seçilecek. -->
 
 ### Iteration N — <title>
@@ -106,12 +147,14 @@
 | Metric | Count |
 |--------|:---:|
 | Current project | `1839c68e` |
-| FE tests (step 1 suite) | **6** |
-| Last CI run (2026-07-03) | **4 PASS / 2 BLOCKED** (both waived) |
-| Banked (PASS) | `5d9b778f`, `acaa43a5`, `d6999073`, `88d22a64` |
-| Waived (false blocked) | `9d591c13`, `bac70c37` |
+| FE tests created | **12** (6 iter-2 + 6 iter-3) |
+| Iteration 2 CI | **4 PASS / 2 BLOCKED** (both waived) |
+| Iteration 3 CI (2026-07-03) | **4 PASS / 1 FAILED / 1 BLOCKED** |
+| Banked (PASS) | `5d9b778f`, `acaa43a5`, `d6999073`, `88d22a64`, `bebca88c`, `3053ece4`, `fe10d08c`, `f2742156` |
+| Waived (false blocked) | `9d591c13`, `bac70c37`, `64381628` |
+| Open bug (fixed, re-verify) | `ebe0b04d` — language toggle on hash URL (`static/i18n.js`) |
 | Backend tests | Not yet recreated on new project |
-| CI on push | Enabled (`push` to master + `workflow_dispatch`) |
+| CI on push | Enabled — runs only current iteration's new tests |
 
 **Evidence:** https://github.com/Kerden22/TestSprite_HackathonSeason3_KnowledgeWar/commits/master  
 **Live URL:** https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com  

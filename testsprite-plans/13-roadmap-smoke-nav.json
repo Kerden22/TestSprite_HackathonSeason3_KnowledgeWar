@@ -1,0 +1,12 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Roadmap loads for logged-in user with header nav",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /roadmap" },
+    { "type": "assertion", "description": "Verify the '🏆 Tournaments' button linking to /tournament is visible in the header" },
+    { "type": "assertion", "description": "Verify the '👤 Profile' button linking to /profile is visible in the header" },
+    { "type": "assertion", "description": "Verify the '🚀 START LEARNING' call-to-action button is visible on the page" }
+  ]
+}

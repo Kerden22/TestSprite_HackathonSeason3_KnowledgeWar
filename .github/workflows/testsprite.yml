@@ -27,18 +27,19 @@ jobs:
             https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/ \
             || true
 
-      # CI runs ONLY the current iteration's new tests (save credits).
-      # Iteration 2 (01,03,04,05) already PASSED and is banked — do not re-run.
-      # Waived (false blocked, never in CI): 02 9d591c13, 06 bac70c37.
+      # CI runs ONLY the current iteration's tests (save credits).
+      # Banked & passing (do not re-run): Iteration 2 (01,03,04,05),
+      #   Iteration 3 (07,08,09,11).
+      # Waived (false blocked, never in CI): 02 9d591c13, 06 bac70c37,
+      #   12 64381628.
       #
-      # Iteration 3 — new tests under verification:
-      #   07 Guest -> /tournament     bebca88c-00ad-4b9f-9253-b0b0fb427483
-      #   08 Guest -> /profile        3053ece4-7d08-4764-8575-54e7b8b6045d
-      #   09 Guest -> /roadmap        fe10d08c-8125-407f-ae04-32da74283161
-      #   10 Language toggle on hash  ebe0b04d-cc30-42bb-b098-ab70faa31458
-      #   11 Logged-in home nav       f2742156-bc3e-46e4-8897-6f925e2848d2
-      #   12 Logged-in tourn+roadmap  64381628-3fcd-4680-86f0-43810d771572
-      - name: Run TestSprite Frontend Suite (Iteration 3 — 6 new tests)
+      # Iteration 4 — bug re-check + Roadmap/Test page (5 tests):
+      #   10 Language toggle on hash  ebe0b04d-cc30-42bb-b098-ab70faa31458  (re-check fix)
+      #   13 Roadmap smoke + nav      9c5d5682-80cf-476a-a479-0c9f6a9e63c9
+      #   14 Roadmap i18n TR + persist f649b96b-fd79-4fb6-859e-203699e69d0c
+      #   15 Roadmap Start -> /learn  8fed1daf-1418-46b3-ba49-4f6da94298f7
+      #   16 Test page answer + result 0dff072e-5f17-44c4-93db-99268f2a793e
+      - name: Run TestSprite Frontend Suite (Iteration 4 — fix re-check + 4 new)
         env:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
         run: |
@@ -46,12 +47,11 @@ jobs:
           set +e
           FAIL=0
           for ID in \
-            bebca88c-00ad-4b9f-9253-b0b0fb427483 \
-            3053ece4-7d08-4764-8575-54e7b8b6045d \
-            fe10d08c-8125-407f-ae04-32da74283161 \
             ebe0b04d-cc30-42bb-b098-ab70faa31458 \
-            f2742156-bc3e-46e4-8897-6f925e2848d2 \
-            64381628-3fcd-4680-86f0-43810d771572; do
+            9c5d5682-80cf-476a-a479-0c9f6a9e63c9 \
+            f649b96b-fd79-4fb6-859e-203699e69d0c \
+            8fed1daf-1418-46b3-ba49-4f6da94298f7 \
+            0dff072e-5f17-44c4-93db-99268f2a793e; do
             testsprite test run "$ID" --wait || FAIL=1
           done
           exit $FAIL

@@ -1,0 +1,11 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Roadmap Start Learning button navigates to learn page",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /roadmap" },
+    { "type": "action", "description": "Click the '🚀 START LEARNING' button" },
+    { "type": "assertion", "description": "Verify the browser URL is now /learn" }
+  ]
+}

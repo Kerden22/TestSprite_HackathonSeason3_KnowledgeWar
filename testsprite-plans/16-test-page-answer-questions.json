@@ -1,0 +1,12 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Test page lets a logged-in user answer questions and see a result",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /test" },
+    { "type": "action", "description": "Answer every question shown by selecting one option for each question until no more questions remain" },
+    { "type": "action", "description": "Submit the test by clicking the final submit/finish button" },
+    { "type": "assertion", "description": "Verify a result or score screen is displayed after submitting the test" }
+  ]
+}

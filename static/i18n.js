@@ -87,7 +87,15 @@ function setLang(code) {
   localStorage.setItem(LANG_STORAGE_KEY, lang);
   const url = new URL(window.location.href);
   url.searchParams.delete('lang');
-  window.location.href = url.toString();
+  const target = url.toString();
+  // If the target only differs by (or shares) a hash fragment, assigning
+  // location.href won't reload the page — force a reload so the new locale
+  // is actually applied. Otherwise navigate normally (e.g. dropping ?lang=).
+  if (target === window.location.href || target.split('#')[0] === window.location.href.split('#')[0]) {
+    window.location.reload();
+  } else {
+    window.location.href = target;
+  }
 }
 
 function updateLangToggleUI() {
