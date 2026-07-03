@@ -1,49 +1,127 @@
-KnowledgeWar — TestSprite yapılacaklar listesi
-================================================
+KnowledgeWar — YAPILACAK TESTLER (seç ve uygula)
+==================================================
 
-GEÇENLER (banked — tekrar koşma, CI'dan çıkarıldı)
---------------------------------------------------
-1.  b14b87e9 — Ana sayfa hero (AI-POWERED, EN|TR toggle)
-2.  73374ea0 — Misafir menü (Features + Log in)
-3.  ad90b2b9 — Turnuva tekrar
-4.  d747883b — Features scroll (#features)
-5.  d32cca15 — Features tekrar
-6.  1064d65e — Home TR (Actions #14)
-7.  cd17f8ca — Home EN geri (Actions #14)
-8.  2fe15023 — Login TR (Actions #14)
+Not: Testleri sıfırdan kuruyoruz. Aşağıdaki liste, LOOP.md'den taşınan tüm
+testlerin (Iteration 2–9) birleştirilmiş halidir. Her testin yanında NEDEN
+yapıldığı (amacı) yazıyor. Aralarından seçip uygulayacağız.
 
-YOKSAYILAN (CI'da koşulmaz — kasıtlı / gereksiz)
-------------------------------------------------
-- 28118134 — Misafir menü + Home (#tournaments anchor misafirde kalır; turnuva sayfasına gitmez)
-- c3f060b1 — Login → turnuva (ad90b2b9 yeterli; artifact 3ec38d7c akışı OK)
+ÜRÜN KURALI (önemli):
+- Misafirler (giriş yapmamış kullanıcı) giriş yapmadan TURNUVALARI GÖREMEZ.
+  -> Turnuva nav linki + turnuva butonu misafire GİZLİ.
+  -> Misafir /tournament'a erişmeye çalışırsa /login'e yönlendirilir.
+  -> Turnuva sayfası ve katılım yalnızca giriş yapmış kullanıcıya açık.
+- Bu kural yüzünden eski "misafir doğrudan /tournament'a girsin" davranışı
+  (eski adım 19–20) İPTAL. Onun yerine "misafir -> login yönlendirmesi" test edilir.
 
-ŞU AN CI'DA (push'ta koşar — testsprite.yml, sonraki batch)
------------------------------------------------------------
-9.  e6d48742 — Roadmap TR
-10. 54a8c006 — Learn TR
-11. 62968e6e — Test TR
-12. ed7b621c — Tournament TR
-13. 98fc7986 — Profile TR
 
-SIRADAKİ FRONTEND
------------------
-14. 925fd7eb — Roadmap EN smoke
-15. db296a54 — Learn EN smoke
-16. cafbbc5c — Test EN smoke
-17. 359739b2 — Profile EN smoke
-18. 5cf8b6d4 — Kayıt formu EN
-19. 4a6a7cf9 — Sayfalar arası gezinme
-20. dc6769f8 — Misafir /profile → /
-21. a5b1c09f — Misafir /tournament → /login
-22. c2d5d7c3 — Giriş sonrası menü
-23. 302da8b4 — Çıkış akışı
+BAĞLAM — Zaten tamamlanan (LOOP.md'de kalıyor)
+----------------------------------------------
+- Baseline: uygulama Render'da canlı, TestSprite projesi kuruldu, ilk 7 UI testi.
+- Iteration 1 (CI/CD + CLI Setup): GitHub Actions workflow, testsprite CLI kurulumu,
+  her deploy'da test kullanıcısı seed'lenmesi (k.erden03@gmail.com / 123456),
+  portal authentication + canlı URL ayarı.
 
-BACKEND (elle — workflow_dispatch + run_backend=true)
------------------------------------------------------
-24. 822308eb — POST /api/login
-25. 85b52f13 — GET /api/profile → 401
-26. d1753dd2 — GET /api/tournaments
-27. 31e5401a — GET /api/active-course
-28. 3d145644 — GET /api/completed-courses
 
-Özet: 8 geçti | 2 yoksay | 5 CI'da | 10 FE sırada | 5 BE bekliyor
+=====================================================================
+A) ANA SAYFA & NAVİGASYON (Frontend)
+=====================================================================
+[ ] Home content: hero + EN|TR toggle
+    Neden: Ana sayfa hero bölümü render oluyor mu ve EN/TR dil değiştirici
+    çalışıyor mu doğrula.
+
+[ ] Guest nav: Features + Log in görünür, Tournaments GİZLİ
+    Neden: Misafir doğru navigasyonu görsün; turnuva linki/butonu misafire
+    görünmemeli (ürün kuralı).
+
+[ ] Guest home links (turnuva görünmez)
+    Neden: Misafir ana sayfadaki linkler beklendiği gibi davranıyor mu;
+    turnuvaya dair hiçbir giriş noktası görünmüyor mu doğrula.
+
+[ ] Features anchor scroll
+    Neden: "Features" linkine tıklayınca sayfa ilgili bölüme (#features) kayıyor mu.
+
+[ ] Features link repeat
+    Neden: "Features" linki tekrar tekrar tıklandığında da çalışmaya devam ediyor mu.
+
+[ ] Cross-page navigation
+    Neden: Sayfalar arası gezinme (uçtan uca) sorunsuz çalışıyor mu.
+
+[ ] Logged-in home nav
+    Neden: Giriş yapmış kullanıcı için ana sayfa navigasyonu (turnuva dahil) doğru mu.
+
+[ ] Logout flow
+    Neden: Çıkış yapınca oturum temizleniyor ve doğru sayfaya yönlendiriliyor mu.
+
+
+=====================================================================
+B) AUTH KAPILARI (giriş zorunluluğu)
+=====================================================================
+[ ] Guest -> /tournament yönlendirmesi
+    Neden: Misafir turnuva sayfasına erişmeye çalışınca /login'e yönlendirilmeli
+    (ürün kuralı).
+
+[ ] Guest -> /profile yönlendirmesi
+    Neden: Misafir profil sayfasına erişmeye çalışınca /login'e yönlendirilmeli.
+
+[ ] Logged-in user -> turnuvaya erişebiliyor
+    Neden: Giriş yapmış kullanıcı turnuva sayfasına ulaşabiliyor mu doğrula.
+
+[ ] Tournament butonu (giriş yapmış kullanıcı)
+    Neden: Giriş yapmış kullanıcı için turnuva butonu tekrar tekrar tıklamada
+    güvenilir çalışıyor mu.
+
+[ ] Login / Register formu (EN)
+    Neden: Giriş/kayıt formu alanları İngilizce doğru görünüyor ve çalışıyor mu.
+
+
+=====================================================================
+C) i18n — ÇEVİRİ (TR / EN)
+=====================================================================
+[ ] i18n: Home TR        Neden: Ana sayfada Türkçe çeviriler doğru render oluyor mu.
+[ ] i18n: Home EN        Neden: Ana sayfada İngilizce çeviriler doğru render oluyor mu.
+[ ] i18n: Login TR       Neden: Giriş sayfasında Türkçe çeviriler doğru mu.
+[ ] i18n: Roadmap TR     Neden: Yol haritası sayfasında Türkçe çeviriler doğru mu.
+[ ] i18n: Learn TR       Neden: Öğren sayfasında Türkçe çeviriler doğru mu.
+[ ] i18n: Test TR        Neden: Test sayfasında Türkçe çeviriler doğru mu.
+[ ] i18n: Tournament TR  Neden: Turnuva sayfasında Türkçe çeviriler doğru mu.
+[ ] i18n: Profile TR     Neden: Profil sayfasında Türkçe çeviriler doğru mu.
+[ ] i18n: Tournament Admin TR/EN
+    Neden: Turnuva admin sayfasında EN/TR çeviriler doğru mu (yeni eklenen sayfa).
+
+
+=====================================================================
+D) SAYFA SMOKE TESTLERİ (EN — temel yüklenme kontrolü)
+=====================================================================
+[ ] Roadmap EN smoke     Neden: Yol haritası sayfası İngilizce sorunsuz yükleniyor mu.
+[ ] Learn EN smoke       Neden: Öğren sayfası İngilizce sorunsuz yükleniyor mu.
+[ ] Test EN smoke        Neden: Test sayfası İngilizce sorunsuz yükleniyor mu.
+[ ] Profile EN smoke     Neden: Profil sayfası İngilizce sorunsuz yükleniyor mu.
+
+
+=====================================================================
+E) BACKEND API TESTLERİ (Python)
+=====================================================================
+[ ] API: login token döndürüyor
+    Neden: Auth her şeyin kapısı; login bozulursa tüm korumalı özellikler çöker.
+
+[ ] API: profile auth gerektiriyor
+    Neden: Korumalı endpoint'ler kimliksiz erişimi reddetmeli (güvenlik).
+
+[ ] API: tournaments listesi
+    Neden: Ana sayfa/turnuva sayfasının bağlı olduğu temel içerik endpoint'i.
+
+[ ] API: aktif kurs (auth ile)
+    Neden: Kullanıcının devam eden kursu doğru yükleniyor mu.
+
+[ ] API: tamamlanan kurslar (auth ile)
+    Neden: Kurs geçmişi / ilerleme takibi doğru çalışıyor mu.
+
+
+=====================================================================
+BİLİNEN NOTLAR / DİKKAT (eski koşulardan)
+=====================================================================
+- Backend'de "aktif kurs" ve "tamamlanan kurslar" testleri eskiden BLOCKED
+  oluyordu: login testi AUTH_TOKEN üretmediği için bağımlılık karşılanmıyordu.
+  Yeni kurulumda ya bağımlılığı kaldır ya da token wiring'i düzelt.
+- Turnuva/misafir davranışıyla çelişen eski testler (misafir /tournament'ı
+  doğrudan görebiliyor) artık geçersiz — ürün kuralına göre yeniden yaz.
