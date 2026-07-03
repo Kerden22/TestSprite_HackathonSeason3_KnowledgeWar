@@ -1,0 +1,12 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Logged-in user can open tournament and roadmap pages",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /tournament" },
+    { "type": "assertion", "description": "Verify the page stays on the /tournament URL and is not redirected to /login" },
+    { "type": "action", "description": "Navigate to /roadmap" },
+    { "type": "assertion", "description": "Verify the page stays on the /roadmap URL and is not redirected to /login" }
+  ]
+}

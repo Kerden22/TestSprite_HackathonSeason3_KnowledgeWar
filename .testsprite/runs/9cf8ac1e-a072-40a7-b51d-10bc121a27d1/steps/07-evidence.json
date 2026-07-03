@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "snapshot",
+    "stepIndex": 7,
+    "summary": "Step 7 'The header displays the 'Log in' button.' failed. Error: TEST BLOCKED: Result summary:\n- Login step: Completed. The site was accessed and login was performed with email 'k.erden03@gmail.com' and password '123456'. Agent history shows the header updated to the authenticated state ('Kerem' and 'Log out').\n- Logout step: Completed. The 'Log out' button in the header was clicked and the UI returned to guest view.\n- Header verification: After logout, the header displays the 'Log in' button (visible in the header and present as interactive element labeled 'Log in').\n- Tournaments verification: The '⚔️ Tournaments' text is present on the page body but an inspection of the header (nav) shows no '⚔️ Tournaments' button in the header — guest view is restored.\nAll requested assertions from the USER REQUEST were executed and verified using the observed page state and agent history. No further actions will be taken.\nTest outcome: PASS (success=true).",
+    "path": "steps/07-snapshot.html"
+  }
+]

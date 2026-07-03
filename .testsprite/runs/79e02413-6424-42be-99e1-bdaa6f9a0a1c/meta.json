@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "cli-v1",
+  "snapshotId": "snap_7262df35b7813048",
+  "testId": "9d591c13-f8f2-44d5-b3a7-837309caa264",
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "codeVersion": "v1",
+  "runIdIfAvailable": "79e02413-6424-42be-99e1-bdaa6f9a0a1c",
+  "targetUrl": "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/",
+  "failedStepIndex": 5,
+  "failureKind": null,
+  "capturedAt": "2026-07-03T19:29:05.449Z",
+  "fetchedAt": "2026-07-03T19:44:31.724Z"
+}

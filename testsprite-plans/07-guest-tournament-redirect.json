@@ -1,0 +1,9 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Guest visiting tournament is redirected to login",
+  "planSteps": [
+    { "type": "action", "description": "Navigate directly to /tournament as a guest without logging in" },
+    { "type": "assertion", "description": "Verify the browser lands on the /login page showing the 'Welcome back' heading" }
+  ]
+}

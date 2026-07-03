@@ -1,0 +1,10 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Language toggle works on a hash-anchored home URL",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the home page with an anchor hash: /#how-it-works" },
+    { "type": "action", "description": "Click the 'TR' button in the EN | TR language toggle in the header" },
+    { "type": "assertion", "description": "Verify the header navigation shows the Turkish label 'Anasayfa'" }
+  ]
+}

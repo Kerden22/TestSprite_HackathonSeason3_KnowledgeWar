@@ -1,0 +1,11 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Logged-in home shows Roadmap and Tournaments buttons",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "After login, go to the home page (/)" },
+    { "type": "assertion", "description": "Verify the '🗺️ Roadmap' button is visible in the header" },
+    { "type": "assertion", "description": "Verify the '⚔️ Tournaments' button is visible in the header" }
+  ]
+}
