@@ -8,6 +8,8 @@
 
 ### Baseline
 
+> _Why:_ Ship the app live and bank an initial TestSprite suite as a reference point.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 1 | Deployed KnowledgeWar to Render (free tier) | — | Live at https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com |
@@ -20,6 +22,8 @@
 
 ### Iteration 1 — CI/CD + CLI Setup
 
+> _Why:_ Automate test runs on every push so regressions are caught early.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 6 | CLI setup (`testsprite setup --from-env`); project listed | CLI | **PASSED** |
@@ -31,6 +35,8 @@
 ---
 
 ### Iteration 2 — Home Navigation (FAIL → FIX)
+
+> _Why:_ Guests couldn't reach tournaments/features from the home page — fix the auth gate and click-blocking overlay.
 
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
@@ -51,6 +57,8 @@
 
 ### Iteration 3 — CI Policy + Full Verification
 
+> _Why:_ Keep CI fast on push while still allowing a full-suite run on demand.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 23 | **FIX:** Push runs failed test only; full suite via manual `workflow_dispatch run_all=true` | `.github/workflows/testsprite.yml` | Faster CI loop |
@@ -61,6 +69,8 @@
 
 ### Iteration 4 — Auth-gated Navigation
 
+> _Why:_ Enforce that tournament features require login while keeping guest browsing clean.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 26 | **FIX:** Guest: hide Turnuvalar nav + button; login → home (`/`); `/tournament` requires auth | `index.html`, `tournament.html` | Committed in `8c726bf` |
@@ -70,6 +80,8 @@
 ---
 
 ### Iteration 5 — i18n Core (EN default + TR toggle)
+
+> _Why:_ Make the app bilingual (English default, Turkish toggle) for a wider audience.
 
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
@@ -82,6 +94,8 @@
 
 ### Iteration 6 — Full FE Suite (25) + BE Seed (5) — `f445915`
 
+> _Why:_ Expand coverage to every page (i18n) and add backend API tests for real end-to-end confidence.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 33 | i18n all pages: roadmap, learn, test, tournament, profile + `profile.js` client date formatting | templates + `static/i18n/` | Committed in `f445915` |
@@ -93,52 +107,52 @@
 
 #### GitHub Actions #13 — Frontend results (7 legacy ran to completion)
 
-| Verdict | Test ID | Name |
-|---------|---------|------|
-| **PASSED** | `b14b87e9` | Home content: hero + EN\|TR toggle |
-| **PASSED** | `73374ea0` | Guest nav: Features, Log in visible |
-| **FAILED** | `28118134` | Guest nav + Home — old plan wrongly required Tournaments for guests |
-| **BLOCKED** | `c3f060b1` | Login → tournament — blocked (overlay / pointer-events; see failure bundle) |
-| **PASSED** | `ad90b2b9` | Tournament button repeat |
-| **PASSED** | `d747883b` | Features anchor scroll |
-| **PASSED** | `d32cca15` | Features link repeat |
+| Verdict | Test ID | Name | Purpose |
+|---------|---------|------|---------|
+| **PASSED** | `b14b87e9` | Home content: hero + EN\|TR toggle | Verify homepage hero renders and the EN/TR language toggle works |
+| **PASSED** | `73374ea0` | Guest nav: Features, Log in visible | Ensure guests see the correct navigation (Features, Log in) |
+| **FAILED** | `28118134` | Guest nav + Home — old plan wrongly required Tournaments for guests | Confirm guest navigation and home links behave as designed |
+| **BLOCKED** | `c3f060b1` | Login → tournament — blocked (overlay / pointer-events; see failure bundle) | Verify a logged-in user can reach the tournaments page |
+| **PASSED** | `ad90b2b9` | Tournament button repeat | Ensure the tournament button stays reliable on repeated clicks |
+| **PASSED** | `d747883b` | Features anchor scroll | Verify the Features link scrolls to its section |
+| **PASSED** | `d32cca15` | Features link repeat | Ensure the Features link keeps working on repeated use |
 
 **Score: 5 PASSED / 1 FAILED / 1 BLOCKED** (of 7 legacy tests executed)
 
 #### Not run in Actions #13 (18 new — still `draft`)
 
-| Test ID | Name |
-|---------|------|
-| `1064d65e` | i18n: Home TR |
-| `cd17f8ca` | i18n: Home EN |
-| `2fe15023` | i18n: Login TR |
-| `e6d48742` | i18n: Roadmap TR |
-| `54a8c006` | i18n: Learn TR |
-| `62968e6e` | i18n: Test TR |
-| `ed7b621c` | i18n: Tournament TR |
-| `98fc7986` | i18n: Profile TR |
-| `925fd7eb` | Roadmap EN smoke |
-| `db296a54` | Learn EN smoke |
-| `cafbbc5c` | Test EN smoke |
-| `359739b2` | Profile EN smoke |
-| `5cf8b6d4` | Login register form EN |
-| `4a6a7cf9` | Cross-page nav |
-| `dc6769f8` | Guest → profile redirect |
-| `a5b1c09f` | Guest → tournament redirect |
-| `c2d5d7c3` | Logged-in home nav |
-| `302da8b4` | Logout flow |
+| Test ID | Name | Purpose |
+|---------|------|---------|
+| `1064d65e` | i18n: Home TR | Verify Turkish translations render on the home page |
+| `cd17f8ca` | i18n: Home EN | Verify English translations render on the home page |
+| `2fe15023` | i18n: Login TR | Verify Turkish translations render on the login page |
+| `e6d48742` | i18n: Roadmap TR | Verify Turkish translations render on the roadmap page |
+| `54a8c006` | i18n: Learn TR | Verify Turkish translations render on the learn page |
+| `62968e6e` | i18n: Test TR | Verify Turkish translations render on the test page |
+| `ed7b621c` | i18n: Tournament TR | Verify Turkish translations render on the tournament page |
+| `98fc7986` | i18n: Profile TR | Verify Turkish translations render on the profile page |
+| `925fd7eb` | Roadmap EN smoke | Smoke-check the roadmap page loads correctly in English |
+| `db296a54` | Learn EN smoke | Smoke-check the learn page loads correctly in English |
+| `cafbbc5c` | Test EN smoke | Smoke-check the test page loads correctly in English |
+| `359739b2` | Profile EN smoke | Smoke-check the profile page loads correctly in English |
+| `5cf8b6d4` | Login register form EN | Verify the login/register form fields in English |
+| `4a6a7cf9` | Cross-page nav | Verify navigation between pages works end to end |
+| `dc6769f8` | Guest → profile redirect | Ensure guests are redirected from profile to login |
+| `a5b1c09f` | Guest → tournament redirect | Ensure guests are redirected when accessing tournament |
+| `c2d5d7c3` | Logged-in home nav | Verify home navigation for authenticated users |
+| `302da8b4` | Logout flow | Verify logout clears the session and redirects |
 
 > CI shell exits on first non-zero `testsprite test run`; `c3f060b1` **blocked** ended the job before draft tests got a first run.
 
 #### Backend — pending (user to run manually)
 
-| Test ID | Name | Status |
-|---------|------|--------|
-| `822308eb` | API: login returns token | **ready** — not run |
-| `85b52f13` | API: profile requires auth | **ready** — not run |
-| `d1753dd2` | API: tournaments list | **ready** — not run |
-| `31e5401a` | API: active course with auth | **ready** — not run |
-| `3d145644` | API: completed courses with auth | **ready** — not run |
+| Test ID | Name | Status | Purpose |
+|---------|------|--------|---------|
+| `822308eb` | API: login returns token | **ready** — not run | Auth is the gate for everything; if login breaks, all protected features fail |
+| `85b52f13` | API: profile requires auth | **ready** — not run | Ensure protected endpoints reject unauthenticated access (security) |
+| `d1753dd2` | API: tournaments list | **ready** — not run | Core content endpoint that the home/tournament pages depend on |
+| `31e5401a` | API: active course with auth | **ready** — not run | Verify a user's in-progress course loads correctly |
+| `3d145644` | API: completed courses with auth | **ready** — not run | Verify course history / progress tracking works |
 
 **Run backend only (CLI):**
 ```bash
@@ -154,6 +168,8 @@ Or TestSprite portal → **Endpoint Tests** → **Rerun all**.
 
 ### Iteration 7 — Banked passes + batch new tests
 
+> _Why:_ Stop re-running already-green tests and run the remaining ones in small batches to save time.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 39 | **FIX:** `28118134` plan — Home link visible + click scrolls to `#home` hero; Tournaments **NOT** visible for guests | `plan put` | Portal updated |
@@ -162,29 +178,29 @@ Or TestSprite portal → **Endpoint Tests** → **Rerun all**.
 
 #### Banked — PASSED (do not re-run)
 
-| Test ID | Name |
-|---------|------|
-| `b14b87e9` | Home content: hero + EN\|TR toggle |
-| `73374ea0` | Guest nav: Features, Log in; Tournaments hidden |
-| `ad90b2b9` | Tournament button repeat |
-| `d747883b` | Features anchor scroll |
-| `d32cca15` | Features link repeat |
-| `1064d65e` | i18n: Home TR |
-| `cd17f8ca` | i18n: Home EN |
-| `2fe15023` | i18n: Login TR |
+| Test ID | Name | Purpose |
+|---------|------|---------|
+| `b14b87e9` | Home content: hero + EN\|TR toggle | Verify homepage hero renders and the EN/TR language toggle works |
+| `73374ea0` | Guest nav: Features, Log in; Tournaments hidden | Ensure guests see the correct navigation and no tournament button |
+| `ad90b2b9` | Tournament button repeat | Ensure the tournament button stays reliable on repeated clicks |
+| `d747883b` | Features anchor scroll | Verify the Features link scrolls to its section |
+| `d32cca15` | Features link repeat | Ensure the Features link keeps working on repeated use |
+| `1064d65e` | i18n: Home TR | Verify Turkish translations render on the home page |
+| `cd17f8ca` | i18n: Home EN | Verify English translations render on the home page |
+| `2fe15023` | i18n: Login TR | Verify Turkish translations render on the login page |
 
 #### Waived — not in CI (intentional product behavior / redundant)
 
-| Test ID | Name | Reason |
-|---------|------|--------|
-| `28118134` | Guest nav + Home | `#tournaments` nav anchor is **meant** to stay visible for guests (scroll to section, not `/tournament`); ⚔️ button correctly hidden |
-| `c3f060b1` | Login → tournament | Redundant with `ad90b2b9`; artifact `3ec38d7c` shows login + `/tournament` OK — blocked verdict is script/assertion ordering, not app bug |
+| Test ID | Name | Purpose | Reason |
+|---------|------|---------|--------|
+| `28118134` | Guest nav + Home | Confirm guest navigation and home links behave as designed | `#tournaments` nav anchor is **meant** to stay visible for guests (scroll to section, not `/tournament`); ⚔️ button correctly hidden |
+| `c3f060b1` | Login → tournament | Verify a logged-in user can reach the tournaments page | Redundant with `ad90b2b9`; artifact `3ec38d7c` shows login + `/tournament` OK — blocked verdict is script/assertion ordering, not app bug |
 
 #### Needs run (not banked)
 
-| Test ID | Name | Note |
-|---------|------|------|
-| `e6d48742` … `302da8b4` | 15 remaining draft tests | See batches below |
+| Test ID | Name | Purpose | Note |
+|---------|------|---------|------|
+| `e6d48742` … `302da8b4` | 15 remaining draft tests | Cover i18n, page smoke tests, auth gates, and navigation across the app | See batches below |
 
 #### New tests — run 5 at a time (CLI)
 
@@ -212,6 +228,8 @@ for ID in a5b1c09f-26f1-4451-a0ee-1961bae0aef1 c2d5d7c3-0e8f-4247-a384-ff80c45d4
 
 ### Iteration 8 — Actions #14 (5-test CI batch) — `fcd7901`
 
+> _Why:_ Verify the first i18n batch in CI and confirm the two known failures are only waivers.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 42 | **Policy:** CI push = next 5 FE only; bank 5 legacy passes | `.github/workflows/testsprite.yml` | Committed `fcd7901` |
@@ -220,13 +238,13 @@ for ID in a5b1c09f-26f1-4451-a0ee-1961bae0aef1 c2d5d7c3-0e8f-4247-a384-ff80c45d4
 
 #### GitHub Actions #14 — Frontend results
 
-| Verdict | Test ID | Name |
-|---------|---------|------|
-| **FAILED** | `28118134` | Guest nav + Home — **waived** (`#tournaments` anchor visible by design) |
-| **BLOCKED** | `c3f060b1` | Login → tournament — **waived** (flow works; `ad90b2b9` covers repeat nav) |
-| **PASSED** | `1064d65e` | i18n: Home TR |
-| **PASSED** | `cd17f8ca` | i18n: Home EN |
-| **PASSED** | `2fe15023` | i18n: Login TR |
+| Verdict | Test ID | Name | Purpose |
+|---------|---------|------|---------|
+| **FAILED** | `28118134` | Guest nav + Home — **waived** (`#tournaments` anchor visible by design) | Confirm guest navigation and home links behave as designed |
+| **BLOCKED** | `c3f060b1` | Login → tournament — **waived** (flow works; `ad90b2b9` covers repeat nav) | Verify a logged-in user can reach the tournaments page |
+| **PASSED** | `1064d65e` | i18n: Home TR | Verify Turkish translations render on the home page |
+| **PASSED** | `cd17f8ca` | i18n: Home EN | Verify English translations render on the home page |
+| **PASSED** | `2fe15023` | i18n: Login TR | Verify Turkish translations render on the login page |
 
 **Score: 3 PASSED / 2 waived** (first i18n batch green)
 
@@ -241,6 +259,8 @@ for ID in a5b1c09f-26f1-4451-a0ee-1961bae0aef1 c2d5d7c3-0e8f-4247-a384-ff80c45d4
 
 ### Iteration 9 — Responsive + Admin i18n + CI (2 FE + 5 BE)
 
+> _Why:_ Fix zoom/resolution layout breakage, translate the admin page, and validate backend APIs in CI.
+
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
 | 49 | **FIX:** Global zoom/resolution guards (`responsive.css` on all pages) | `static/responsive.css` | Committed |
@@ -253,41 +273,41 @@ for ID in a5b1c09f-26f1-4451-a0ee-1961bae0aef1 c2d5d7c3-0e8f-4247-a384-ff80c45d4
 
 #### GitHub Actions — CI run (2026-07-02)
 
-| Verdict | Test ID | Name | Note |
-|---------|---------|------|------|
-| **BLOCKED** | `c3f060b1` | Login → tournament | False blocked — login + `/tournament` OK; agent assertion ordering |
-| **FAILED** | `28118134` | Guest nav + Home | `#tournaments` anchor visible by design — waived |
-| **PASS** | `822308eb` | API: login returns token | |
-| **PASS** | `85b52f13` | API: profile requires auth | |
-| **PASS** | `d1753dd2` | API: tournaments list | |
-| **BLOCKED** | `31e5401a` | API: active course with auth | `AUTH_TOKEN` dependency not satisfied |
-| **BLOCKED** | `3d145644` | API: completed courses with auth | same `AUTH_TOKEN` starvation |
+| Verdict | Test ID | Name | Purpose | Note |
+|---------|---------|------|---------|------|
+| **BLOCKED** | `c3f060b1` | Login → tournament | Verify a logged-in user can reach the tournaments page | False blocked — login + `/tournament` OK; agent assertion ordering |
+| **FAILED** | `28118134` | Guest nav + Home | Confirm guest navigation and home links behave as designed | `#tournaments` anchor visible by design — waived |
+| **PASS** | `822308eb` | API: login returns token | Auth is the gate for everything; if login breaks, all protected features fail | |
+| **PASS** | `85b52f13` | API: profile requires auth | Ensure protected endpoints reject unauthenticated access (security) | |
+| **PASS** | `d1753dd2` | API: tournaments list | Core content endpoint that the home/tournament pages depend on | |
+| **BLOCKED** | `31e5401a` | API: active course with auth | Verify a user's in-progress course loads correctly | `AUTH_TOKEN` dependency not satisfied |
+| **BLOCKED** | `3d145644` | API: completed courses with auth | Verify course history / progress tracking works | same `AUTH_TOKEN` starvation |
 
 **Score: 3 PASS / 3 BLOCKED / 1 FAILED** — workflow exit code 1. FE step used `continue-on-error`; BE still ran.
 
 #### CI push scope — 2 FE + 5 BE (superseded)
 
-| Type | Test ID | Name | CI result (2026-07-02) |
-|------|---------|------|------------------------|
-| FE | `c3f060b1` | Login → tournament | BLOCKED (waived) |
-| FE | `28118134` | Guest nav + Home | FAILED (waived) |
-| BE | `822308eb` | API: login returns token | PASS |
-| BE | `85b52f13` | API: profile requires auth | PASS |
-| BE | `d1753dd2` | API: tournaments list | PASS |
-| BE | `31e5401a` | API: active course with auth | BLOCKED |
-| BE | `3d145644` | API: completed courses with auth | BLOCKED |
+| Type | Test ID | Name | Purpose | CI result (2026-07-02) |
+|------|---------|------|---------|------------------------|
+| FE | `c3f060b1` | Login → tournament | Verify a logged-in user can reach the tournaments page | BLOCKED (waived) |
+| FE | `28118134` | Guest nav + Home | Confirm guest navigation and home links behave as designed | FAILED (waived) |
+| BE | `822308eb` | API: login returns token | Auth is the gate for everything; if login breaks, all protected features fail | PASS |
+| BE | `85b52f13` | API: profile requires auth | Ensure protected endpoints reject unauthenticated access (security) | PASS |
+| BE | `d1753dd2` | API: tournaments list | Core content endpoint that the home/tournament pages depend on | PASS |
+| BE | `31e5401a` | API: active course with auth | Verify a user's in-progress course loads correctly | BLOCKED |
+| BE | `3d145644` | API: completed courses with auth | Verify course history / progress tracking works | BLOCKED |
 
 #### Backend — portal baseline (before this push)
 
 Manual **Rerun all** on Endpoint Tests (2026-07-01):
 
-| Verdict | Test ID | Name |
-|---------|---------|------|
-| **PASS** | `822308eb` | API: login returns token |
-| **PASS** | `85b52f13` | API: profile requires auth |
-| **PASS** | `d1753dd2` | API: tournaments list |
-| **BLOCKED** | `31e5401a` | API: active course with auth — `AUTH_TOKEN` not produced by login test |
-| **BLOCKED** | `3d145644` | API: completed courses with auth — same dependency starvation |
+| Verdict | Test ID | Name | Purpose |
+|---------|---------|------|---------|
+| **PASS** | `822308eb` | API: login returns token | Auth is the gate for everything; if login breaks, all protected features fail |
+| **PASS** | `85b52f13` | API: profile requires auth | Ensure protected endpoints reject unauthenticated access (security) |
+| **PASS** | `d1753dd2` | API: tournaments list | Core content endpoint that the home/tournament pages depend on |
+| **BLOCKED** | `31e5401a` | API: active course with auth — `AUTH_TOKEN` not produced by login test | Verify a user's in-progress course loads correctly |
+| **BLOCKED** | `3d145644` | API: completed courses with auth — same dependency starvation | Verify course history / progress tracking works |
 
 **Score: 3 PASS / 2 BLOCKED** — blocked pair need dependency removed or `auth_token` wiring fixed; CI runs each BE test individually (no `--skip-dependencies`).
 
