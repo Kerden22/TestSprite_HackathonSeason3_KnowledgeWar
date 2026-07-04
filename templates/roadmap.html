@@ -890,18 +890,30 @@
             return t(key);
         }
 
+        function isYoutubeLink(link) {
+            if (!link) return false;
+            const lower = link.toLowerCase();
+            return lower.includes('youtube.com') || lower.includes('youtu.be');
+        }
+
         function isGenericBtkLink(link) {
             if (!link || link === '#') return true;
+            if (isYoutubeLink(link)) return false;
             const normalized = link.replace(/\/$/, '').toLowerCase();
             return normalized.endsWith('/portal') || (!normalized.includes('/course/') && !normalized.includes('/egitim/'));
         }
 
         function resolveStepLink(step, courseLink) {
-            const candidates = [step.link, courseLink].filter(Boolean);
+            if (step.link && step.link !== '#') return step.link;
+            const candidates = [courseLink].filter(Boolean);
             for (const link of candidates) {
                 if (!isGenericBtkLink(link)) return link;
             }
             return candidates[0] || '#';
+        }
+
+        function stepButtonLabel(step) {
+            return isYoutubeLink(step.link) ? 'roadmap.watchVideo' : 'roadmap.goToSection';
         }
         // Initialize cosmic background effects
         function createStarField() {
@@ -1148,6 +1160,14 @@
                     descEl.textContent = step.description;
                     descEl.className = `text-gray-300 mb-4 leading-relaxed text-sm step-description${step.status === 'locked' ? ' text-gray-400' : ''}`;
 
+                    if (step.thumbnail) {
+                        const thumb = document.createElement('img');
+                        thumb.src = step.thumbnail;
+                        thumb.alt = step.video_title || step.title;
+                        thumb.className = 'w-full max-w-xs rounded-lg mb-3 mx-auto block';
+                        descEl.parentNode.insertBefore(thumb, descEl);
+                    }
+
                     // Butonlar
                     const btn = card.querySelector('.step-button');
                     const completeBtn = card.querySelector('.step-complete-btn');
@@ -1189,7 +1209,8 @@
                         } else if (step.status === 'completed') {
                             btn.style.display = '';
                             btn.href = resolveStepLink(step, course.link);
-                            btn.innerHTML = roadmapBtnText('roadmap.goToSection');
+                            btn.target = '_blank';
+                            btn.innerHTML = roadmapBtnText(stepButtonLabel(step));
                             completeBtn.innerHTML = roadmapBtnLabel('🎉', 'roadmap.completedExclaim');
                             completeBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
                             completeBtn.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.3)';
@@ -1198,7 +1219,8 @@
                         } else {
                             btn.style.display = '';
                             btn.href = resolveStepLink(step, course.link);
-                            btn.innerHTML = roadmapBtnText('roadmap.goToSection');
+                            btn.target = '_blank';
+                            btn.innerHTML = roadmapBtnText(stepButtonLabel(step));
                             completeBtn.innerHTML = roadmapBtnLabel('✅', 'roadmap.completed');
                             completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                             completeBtn.disabled = false;
@@ -1257,8 +1279,8 @@
                     steps[stepIndex + 1].status = 'current';
                 }
                 
-                // Proje kartı kontrolü - sadece diğer tüm kartlar tamamlandığında proje kartını aç
-                const isProjectCard = (stepIndex + 1) === steps.length && steps[stepIndex + 1] && 
+                // Proje kartı kontrolü — yalnızca eski BTK yol haritaları için
+                const isProjectCard = (stepIndex + 1) < steps.length && steps[stepIndex + 1] &&
                                     ['🚀', '💻', '🎮', '📊', '🌐', '🤖', '📱', '🎨'].includes(steps[stepIndex + 1].icon);
                 
                 if (isProjectCard) {
@@ -1285,6 +1307,12 @@
                     });
                     
                     if (response.ok) {
+                        const result = await response.json();
+                        if (result.course_completed) {
+                            showNotification(t('roadmap.courseCompleteCongrats'), 'success');
+                            setTimeout(() => window.location.reload(), 2000);
+                            return;
+                        }
                         showNotification(t('roadmap.progressSaved'), 'success');
                     } else {
                         showNotification(t('roadmap.progressSaveFailed'), 'error');

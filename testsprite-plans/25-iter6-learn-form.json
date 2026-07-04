@@ -1,0 +1,11 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Iter6 Learn form 4 questions visible",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /learn" },
+    { "type": "assertion", "description": "Verify the label text '1. What skill do you want to learn?' is visible on the page" },
+    { "type": "assertion", "description": "Verify the submit button text '🤖 Analyze My Profile' is visible on the page" }
+  ]
+}

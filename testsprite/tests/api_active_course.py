@@ -1,4 +1,3 @@
-import os
 import requests
 
 BASE_URL = "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com"
@@ -7,9 +6,6 @@ TEST_PASSWORD = "123456"
 
 
 def _get_token():
-    token = os.environ.get("AUTH_TOKEN")
-    if token:
-        return token
     response = requests.post(
         f"{BASE_URL}/api/login",
         json={"email": TEST_EMAIL, "password": TEST_PASSWORD},

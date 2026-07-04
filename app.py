@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# .env must load before any module reads GEMINI_API_KEY / YOUTUBE_API_KEY
+load_dotenv()
+
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import sqlite3
@@ -10,23 +15,12 @@ import json
 import re
 import urllib3
 from werkzeug.security import generate_password_hash, check_password_hash
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup
 import time
 import google.generativeai as genai
+from services.roadmap_service import build_learning_roadmap
 
 # SSL uyarılarını kapatma
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-from dotenv import load_dotenv
-
-# .env dosyasını yükleme
-load_dotenv()
 
 TR_TZ = timezone(timedelta(hours=3))
 
@@ -232,268 +226,6 @@ init_db()
 update_database_schema()
 seed_default_test_user()
 
-# BTK Akademi entegrasyonu için fonksiyonlar
-def _parse_gemini_courses_json(response):
-    """Gemini yanıtından BTK kurs listesi çıkar."""
-    response_text = (response.text or "").strip()
-    if not response_text:
-        return []
-
-    if response_text.startswith("```json"):
-        json_match = re.search(r"```json\s*(.*?)\s*```", response_text, re.DOTALL)
-        response_text = json_match.group(1).strip() if json_match else response_text[7:].strip()
-    elif response_text.startswith("```"):
-        json_match = re.search(r"```\s*(.*?)\s*```", response_text, re.DOTALL)
-        response_text = json_match.group(1).strip() if json_match else response_text[3:].strip()
-
-    response_text = clean_and_fix_json(response_text)
-    parsed = json.loads(response_text)
-    if isinstance(parsed, dict):
-        parsed = parsed.get("courses") or parsed.get("items") or []
-    if not isinstance(parsed, list):
-        return []
-
-    courses = []
-    for item in parsed:
-        if not isinstance(item, dict):
-            continue
-        link = (item.get("link") or item.get("url") or "").strip()
-        if "btkakademi.gov.tr" not in link.lower():
-            continue
-        courses.append({
-            "title": item.get("title", "Kurs başlığı bulunamadı"),
-            "link": link,
-            "snippet": item.get("snippet") or item.get("description") or "Açıklama bulunamadı",
-        })
-    return courses
-
-
-_btk_gemini_cache = {}
-_BTK_GEMINI_CACHE_TTL = 300
-
-
-def search_btk_courses_with_gemini(query, skill=None):
-    """Google CSE kullanılamadığında Gemini ile gerçek BTK kursları bul."""
-    if GEMINI_API_KEY == "your_gemini_api_key_here":
-        return []
-
-    cache_key = f"{(skill or '').strip().lower()}|{query.strip().lower()}"
-    cached = _btk_gemini_cache.get(cache_key)
-    if cached and (time.time() - cached["ts"]) < _BTK_GEMINI_CACHE_TTL:
-        return cached["courses"]
-
-    try:
-        focus = (skill or query).strip()
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        prompt = f"""Find up to 5 real online courses on BTK Akademi (btkakademi.gov.tr) matching this search.
-
-Search query: {query}
-Primary skill: {focus}
-
-Return ONLY a JSON array. Each object must have:
-- "title": course title (Turkish)
-- "link": full HTTPS URL on btkakademi.gov.tr (use /portal/course/... URLs when possible)
-- "snippet": one-sentence Turkish description
-
-Use only courses that exist on btkakademi.gov.tr. Do not invent URLs."""
-
-        response = model.generate_content(prompt)
-        courses = _parse_gemini_courses_json(response)
-        if courses:
-            print(f"Gemini BTK araması: {len(courses)} kurs bulundu ({query!r})")
-        else:
-            print(f"Gemini BTK araması sonuç döndürmedi: {query!r}")
-        _btk_gemini_cache[cache_key] = {"ts": time.time(), "courses": courses}
-        return courses
-    except Exception as e:
-        err = str(e)
-        if "429" in err:
-            retry_match = re.search(r"retry in ([\d.]+)s", err, re.IGNORECASE)
-            wait = int(float(retry_match.group(1))) + 2 if retry_match else 35
-            print(f"Gemini kota aşıldı, {wait}s sonra tekrar deneniyor...")
-            time.sleep(wait)
-            try:
-                response = model.generate_content(prompt)
-                courses = _parse_gemini_courses_json(response)
-                if courses:
-                    print(f"Gemini BTK araması (retry): {len(courses)} kurs ({query!r})")
-                _btk_gemini_cache[cache_key] = {"ts": time.time(), "courses": courses}
-                return courses
-            except Exception as retry_err:
-                print(f"Gemini BTK arama retry hatası: {retry_err}")
-                return []
-        print(f"Gemini BTK arama hatası: {e}")
-        return []
-
-
-def search_btk_courses(query, skill=None):
-    """BTK Akademi'de kurs arama — önce Google CSE, sonra Gemini, en son demo."""
-    google_api_key = os.getenv("GOOGLE_SEARCH_API_KEY")
-    cse_id = os.getenv("GOOGLE_CSE_ID")
-
-    if google_api_key and cse_id and google_api_key != "your_google_search_api_key_here":
-        try:
-            response = requests.get(
-                "https://www.googleapis.com/customsearch/v1",
-                params={
-                    "key": google_api_key,
-                    "cx": cse_id,
-                    "q": query,
-                    "num": 10,
-                    "siteSearch": "btkakademi.gov.tr",
-                    "siteSearchFilter": "i",
-                },
-                timeout=15,
-            )
-
-            if response.status_code == 200:
-                items = response.json().get("items", [])
-                if items:
-                    print(f"Google CSE: {len(items)} kurs ({query!r})")
-                    return [_normalize_course_item(item) for item in items]
-                print(f"Google CSE 0 sonuç: {query!r}")
-            else:
-                err = response.json().get("error", {}).get("message", response.text[:200])
-                print(f"Google CSE hatası ({response.status_code}): {err}")
-                if response.status_code == 403:
-                    print(
-                        "İpucu: Google Cloud Console'da 'Custom Search JSON API' etkinleştirin "
-                        "(şimdilik Gemini araması kullanılacak)."
-                    )
-        except Exception as e:
-            print(f"Google CSE istek hatası: {e}")
-    else:
-        print("Google CSE anahtarları yapılandırılmamış, Gemini aramasına geçiliyor")
-
-    gemini_courses = search_btk_courses_with_gemini(query, skill=skill)
-    if gemini_courses:
-        return gemini_courses
-
-    print(f"Tüm arama yöntemleri başarısız, demo kurslar kullanılıyor: {query!r}")
-    return get_demo_courses(query, skill=skill)
-
-
-def _normalize_course_item(item):
-    return {
-        "title": item.get("title", "Kurs başlığı bulunamadı"),
-        "link": item.get("link", "#"),
-        "snippet": item.get("snippet", "Açıklama bulunamadı"),
-    }
-
-
-def get_demo_courses(query, skill=None):
-    """BTK araması başarısız olduğunda örnek kurs verileri döndür"""
-    demo_courses = [
-        {
-            "title": "Python Programlama (1)",
-            "link": "https://btkakademi.gov.tr/portal/course/python-programlama-1-12297",
-            "snippet": "Python programlama dilinin temel kavramları, değişkenler, döngüler, fonksiyonlar ve nesne yönelimli programlama.",
-            "tags": ["python", "programlama", "temel", "başlangıç"],
-        },
-        {
-            "title": "İleri Seviye Python Programlama",
-            "link": "https://btkakademi.gov.tr/portal/course/ileri-seviye-python-programlama-12773",
-            "snippet": "Pandas, NumPy ve ileri Python konuları ile veri analizi ve uygulama geliştirme.",
-            "tags": ["python", "veri", "analiz", "ileri"],
-        },
-        {
-            "title": "Python ile Web Geliştirme",
-            "link": "https://btkakademi.gov.tr/portal/course/python-programlama-2-12772",
-            "snippet": "Django ve Flask ile web uygulamaları ve API geliştirme.",
-            "tags": ["python", "web", "django", "flask"],
-        },
-        {
-            "title": "JavaScript Programlama",
-            "link": "https://btkakademi.gov.tr/portal/course/javascript-programlama-10649",
-            "snippet": "JavaScript temelleri, DOM, etkileşimli web sayfaları ve modern JS.",
-            "tags": ["javascript", "js", "web", "frontend"],
-        },
-        {
-            "title": "HTML ve CSS ile Web Tasarımı",
-            "link": "https://btkakademi.gov.tr/portal/course/html-ve-css-ile-web-tasarimi-10648",
-            "snippet": "HTML5, CSS3 ve responsive web tasarımı temelleri.",
-            "tags": ["html", "css", "web", "tasarım", "frontend"],
-        },
-        {
-            "title": "React.js ile Modern Web Uygulamaları",
-            "link": "https://btkakademi.gov.tr/portal/course/react-js-12775",
-            "snippet": "React bileşenleri, state yönetimi ve modern frontend geliştirme.",
-            "tags": ["react", "javascript", "frontend", "web"],
-        },
-        {
-            "title": "Java Programlama",
-            "link": "https://btkakademi.gov.tr/portal/course/java-programlama-10651",
-            "snippet": "Java temelleri, nesne yönelimli programlama ve uygulama geliştirme.",
-            "tags": ["java", "programlama", "oop"],
-        },
-        {
-            "title": "Siber Güvenlik Temelleri",
-            "link": "https://btkakademi.gov.tr/portal/course/siber-guvenlik-10654",
-            "snippet": "Temel siber güvenlik kavramları, ağ güvenliği ve güvenli yazılım.",
-            "tags": ["siber", "güvenlik", "security", "ağ"],
-        },
-        {
-            "title": "Veritabanı Yönetimi ve SQL",
-            "link": "https://btkakademi.gov.tr/portal/course/veritabani-yonetimi-10653",
-            "snippet": "İlişkisel veritabanları, SQL sorguları ve veri modelleme.",
-            "tags": ["sql", "veritabanı", "database", "db"],
-        },
-        {
-            "title": "Git ve GitHub ile Versiyon Kontrolü",
-            "link": "https://btkakademi.gov.tr/portal/course/git-ve-github-10652",
-            "snippet": "Git komutları, branch yönetimi ve GitHub ile ekip çalışması.",
-            "tags": ["git", "github", "versiyon", "yazılım"],
-        },
-    ]
-    
-    query_lower = query.lower()
-    focus = (skill or query).lower().strip()
-    focus_parts = [w for w in re.split(r"[^\wğüşıöç]+", focus, flags=re.IGNORECASE) if len(w) > 2]
-    keywords = [
-        w for w in re.split(r"[^\wğüşıöç]+", query_lower, flags=re.IGNORECASE)
-        if len(w) > 2 and w not in {"seviye", "kurs", "level", "course", "egitim", "eğitim", "programlama", "baslangic", "başlangıç"}
-    ]
-
-    scored = []
-    for course in demo_courses:
-        haystack = " ".join([
-            course["title"],
-            course["snippet"],
-            " ".join(course.get("tags", [])),
-        ]).lower()
-        score = 0
-        for part in focus_parts:
-            if part in haystack:
-                score += 10
-        for kw in keywords:
-            if kw in haystack:
-                score += 1
-        if score > 0:
-            scored.append((score, course))
-
-    if scored:
-        scored.sort(key=lambda x: x[0], reverse=True)
-        return [course for _, course in scored[:5]]
-
-    skill_aliases = {
-        "js": "javascript",
-        "node": "javascript",
-        "reactjs": "react",
-        "db": "veritabanı",
-        "database": "veritabanı",
-        "security": "siber",
-    }
-    for alias, target in skill_aliases.items():
-        if alias in query_lower:
-            keywords.append(target)
-
-    for course in demo_courses:
-        haystack = " ".join([course["title"], course["snippet"], " ".join(course.get("tags", []))]).lower()
-        if any(kw in haystack for kw in keywords):
-            return [course]
-
-    return demo_courses[:3]
-
 def analyze_user_profile(responses):
     """Kullanıcı yanıtlarını analiz ederek profil oluştur"""
     try:
@@ -531,386 +263,6 @@ def analyze_user_profile(responses):
     except Exception as e:
         print(f"Profil analizi hatası: {str(e)}")
         return None
-
-KNOWN_BTK_COURSES = [
-    {
-        "match": ["html", "css", "web tasarım", "web tasarim", "html5"],
-        "title": "HTML ve CSS ile Web Tasarımı",
-        "link": "https://btkakademi.gov.tr/portal/course/html-ve-css-ile-web-tasarimi-10648",
-    },
-    {
-        "match": ["javascript", "js"],
-        "title": "JavaScript Programlama",
-        "link": "https://btkakademi.gov.tr/portal/course/javascript-programlama-10649",
-    },
-    {
-        "match": ["python"],
-        "title": "Python Programlama",
-        "link": "https://btkakademi.gov.tr/portal/course/python-programlama-1-12297",
-    },
-    {
-        "match": ["react"],
-        "title": "React.js",
-        "link": "https://btkakademi.gov.tr/portal/course/react-js-12775",
-    },
-    {
-        "match": ["java"],
-        "title": "Java Programlama",
-        "link": "https://btkakademi.gov.tr/portal/course/java-programlama-10651",
-    },
-    {
-        "match": ["git", "github"],
-        "title": "Git ve GitHub",
-        "link": "https://btkakademi.gov.tr/portal/course/git-ve-github-10652",
-    },
-    {
-        "match": ["sql", "veritabanı", "veritabani", "database"],
-        "title": "Veritabanı ve SQL",
-        "link": "https://btkakademi.gov.tr/portal/course/veritabani-yonetimi-10653",
-    },
-    {
-        "match": ["siber", "güvenlik", "guvenlik", "security"],
-        "title": "Siber Güvenlik",
-        "link": "https://btkakademi.gov.tr/portal/course/siber-guvenlik-10654",
-    },
-]
-
-
-def lookup_known_btk_course(title, skill=None):
-    """API kotası olmadan bilinen BTK kurs URL'lerini eşleştir."""
-    haystack = f"{title} {skill or ''}".lower()
-    haystack = re.sub(r"[^\wğüşıöç\s]", " ", haystack, flags=re.IGNORECASE)
-
-    best = None
-    best_score = 0
-    for course in KNOWN_BTK_COURSES:
-        score = sum(1 for keyword in course["match"] if keyword in haystack)
-        if score > best_score:
-            best_score = score
-            best = course
-
-    if best and best_score > 0:
-        return best["link"]
-    return None
-
-
-def is_generic_btk_link(link):
-    """Portal ana sayfası veya geçersiz link mi?"""
-    if not link or link == "#":
-        return True
-    normalized = link.rstrip("/").lower()
-    if normalized in {
-        "https://btkakademi.gov.tr/portal",
-        "https://www.btkakademi.gov.tr/portal",
-        "http://btkakademi.gov.tr/portal",
-        "http://www.btkakademi.gov.tr/portal",
-    }:
-        return True
-    return "/course/" not in normalized and "/egitim/" not in normalized
-
-
-def resolve_btk_course_link(title, link=None, skill=None):
-    """Genel portal linklerini gerçek BTK kurs URL'sine çevir."""
-    if link and not is_generic_btk_link(link):
-        return link
-
-    known = lookup_known_btk_course(title, skill)
-    if known:
-        print(f"Bilinen BTK kursu eşleşti: {title!r} -> {known}")
-        return known
-
-    focus = (skill or title or "").strip()
-    results = search_btk_courses(focus, skill=focus)
-    if not results:
-        return link or "#"
-
-    title_lower = title.lower()
-    title_words = [w for w in re.split(r"[^\wğüşıöç]+", title_lower, flags=re.IGNORECASE) if len(w) > 2]
-
-    def score_match(course):
-        haystack = f"{course.get('title', '')} {course.get('snippet', '')}".lower()
-        return sum(1 for word in title_words if word in haystack)
-
-    ranked = sorted(
-        [c for c in results if not is_generic_btk_link(c.get("link"))],
-        key=score_match,
-        reverse=True,
-    )
-    if ranked:
-        resolved = ranked[0]["link"]
-        print(f"Kurs linki çözümlendi: {title!r} -> {resolved}")
-        return resolved
-
-    return link or "#"
-
-
-def repair_roadmap_links(course_title, course_link, roadmap_steps, skill=None):
-    """Yol haritası adımlarındaki geçersiz linkleri düzelt."""
-    resolved_link = resolve_btk_course_link(course_title, course_link, skill)
-    if is_generic_btk_link(resolved_link):
-        return course_link, roadmap_steps, False
-
-    changed = resolved_link != course_link
-    repaired_steps = []
-    for step in roadmap_steps:
-        step_copy = dict(step)
-        if is_generic_btk_link(step_copy.get("link")):
-            step_copy["link"] = resolved_link
-            changed = True
-        repaired_steps.append(step_copy)
-
-    return resolved_link, repaired_steps, changed
-
-
-def recommend_best_course(profile, courses, skill):
-    """En uygun kursu seç"""
-    if not courses:
-        return None
-
-    skill_lower = skill.lower().strip()
-    skill_parts = [w for w in re.split(r"[^\wğüşıöç]+", skill_lower, flags=re.IGNORECASE) if len(w) > 2]
-
-    def course_score(course):
-        text = f"{course.get('title', '')} {course.get('snippet', '')} {' '.join(course.get('tags', []))}".lower()
-        return sum(10 for part in skill_parts if part in text)
-
-    best_course = max(courses, key=course_score)
-    course_link = resolve_btk_course_link(
-        best_course.get("title", skill),
-        best_course.get("link", "#"),
-        skill,
-    )
-
-    return {
-        "title": best_course.get('title', 'Kurs başlığı bulunamadı'),
-        "link": course_link,
-        "description": best_course.get('snippet', 'Açıklama bulunamadı'),
-        "reason": f"Bu kurs {profile['seviye']} seviyesinde {skill} öğrenmek için en uygun seçenektir."
-    }
-
-def scrape_btk_course_sections(course_url):
-    """BTK Akademi kurs sayfasından bölümleri çek - Hibrit versiyon"""
-    try:
-        print(f"Kurs sayfasına gidiliyor: {course_url}")
-        
-        # Önce Requests ile dene (hızlı)
-        try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
-            }
-            
-            response = requests.get(course_url, headers=headers, timeout=15, verify=False)
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.content, 'html.parser')
-            print("Requests ile HTML alındı, bölümler aranıyor...")
-            
-            # Bölümleri bul
-            sections = []
-            span_elements = soup.find_all('span', class_='font-medium text-base')
-            print(f"font-medium text-base ile {len(span_elements)} span bulundu")
-            
-            for span in span_elements:
-                text = span.get_text().strip()
-                if re.match(r'^\d+\.', text):
-                    sections.append(text)
-                    print(f"Bölüm bulundu: {text}")
-            
-            if sections:
-                print(f"Requests başarılı! Toplam {len(sections)} bölüm bulundu")
-                return sections
-                
-        except Exception as e:
-            print(f"Requests başarısız: {e}")
-        
-        # Requests başarısızsa Selenium kullan (yavaş ama güvenilir)
-        print("Selenium ile deneniyor...")
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--ignore-ssl-errors")
-        chrome_options.add_argument("--ignore-certificate-errors")
-        chrome_options.add_argument("--disable-web-security")
-        chrome_options.add_argument("--allow-running-insecure-content")
-        chrome_options.add_argument("--window-size=1920,1080")
-        chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-        
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        
-        driver.get(course_url)
-        time.sleep(3)  # Daha kısa bekleme
-        
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
-        
-        print("Selenium ile HTML alındı, bölümler aranıyor...")
-        
-        sections = []
-        span_elements = soup.find_all('span', class_='font-medium text-base')
-        print(f"font-medium text-base ile {len(span_elements)} span bulundu")
-        
-        for span in span_elements:
-            text = span.get_text().strip()
-            if re.match(r'^\d+\.', text):
-                sections.append(text)
-                print(f"Bölüm bulundu: {text}")
-        
-        driver.quit()
-        
-        if sections:
-            print(f"Selenium başarılı! Toplam {len(sections)} bölüm bulundu")
-            return sections
-        else:
-            print("Hiç bölüm bulunamadı, demo veriler döndürülüyor")
-            if 'git' in course_url.lower():
-                return ["1. Git Temelleri", "2. Repository Yönetimi", "3. Branch ve Merge", "4. GitHub Kullanımı", "5. İleri Git Teknikleri"]
-            elif 'python' in course_url.lower():
-                return ["1. Python Giriş", "2. Temel Syntax", "3. Veri Yapıları", "4. Fonksiyonlar", "5. OOP"]
-            else:
-                return ["1. Tanıtım", "2. Temel Kavramlar", "3. Uygulama", "4. Test", "5. Proje"]
-            
-    except Exception as e:
-        print(f"Scraping hatası: {e}")
-        if 'git' in course_url.lower():
-            return ["1. Git Temelleri", "2. Repository Yönetimi", "3. Branch ve Merge", "4. GitHub Kullanımı", "5. İleri Git Teknikleri"]
-        else:
-            return ["1. Tanıtım", "2. Temel Kavramlar", "3. Uygulama", "4. Test", "5. Proje"]
-
-def generate_project_suggestion(skill, level):
-    """Gemini API ile proje önerisi oluştur"""
-    try:
-        # Gemini API anahtarını kontrol et
-        if GEMINI_API_KEY == "your_gemini_api_key_here":
-            print("UYARI: Gemini API anahtarı ayarlanmamış. Demo proje önerisi döndürülüyor.")
-            return {
-                'title': f"{skill} ile Basit Proje",
-                'description': f"{skill} öğrendiklerinizi pekiştirmek için basit bir proje yapın.",
-                'icon': '🚀',
-                'status': 'locked'
-            }
-        
-        model = genai.GenerativeModel('gemini-2.5-flash')
-        
-        prompt = f"""
-{skill} programlama dili için {level} seviyesinde bir proje önerisi oluştur.
-
-ÖNEMLİ: Yanıtı SADECE JSON formatında ver, başka hiçbir metin ekleme:
-
-{{
-    "title": "Proje başlığı (kısa ve net)",
-    "description": "Proje açıklaması (2-3 cümle, ne yapılacağını açıklasın)",
-    "icon": "Uygun emoji (🚀, 💻, 🎮, 📊, 🌐, 🤖, 📱, 🎨 gibi)",
-    "status": "locked"
-}}
-
-KURALLAR:
-- Proje {level} seviyesinde olmalı (başlangıç/orta/ileri)
-- {skill} ile yapılabilecek pratik bir proje olmalı
-- Başlık kısa ve net olmalı
-- Açıklama 2-3 cümle olmalı
-- Yanıt sadece JSON olmalı, markdown kod bloğu kullanma
-- Başka açıklama ekleme, sadece JSON döndür
-- Tüm tırnak işaretlerinin doğru kapatıldığından emin ol
-- JSON formatının tam ve geçerli olduğundan emin ol
-"""
-        
-        response = model.generate_content(prompt)
-        
-        # JSON parse et
-        import json
-        import re
-        
-        try:
-            response_text = response.text.strip()
-            
-            # Markdown kod bloğu varsa temizle
-            if response_text.startswith('```json'):
-                # ```json ile başlayıp ``` ile bitenleri bul
-                json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
-                if json_match:
-                    response_text = json_match.group(1).strip()
-                else:
-                    # ```json varsa ama ``` yoksa, ```json'dan sonrasını al
-                    response_text = response_text[7:].strip()  # ```json kısmını çıkar
-            elif response_text.startswith('```'):
-                # Sadece ``` ile başlıyorsa
-                json_match = re.search(r'```\s*(.*?)\s*```', response_text, re.DOTALL)
-                if json_match:
-                    response_text = json_match.group(1).strip()
-                else:
-                    response_text = response_text[3:].strip()  # ``` kısmını çıkar
-            
-            # JSON'u temizle ve tamamla
-            response_text = clean_and_fix_json(response_text)
-            
-            # JSON parse et
-            result = json.loads(response_text)
-            
-            return {
-                'title': result.get('title', f'{skill} ile Proje'),
-                'description': result.get('description', f'{skill} öğrendiklerinizi pekiştirmek için bir proje yapın.'),
-                'icon': result.get('icon', '🚀'),
-                'status': 'locked'
-            }
-            
-        except json.JSONDecodeError as e:
-            print(f"JSON parse hatası: {e}")
-            print(f"AI yanıtı: {response_text[:200]}...")
-            
-            # JSON parse edilemezse varsayılan proje döndür
-            return {
-                'title': f"{skill} ile Basit Proje",
-                'description': f"{skill} öğrendiklerinizi pekiştirmek için basit bir proje yapın.",
-                'icon': '🚀',
-                'status': 'locked'
-            }
-            
-    except Exception as e:
-        print(f"Proje önerisi oluşturma hatası: {e}")
-        return {
-            'title': f"{skill} ile Proje",
-            'description': f"{skill} öğrendiklerinizi pekiştirmek için bir proje yapın.",
-            'icon': '🚀',
-            'status': 'locked'
-        }
-
-def create_dynamic_roadmap(course_title, course_link, sections, skill=None, level=None):
-    """Dinamik yol haritası oluştur"""
-    roadmap_steps = []
-    
-    for i, section in enumerate(sections, 1):
-        step = {
-            'id': i,
-            'title': section,
-            'description': f"{course_title} - {section}",
-            'link': course_link,
-            'status': 'current' if i == 1 else 'locked',
-            'icon': '📚'
-        }
-        roadmap_steps.append(step)
-    
-    # En sona proje kartı ekle
-    if skill and level:
-        project_suggestion = generate_project_suggestion(skill, level)
-        project_step = {
-            'id': len(roadmap_steps) + 1,
-            'title': project_suggestion['title'],
-            'description': project_suggestion['description'],
-            'link': '#',
-            'status': project_suggestion['status'],
-            'icon': project_suggestion['icon']
-        }
-        roadmap_steps.append(project_step)
-    
-    return roadmap_steps
 
 @app.route('/')
 def index():
@@ -1153,96 +505,59 @@ def get_users():
 
 @app.route('/api/analyze-profile', methods=['POST'])
 def analyze_profile():
-    """Kullanıcı profilini analiz et ve kurs önerisi yap"""
+    """Kullanıcı profilini analiz et ve Gemini + YouTube ile yol haritası üret"""
     try:
         print("=== ANALYZE PROFILE API CALLED ===")
         
-        # Token kontrolü
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
-            print("ERROR: Token missing or invalid format")
             return jsonify({'error': 'Token gereklidir'}), 401
         
         token = auth_header.split(' ')[1]
         
         try:
             payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-            print(f"Token decoded successfully for user_id: {payload['user_id']}")
         except jwt.ExpiredSignatureError:
-            print("ERROR: Token expired")
             return jsonify({'error': 'Token süresi dolmuş'}), 401
         except jwt.InvalidTokenError:
-            print("ERROR: Invalid token")
             return jsonify({'error': 'Geçersiz token'}), 401
         
         data = request.get_json()
-        print(f"Received data: {data}")
         
-        # Veri doğrulama
         required_fields = ['skill', 'goal', 'level', 'time']
         for field in required_fields:
             if not data.get(field):
-                print(f"ERROR: Missing field: {field}")
                 return jsonify({'error': f'{field} alanı gereklidir'}), 400
         
-        print("Data validation passed")
-        
-        # Profil analizi
-        print("Starting profile analysis...")
         profile = analyze_user_profile(data)
         if not profile:
-            print("ERROR: Profile analysis failed")
             return jsonify({'error': 'Profil analizi başarısız'}), 500
         
-        print(f"Profile created: {profile}")
+        lang = resolve_content_lang(data.get('lang') or request.headers.get('X-Content-Lang'))
+        roadmap_result = build_learning_roadmap(
+            data['skill'],
+            data['goal'],
+            data['level'],
+            data['time'],
+            lang,
+        )
         
-        # BTK kurs arama
-        search_query = f"{data['skill']} {profile['seviye']} seviye kurs"
-        print(f"Searching for: {search_query}")
-        courses = search_btk_courses(search_query, skill=data['skill'])
-        print(f"Found {len(courses)} courses")
-        
-        if not courses:
-            print("No courses found, trying general search...")
-            search_query = f"{data['skill']} programlama eğitim"
-            courses = search_btk_courses(search_query, skill=data['skill'])
-            print(f"General search found {len(courses)} courses")
-
-        if not courses:
-            print("Still no courses, using skill-based demo fallback...")
-            courses = get_demo_courses(data['skill'], skill=data['skill'])
-        
-        # En uygun kursu seç
-        best_course = recommend_best_course(profile, courses, data['skill'])
-        if not best_course:
-            print("No best course selected, forcing demo fallback...")
-            courses = get_demo_courses(data['skill'], skill=data['skill'])
-            best_course = recommend_best_course(profile, courses, data['skill'])
-        print(f"Best course: {best_course}")
-        
-        # Profili veritabanına kaydet
-        print("Saving profile to database...")
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        
         cursor.execute('''
             INSERT INTO user_profiles (user_id, skill, goal, level, time_commitment, learning_style)
             VALUES (?, ?, ?, ?, ?, ?)
         ''', (payload['user_id'], data['skill'], data['goal'], data['level'], data['time'], 'Genel öğrenme'))
-        
         conn.commit()
         conn.close()
-        print("Profile saved to database")
         
-        response_data = {
+        return jsonify({
             'success': True,
             'profile': profile,
-            'recommended_course': best_course,
-            'total_courses_found': len(courses)
-        }
-        
-        print(f"Sending response: {response_data}")
-        return jsonify(response_data), 200
+            'roadmap_title': roadmap_result['roadmap_title'],
+            'roadmap_steps': roadmap_result['roadmap_steps'],
+            'total_steps': roadmap_result['total_steps'],
+        }), 200
         
     except Exception as e:
         print(f"ERROR in analyze_profile: {str(e)}")
@@ -1270,50 +585,38 @@ def add_course_to_roadmap():
         
         data = request.get_json()
         
-        # Veri doğrulama
-        required_fields = ['course_title', 'course_link', 'course_description']
+        required_fields = ['roadmap_title', 'roadmap_steps']
         for field in required_fields:
             if not data.get(field):
                 return jsonify({'error': f'{field} alanı gereklidir'}), 400
         
-        # Veritabanı bağlantısını aç
+        roadmap_steps = data['roadmap_steps']
+        if not isinstance(roadmap_steps, list) or len(roadmap_steps) == 0:
+            return jsonify({'error': 'roadmap_steps geçerli bir liste olmalıdır'}), 400
+        
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         
-        # Kullanıcının profil bilgilerini al
-        cursor.execute('''
-            SELECT skill, level FROM user_profiles 
-            WHERE user_id = ? ORDER BY created_at DESC LIMIT 1
-        ''', (payload['user_id'],))
-        
-        profile = cursor.fetchone()
-        skill = profile[0] if profile else None
-        level = profile[1] if profile else None
-
-        course_link = resolve_btk_course_link(
-            data['course_title'],
-            data['course_link'],
-            skill,
-        )
-        
-        # BTK Akademi'den kurs bölümlerini çek
-        print(f"BTK Akademi'den bölümler çekiliyor: {course_link}")
-        sections = scrape_btk_course_sections(course_link)
-        
-        # Dinamik yol haritası oluştur (proje kartı ile birlikte)
-        roadmap_steps = create_dynamic_roadmap(data['course_title'], course_link, sections, skill, level)
+        course_description = data.get('course_description') or data['roadmap_title']
         
         cursor.execute('''
             INSERT INTO user_courses (user_id, course_title, course_link, course_description, roadmap_sections, added_at)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (payload['user_id'], data['course_title'], course_link, data['course_description'], json.dumps(roadmap_steps), now_tr_str()))
+        ''', (
+            payload['user_id'],
+            data['roadmap_title'],
+            '#',
+            course_description,
+            json.dumps(roadmap_steps),
+            now_tr_str(),
+        ))
         
         conn.commit()
         conn.close()
         
         return jsonify({
             'success': True,
-            'message': 'Kurs yol haritasına eklendi'
+            'message': 'Yol haritası kaydedildi'
         }), 200
         
     except Exception as e:
@@ -1360,7 +663,6 @@ def get_user_roadmap():
             'courses': []
         }
         
-        profile_skill = profile[0] if profile else None
         if profile:
             roadmap_data['profile'] = {
                 'skill': profile[0],
@@ -1380,19 +682,6 @@ def get_user_roadmap():
                 except Exception:
                     roadmap_steps = []
 
-            course_link, roadmap_steps, repaired = repair_roadmap_links(
-                course_title,
-                course_link,
-                roadmap_steps,
-                profile_skill,
-            )
-            if repaired:
-                cursor.execute('''
-                    UPDATE user_courses
-                    SET course_link = ?, roadmap_sections = ?
-                    WHERE id = ?
-                ''', (course_link, json.dumps(roadmap_steps), course_id))
-            
             roadmap_data['courses'].append({
                 'title': course_title,
                 'link': course_link,
@@ -1453,18 +742,26 @@ def update_user_progress():
         
         course_id, course_title, existing_roadmap = course
         
-        # Mevcut roadmap'i güncelle
         updated_roadmap = json.dumps(data['roadmap_steps'])
-        
-        print(f"DEBUG: Updating roadmap for course {course_id}")
-        print(f"DEBUG: New roadmap data: {data['roadmap_steps']}")
-        print(f"DEBUG: Completed step: {data['completed_step']}")
+        steps = data['roadmap_steps']
+        all_completed = (
+            isinstance(steps, list)
+            and len(steps) > 0
+            and all(step.get('status') == 'completed' for step in steps)
+        )
         
         cursor.execute('''
             UPDATE user_courses 
             SET roadmap_sections = ?
             WHERE id = ?
         ''', (updated_roadmap, course_id))
+        
+        if all_completed:
+            cursor.execute('''
+                UPDATE user_courses
+                SET status = 'completed', completed_at = ?
+                WHERE id = ?
+            ''', (now_tr_str(), course_id))
         
         conn.commit()
         conn.close()
@@ -1473,7 +770,8 @@ def update_user_progress():
             'success': True,
             'message': 'İlerleme başarıyla kaydedildi',
             'completed_step': data['completed_step'],
-            'course_title': course_title
+            'course_title': course_title,
+            'course_completed': all_completed,
         }), 200
         
     except Exception as e:

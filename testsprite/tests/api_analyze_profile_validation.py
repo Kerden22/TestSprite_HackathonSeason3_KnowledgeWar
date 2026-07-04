@@ -15,14 +15,18 @@ def _get_token():
     return response.json()["token"]
 
 
-def test_completed_courses_with_auth():
+def test_analyze_profile_requires_skill():
     token = _get_token()
-    response = requests.get(
-        f"{BASE_URL}/api/completed-courses",
+    response = requests.post(
+        f"{BASE_URL}/api/analyze-profile",
         headers={"Authorization": f"Bearer {token}"},
+        json={
+            "goal": "build projects",
+            "level": "none",
+            "time": "1 hour per day",
+        },
         timeout=30,
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 400, response.text
     data = response.json()
-    assert "completed_courses" in data
-    assert isinstance(data["completed_courses"], list)
+    assert "error" in data

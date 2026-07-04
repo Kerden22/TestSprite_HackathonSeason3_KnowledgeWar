@@ -135,8 +135,8 @@
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
-                        🚀 BTK Akademi
+                    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent" data-i18n="learn.brand">
+                        KNOWLEDGEWAR
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -230,7 +230,7 @@
                 <div class="text-center space-y-6">
                     <div class="text-3xl">🚀</div>
                     <h3 class="text-2xl font-bold text-white" data-i18n="learn.loadingTitle">Analyzing Your Profile...</h3>
-                    <p class="text-gray-400" data-i18n="learn.loadingSubtitle">Searching for the best BTK Academy courses</p>
+                    <p class="text-gray-400" data-i18n="learn.loadingSubtitle">Generating your personalized learning path with AI and YouTube</p>
                     
                     <!-- Progress Bar -->
                     <div class="w-full bg-gray-700 rounded-full h-3">
@@ -252,11 +252,11 @@
                         </div>
                     </div>
 
-                    <!-- Course Recommendation -->
+                    <!-- Roadmap Preview -->
                     <div>
-                        <h3 class="text-2xl font-bold text-white mb-4" data-i18n="learn.recommendedCourse">🎯 Recommended Course</h3>
-                        <div id="courseRecommendation" class="bg-gray-800 p-6 rounded-xl">
-                            <!-- Course data will be inserted here -->
+                        <h3 class="text-2xl font-bold text-white mb-4" data-i18n="learn.roadmapPreview">🗺️ Your Learning Roadmap</h3>
+                        <div id="roadmapPreview" class="bg-gray-800 p-6 rounded-xl">
+                            <!-- Roadmap preview will be inserted here -->
                         </div>
                     </div>
 
@@ -344,7 +344,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'X-Content-Lang': typeof getLang === 'function' ? getLang() : 'en'
                     },
                     body: JSON.stringify(data)
                 });
@@ -404,32 +405,42 @@
                     </div>
                 `;
                 
-                // Show course recommendation
-                const courseRecommendation = document.getElementById('courseRecommendation');
-                if (result.recommended_course) {
-                    courseRecommendation.innerHTML = `
-                        <div class="space-y-4">
-                            <h5 class="text-lg font-bold text-cosmic-blue">${result.recommended_course.title}</h5>
-                            <p class="text-gray-400">${result.recommended_course.description}</p>
-                            <p class="text-sm text-cosmic-green"><strong>${t('learn.whyThisCourse')}</strong> ${result.recommended_course.reason}</p>
-                            <a href="${result.recommended_course.link}" target="_blank" class="inline-block bg-cosmic-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                                ${t('learn.viewCourse')}
-                            </a>
+                // Show roadmap preview
+                const roadmapPreview = document.getElementById('roadmapPreview');
+                if (result.roadmap_steps && result.roadmap_steps.length > 0) {
+                    const previewSteps = result.roadmap_steps.slice(0, 3);
+                    const stepsHtml = previewSteps.map((step, idx) => `
+                        <div class="border-b border-gray-700 pb-3 mb-3 last:border-0 last:pb-0 last:mb-0">
+                            <p class="text-cosmic-blue font-semibold">${idx + 1}. ${step.title}</p>
+                            <p class="text-gray-400 text-sm mt-1">${step.description}</p>
+                        </div>
+                    `).join('');
+                    const moreCount = result.roadmap_steps.length - previewSteps.length;
+                    const moreHtml = moreCount > 0
+                        ? `<p class="text-sm text-cosmic-green mt-4">${tFormat('learn.moreSteps', { count: moreCount })}</p>`
+                        : '';
+                    roadmapPreview.innerHTML = `
+                        <div class="space-y-2">
+                            <h5 class="text-lg font-bold text-white">${result.roadmap_title}</h5>
+                            <p class="text-sm text-gray-400">${tFormat('learn.totalSteps', { count: result.total_steps || result.roadmap_steps.length })}</p>
+                            <div class="mt-4">${stepsHtml}</div>
+                            ${moreHtml}
                         </div>
                     `;
-                    
-                    // Store course data for later use
-                    window.currentCourse = result.recommended_course;
+                    window.currentRoadmap = {
+                        title: result.roadmap_title,
+                        steps: result.roadmap_steps,
+                        description: result.roadmap_title
+                    };
                 } else {
-                    courseRecommendation.innerHTML = `
-                        <p class="text-gray-400">${t('learn.noCourseFound')}</p>
-                    `;
+                    roadmapPreview.innerHTML = `<p class="text-gray-400">${t('learn.noRoadmapFound')}</p>`;
+                    window.currentRoadmap = null;
                 }
             }, 500);
         }
 
         async function addCourseToRoadmap() {
-            if (!window.currentCourse) {
+            if (!window.currentRoadmap || !window.currentRoadmap.steps) {
                 swalError(t('learn.analyzeFirst'));
                 return;
             }
@@ -453,9 +464,9 @@
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        course_title: window.currentCourse.title,
-                        course_link: window.currentCourse.link,
-                        course_description: window.currentCourse.description
+                        roadmap_title: window.currentRoadmap.title,
+                        roadmap_steps: window.currentRoadmap.steps,
+                        course_description: window.currentRoadmap.description
                     })
                 });
 
@@ -492,7 +503,7 @@
             document.getElementById('resultsContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('learningForm').reset();
-            window.currentCourse = null;
+            window.currentRoadmap = null;
         }
 
         document.addEventListener('DOMContentLoaded', async () => {

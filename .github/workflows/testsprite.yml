@@ -1,10 +1,20 @@
 name: TestSprite CI/CD Verification
 
-# Runs automatically on push to master, and manually from the Actions tab.
 on:
   push:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      run_frontend:
+        description: 'Run frontend tests (3)'
+        required: false
+        type: boolean
+        default: true
+      run_backend:
+        description: 'Run all backend tests (11)'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   test:
@@ -21,37 +31,83 @@ jobs:
       - name: Install TestSprite CLI
         run: npm install -g @testsprite/testsprite-cli
 
-      - name: Wake live app
+      - name: Wake live app (Render deploy)
         run: |
-          curl -sf --retry 5 --retry-delay 15 \
-            https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/ \
-            || true
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -sf --max-time 30 \
+              https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/; then
+              echo "App is up (attempt $i)"
+              exit 0
+            fi
+            echo "Waiting for deploy... attempt $i"
+            sleep 30
+          done
+          echo "Wake failed — tests may still run against stale deploy"
+          exit 0
 
-      # CI runs ONLY the current iteration's tests (save credits).
-      # Banked & passing (do not re-run): Iteration 2–4 (see LOOP.md).
-      # Waived (false blocked, never in CI): 02, 06, 12, 14, 15.
+      # Iteration 6 — FE first, then all BE (fast → slow).
+      # Gemini+YouTube quota: a7bbf927 + f046f210 (run last).
       #
-      # Iteration 5 — Tournament / Profile / Learn / Admin (6 tests):
-      #   17 Tournament EN smoke        b0ff2134-a12f-4f54-8ea4-a47475f25c30
-      #   18 Tournament i18n TR         d9f72918-65da-4a2d-b5eb-cc87b450dd37
-      #   19 Profile EN smoke           bf65fb04-0699-48e4-a152-ee39bb58f3cb
-      #   20 Learn EN smoke             fba7706b-a527-420a-810a-c335657d168c
-      #   21 Tournament admin i18n      d8d0fdec-58c6-4f70-812b-49ae67ae1dd2
-      #   22 Tournament admin AI gen    d2bc376f-8d9d-4588-ab07-7131ecb426c3
-      - name: Run TestSprite Frontend Suite (Iteration 5 — 6 new tests)
+      # Frontend (3):
+      #   learn EN smoke          a4bd6c04-4004-420f-be9a-4af47d64a62c
+      #   roadmap EN smoke        eca16881-f0d2-40c2-9091-7ec7fa9ab2dc
+      #   learn form visible      a4732506-19fa-4e38-ac5e-157e6c442737
+      #
+      # Backend (11):
+      #   login                   8fe0eb1f-ca3c-4b5f-83b0-f0905b931ba2
+      #   profile auth            407ed44d-77cc-4f4d-a31d-935f373ba624
+      #   tournaments             8444706e-34e4-417a-af10-5a927382307c
+      #   active course           bee6c90f-63d7-40cd-ab84-c2043f5df9b8
+      #   completed courses       561cd21f-575e-4b4c-8986-85cb35eed654
+      #   iter6 auth 401          70309105-5aa8-45e9-b219-c1e933ce0ee4
+      #   iter6 validation 400    584d61dd-572f-4773-8054-ae43cb37238c
+      #   analyze auth (legacy)   18faba0d-d05d-4917-b3e6-ddff4dd05193
+      #   analyze validate (leg.) 36932166-8aa3-487c-8366-b93f8c5f72a7
+      #   roadmap schema (leg.)   a7bbf927-b0dc-411f-8687-54ceff12bb44
+      #   iter6 pipeline          f046f210-520d-4578-9d16-5bc85ee6313c
+      - name: Run TestSprite tests (FE → BE)
         env:
           TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_TOKEN }}
         run: |
           testsprite setup --from-env
           set +e
           FAIL=0
-          for ID in \
-            b0ff2134-a12f-4f54-8ea4-a47475f25c30 \
-            d9f72918-65da-4a2d-b5eb-cc87b450dd37 \
-            bf65fb04-0699-48e4-a152-ee39bb58f3cb \
-            fba7706b-a527-420a-810a-c335657d168c \
-            d8d0fdec-58c6-4f70-812b-49ae67ae1dd2 \
-            d2bc376f-8d9d-4588-ab07-7131ecb426c3; do
-            testsprite test run "$ID" --wait || FAIL=1
-          done
+
+          RUN_FE=true
+          RUN_BE=true
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            [ "${{ inputs.run_frontend }}" = "true" ] || RUN_FE=false
+            [ "${{ inputs.run_backend }}" = "true" ] || RUN_BE=false
+          fi
+
+          if [ "$RUN_FE" = "true" ]; then
+            echo "=== Frontend tests (3) ==="
+            for ID in \
+              a4bd6c04-4004-420f-be9a-4af47d64a62c \
+              eca16881-f0d2-40c2-9091-7ec7fa9ab2dc \
+              a4732506-19fa-4e38-ac5e-157e6c442737; do
+              echo "--- FE test $ID ---"
+              testsprite test run "$ID" --wait || FAIL=1
+            done
+          fi
+
+          if [ "$RUN_BE" = "true" ]; then
+            echo "=== Backend tests (11) — fast first, pipeline last ==="
+            for ID in \
+              8fe0eb1f-ca3c-4b5f-83b0-f0905b931ba2 \
+              407ed44d-77cc-4f4d-a31d-935f373ba624 \
+              8444706e-34e4-417a-af10-5a927382307c \
+              bee6c90f-63d7-40cd-ab84-c2043f5df9b8 \
+              561cd21f-575e-4b4c-8986-85cb35eed654 \
+              70309105-5aa8-45e9-b219-c1e933ce0ee4 \
+              584d61dd-572f-4773-8054-ae43cb37238c \
+              18faba0d-d05d-4917-b3e6-ddff4dd05193 \
+              36932166-8aa3-487c-8366-b93f8c5f72a7 \
+              a7bbf927-b0dc-411f-8687-54ceff12bb44 \
+              f046f210-520d-4578-9d16-5bc85ee6313c; do
+              echo "--- BE test $ID ---"
+              testsprite test run "$ID" --wait || FAIL=1
+            done
+          fi
+
           exit $FAIL
