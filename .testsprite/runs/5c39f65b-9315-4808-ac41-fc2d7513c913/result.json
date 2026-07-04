@@ -1,0 +1,18 @@
+{
+  "testId": "ebe0b04d-cc30-42bb-b098-ab70faa31458",
+  "status": "failed",
+  "startedAt": "2026-07-03T20:37:14.629Z",
+  "finishedAt": "2026-07-03T20:41:07.947Z",
+  "videoUrl": "https://testsprite-videos.s3.us-east-1.amazonaws.com/34d8d448-8021-7076-ae6b-533705641a44/1783111265951534//tmp/ca8c44fd-4272-4f75-b0e3-255e22452215/result.webm",
+  "failureAnalysisUrl": null,
+  "snapshotId": "snap_ced1747eae58870b",
+  "runIdIfAvailable": "5c39f65b-9315-4808-ac41-fc2d7513c913",
+  "codeVersion": "v1",
+  "targetUrl": "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/",
+  "targetUrlSource": "run",
+  "failedStepIndex": 6,
+  "failureKind": "unknown",
+  "verdict": "failed",
+  "executionStatus": "completed",
+  "summary": "Failed: TEST FAILURE\n\nThe Turkish language toggle did not change the site header to Turkish when the 'TR' button was clicked.\n\nObservations:\n- The 'TR' button was clicked three times, but the header still shows English navigation labels such as 'Home'.\n- Searching the page for the Turkish label 'Anasayfa' returned no matches."
+}

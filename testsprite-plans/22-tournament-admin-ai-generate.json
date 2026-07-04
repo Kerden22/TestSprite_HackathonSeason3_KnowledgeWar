@@ -1,0 +1,13 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Tournament admin AI generates questions",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /tournament-admin" },
+    { "type": "action", "description": "Fill the tournament title with 'Python Basics Quiz' and the content field with 'Python variables, loops, and functions'" },
+    { "type": "action", "description": "Set question count to 5, set start time to tomorrow and end time to two days from now in the datetime fields" },
+    { "type": "action", "description": "Click the '🤖 Generate Questions with AI' button and wait until question generation finishes" },
+    { "type": "assertion", "description": "Verify the heading '📝 Generated Questions' is visible on the page" }
+  ]
+}

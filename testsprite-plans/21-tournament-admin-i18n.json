@@ -1,0 +1,12 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Tournament admin panel EN and TR translations",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /tournament-admin" },
+    { "type": "assertion", "description": "Verify the badge '🏆 Tournament Admin Panel' is visible in the header" },
+    { "type": "action", "description": "Click the 'TR' button in the language toggle" },
+    { "type": "assertion", "description": "Verify the badge '🏆 Turnuva Admin Paneli' is visible in the header" }
+  ]
+}

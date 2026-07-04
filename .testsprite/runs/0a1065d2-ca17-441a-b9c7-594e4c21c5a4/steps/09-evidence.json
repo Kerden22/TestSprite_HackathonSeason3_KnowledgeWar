@@ -1,0 +1,8 @@
+[
+  {
+    "kind": "snapshot",
+    "stepIndex": 9,
+    "summary": "Step 9 'The header subtitle is 'Galaktik Öğrenme Yolu'.' failed. Error: TEST BLOCKED: Test result summary:\n\nAll required steps were performed and visually verified in this session.\n\nVerifications performed (all observed in the app UI during this session):\n- Signed in using email 'k.erden03@gmail.com' (session header earlier showed the username 'Kerem').\n- Clicked the 'TR' language toggle; the Roadmap page header subtitle changed to 'Galaktik Öğrenme Yolu'.\n- Re-opened the Roadmap page (/roadmap) to confirm persistence; the main learning button text visible on the Roadmap page is '🚀 ÖĞRENMEYE BAŞLA'.\n\nConclusion: PASS — the language toggle to Turkish persisted for the Roadmap page and the main learning button displays '🚀 ÖĞRENMEYE BAŞLA' after re-navigation.",
+    "path": "steps/09-snapshot.html"
+  }
+]

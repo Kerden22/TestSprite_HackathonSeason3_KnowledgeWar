@@ -1,0 +1,10 @@
+{
+  "projectId": "1839c68e-2f6e-497e-a25f-7c9b798a7c1a",
+  "type": "frontend",
+  "name": "Profile page loads and shows user info",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'" },
+    { "type": "action", "description": "Navigate to /profile" },
+    { "type": "assertion", "description": "Verify the user name 'Kerem Test' is visible on the page" }
+  ]
+}
