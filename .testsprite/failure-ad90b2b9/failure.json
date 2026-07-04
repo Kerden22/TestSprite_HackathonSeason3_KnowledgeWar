@@ -1,9 +1,0 @@
-{
-  "rootCauseHypothesis": "The production host appears to be enforcing an auth guard on /tournament, causing the CTA to redirect to /login?next=/tournament. This is likely due to a route protection/middleware misconfiguration on the hosting side, such as the tournaments page being marked private in production, missing/invalid auth session cookies in the deployed environment, or an incorrect environment setup that makes the app think the user is logged out. As a result, clicking the primary tournaments button opens the login form instead of the tournaments UI. Underlying error: TEST FAILURE\n\nThe tournaments experience did not open when clicking the primary '⚔️ Turnuvalar' button on the landing page — the application redirected to the login page instead.\n\nObservations:\n- Clicking '⚔️ Turnuvalar' navigated to /login?next=/tournament rather than showing the tournaments UI.\n- The visible page shows a login form titled 'Tekrar Hoş Geldin' with 'E-posta Adresi' and 'Şifre' fields and a 'Giriş Yap' button.",
-  "recommendedFixTarget": {
-    "kind": "env",
-    "reference": null,
-    "rationale": "Make the /tournament route publicly accessible on the deployed host, or ensure the landing-page '⚔️ Turnuvalar' CTA points to the intended public tournaments page instead of an authenticated-only route. If tournaments are meant to be protected, update the route guard so unauthenticated users can still view the tournaments experience (or a read-only version) without being redirected to /login. Also verify hosting/auth configuration (session cookie domain, auth middleware, environment variables, route rules) so the production deployment does not mistakenly treat all tournament visits as unauthenticated."
-  },
-  "evidence": []
-}

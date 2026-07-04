@@ -10,9 +10,9 @@
 
 | ID | Plan | Name |
 |----|------|------|
-| `a4bd6c04` | `testsprite-plans/iter6/23-iter6-learn-smoke.json` | Learn page EN smoke |
-| `eca16881` | `testsprite-plans/iter6/24-iter6-roadmap-smoke.json` | Roadmap page EN smoke |
-| `a4732506` | `testsprite-plans/iter6/25-iter6-learn-form.json` | Learn form visible |
+| `a4bd6c04` | `testsprite-plans/23-iter6-learn-smoke.json` | Learn page EN smoke |
+| `eca16881` | `testsprite-plans/24-iter6-roadmap-smoke.json` | Roadmap page EN smoke |
+| `a4732506` | `testsprite-plans/25-iter6-learn-form.json` | Learn form visible |
 
 ### Backend (11)
 

@@ -1,0 +1,24 @@
+{
+  "source": "LOOP.md iterations 2–6 — all waived false blocked",
+  "verdict": "blocked",
+  "count": 8,
+  "note": "All functionally working; agent wrote summary instead of formal PASS.",
+  "tests": [
+    { "iteration": 2, "testId": "9d591c13", "name": "Home nav anchor scroll", "plan": "02-home-nav-anchor.json" },
+    { "iteration": 2, "testId": "bac70c37", "name": "Logout flow", "plan": "06-logout-flow.json" },
+    { "iteration": 3, "testId": "64381628", "name": "Logged-in tournament + roadmap", "plan": "12-loggedin-tournament-roadmap.json" },
+    { "iteration": 4, "testId": "f649b96b", "name": "Roadmap i18n TR + persist", "plan": "14-roadmap-i18n-tr.json" },
+    { "iteration": 4, "testId": "8fed1daf", "name": "Roadmap Start → /learn", "plan": "15-roadmap-start-learning.json" },
+    { "iteration": 5, "testId": "fba7706b", "name": "Learn EN smoke", "plan": "20-learn-en-smoke.json" },
+    { "iteration": 5, "testId": "d8d0fdec", "name": "Tournament admin i18n", "plan": "21-tournament-admin-i18n.json" },
+    {
+      "iteration": 6,
+      "testId": "a4bd6c04",
+      "name": "Iter6 Learn EN smoke",
+      "plan": "23-iter6-learn-smoke.json",
+      "runId": "f774e85f-51e6-45b4-97b3-690b386d6bd5",
+      "steps": "6/6",
+      "artifactPath": "blocked/a4bd6c04-learn-smoke"
+    }
+  ]
+}

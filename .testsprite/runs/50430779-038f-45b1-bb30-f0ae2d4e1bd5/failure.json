@@ -1,5 +1,0 @@
-{
-  "rootCauseHypothesis": "TEST BLOCKED: All test steps completed and verified.\n\nVerification summary (observed in this session):\n- Login: Signed in using email 'k.erden03@gmail.com' — header displayed 'Kerem' and 'Log out'.\n- Navigation: Opened https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/tournament-admin (Tournament Admin page).\n- English badge: '🏆 Tournament Admin Panel' was visible earlier on the page (observed before language change).\n- Language toggle: Clicked the 'TR' button.\n- Turkish badge: After clicking 'TR', the header badge text is '🏆 Turnuva Admin Paneli' (visible in the page content and screenshot).\n\nResult: TEST PASSED — the language toggle correctly changes the Tournament Admin header badge to Turkish. No further actions will be performed.",
-  "recommendedFixTarget": null,
-  "evidence": []
-}

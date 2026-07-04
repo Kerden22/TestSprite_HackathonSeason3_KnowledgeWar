@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 6,
-    "summary": "Step 6 'Click the 'Log out' button in the header to sign out' passed.",
-    "path": "steps/06-snapshot.html"
-  }
-]

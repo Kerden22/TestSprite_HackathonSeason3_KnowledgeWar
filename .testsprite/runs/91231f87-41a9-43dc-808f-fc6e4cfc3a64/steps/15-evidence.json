@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 15,
-    "summary": "Step 15 'Expected 'Features' link to be visible in the top navigation.' failed. Error: TEST FAILURE\n\nThe 'Tournaments' navigation link is visible to guests but the test expected it to be hidden.\n\nObservations:\n- The header navigation shows a 'Tournaments' link alongside 'Home', 'Features', and 'Log in'.\n- The hero section is visible and displays the expected 'AI-POWERED' text.",
-    "path": "steps/15-snapshot.html"
-  }
-]

@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 4,
-    "summary": "Step 4 'Expected the 'Özellikler' (Features) link to be visible.' failed. Error: TEST FAILURE\n\nA primary 'Tournaments' navigation entry in the header is missing — the site shows tournament content on the page but no tournament button/link is present in the main navigation.\n\nObservations:\n- The header navigation contains the 'Özellikler' (Features) link (visible in the top navigation).\n- No 'Turnuva' / 'Turnuvalar' / 'Yarış' button or link is present in the header/main navigation.\n- The page body contains a 'TURNUVALAR' section and a 'Yarış ve Kazan' card, but these are in-page content rather than primary navigation items.",
-    "path": "steps/04-snapshot.html"
-  }
-]

@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 5,
-    "summary": "Step 5 'Click the 'TR' button in the EN | TR language toggle, then verify the header shows the Turkish label 'Anasayfa'' passed.",
-    "path": "steps/05-snapshot.html"
-  }
-]

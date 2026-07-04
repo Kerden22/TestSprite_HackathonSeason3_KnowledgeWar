@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 5,
-    "summary": "Step 5 'The 'How it works' section is visible in the viewport.' failed. Error: TEST BLOCKED: All requested navigation checks completed successfully.\n\nObserved facts (from the page and screenshot):\n- The header navigation items 'Home', 'How it works', and 'Features' are present.\n- The 'How it works' section was clicked and visible during the session (step recorded).\n- The 'Features' link was clicked and the FEATURES section was visible during the session (step recorded).\n- The 'Home' link was clicked and the hero section is visible in the viewport showing the text 'AI-POWERED' and 'LEARNING PLATFORM'.\n\nConclusion: The navigation and section visibility behavior works as expected for the requested steps. The task is complete.",
-    "path": "steps/05-snapshot.html"
-  }
-]

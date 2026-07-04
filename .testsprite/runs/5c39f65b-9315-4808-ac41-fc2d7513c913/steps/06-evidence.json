@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 6,
-    "summary": "Step 6 'Expected the header navigation link to display the Turkish label 'Anasayfa'.' failed. Error: TEST FAILURE\n\nThe Turkish language toggle did not change the site header to Turkish when the 'TR' button was clicked.\n\nObservations:\n- The 'TR' button was clicked three times, but the header still shows English navigation labels such as 'Home'.\n- Searching the page for the Turkish label 'Anasayfa' returned no matches.",
-    "path": "steps/06-snapshot.html"
-  }
-]

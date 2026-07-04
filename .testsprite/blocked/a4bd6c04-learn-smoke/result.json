@@ -1,0 +1,18 @@
+{
+  "testId": "a4bd6c04-4004-420f-be9a-4af47d64a62c",
+  "status": "blocked",
+  "startedAt": "2026-07-04T22:44:57.562Z",
+  "finishedAt": "2026-07-04T22:46:57.946Z",
+  "videoUrl": "https://testsprite-videos.s3.us-east-1.amazonaws.com/34d8d448-8021-7076-ae6b-533705641a44/1783205217758082//tmp/b2991c32-5bd9-496c-9133-4d853c11e8e6/result.webm",
+  "failureAnalysisUrl": null,
+  "snapshotId": "snap_429750b4d597fb5f",
+  "runIdIfAvailable": "f774e85f-51e6-45b4-97b3-690b386d6bd5",
+  "codeVersion": "v1",
+  "targetUrl": "https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com/",
+  "targetUrlSource": "run",
+  "failedStepIndex": 7,
+  "failureKind": null,
+  "verdict": "blocked",
+  "executionStatus": "completed",
+  "summary": "Blocked before a verdict could be produced: TEST BLOCKED: All required steps were completed and verified:\n\nRequirements from the user request:\n- Navigate to /login and log in with email 'k.erden03@gmail.com' and password '123456'.\n  Evidence: After submitting the credentials earlier in this session, the UI showed a profile labeled 'Kerem' and a 'Log out' button (visible in the session history), indicating an authenticated session.\n\n- Navigate to /learn.\n  Evidence: The current tab URL is '/lear…"
+}

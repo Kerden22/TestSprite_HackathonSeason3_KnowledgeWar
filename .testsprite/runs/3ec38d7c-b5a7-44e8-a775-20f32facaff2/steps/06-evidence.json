@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 6,
-    "summary": "Step 6 'Click the '⚔️ Tournaments' button in the navbar to open the tournaments page' passed.",
-    "path": "steps/06-snapshot.html"
-  }
-]

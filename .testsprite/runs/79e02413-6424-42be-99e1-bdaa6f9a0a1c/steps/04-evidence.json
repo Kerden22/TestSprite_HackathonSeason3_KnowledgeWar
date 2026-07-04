@@ -1,8 +1,0 @@
-[
-  {
-    "kind": "snapshot",
-    "stepIndex": 4,
-    "summary": "Step 4 'Click the 'Home' link in the header navigation and verify the hero section with 'LEARNING PLATFORM' is back in view' passed.",
-    "path": "steps/04-snapshot.html"
-  }
-]

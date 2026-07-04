@@ -1,0 +1,20 @@
+{
+  "source": "LOOP.md iterations 2–6",
+  "verdict": "failed",
+  "count": 1,
+  "note": "Iteration 6 had zero real failures. CI exit 1 was one false BLOCKED (see blocked/manifest.json).",
+  "tests": [
+    {
+      "iteration": 3,
+      "testId": "ebe0b04d",
+      "name": "Language toggle on hash URL",
+      "plan": "10-home-anchor-i18n.json",
+      "history": [
+        { "iteration": 3, "verdict": "failed", "reason": "Real bug — setLang() did not reload on hash URLs; fixed in static/i18n.js" },
+        { "iteration": 4, "verdict": "failed", "reason": "Deploy race in CI; manual re-run PASS 5/5 after deploy" }
+      ],
+      "status": "fixed",
+      "openBug": false
+    }
+  ]
+}

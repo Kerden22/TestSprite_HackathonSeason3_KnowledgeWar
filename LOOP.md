@@ -194,85 +194,81 @@ CI started test 10 at **20:37 UTC** while Render was still deploying the same pu
 
 ---
 
-### Iteration 6 — BTK → Gemini + YouTube Roadmap Refactor + BE Suite (8 API tests)
+### Iteration 6 — BTK → Gemini + YouTube Roadmap Refactor + Full CI (3 FE + 11 BE)
 
-> _Why:_ Remove Selenium/BTK scraping; generate dynamic video-based learning paths via Gemini + YouTube Data API v3; keep existing roadmap card UI; add fast, deterministic backend API tests for CI.
+> _Why:_ Remove Selenium/BTK scraping; generate dynamic video-based learning paths via Gemini + YouTube Data API v3; restore capstone project card; verify end-to-end on live Render with a full FE → BE suite.
 
 | # | Action | TestSprite | Result |
 |---|--------|-----------|--------|
-| 34 | **REFACTOR:** `services/roadmap_service.py` — `generate_roadmap_with_gemini`, `search_youtube_video`, `enrich_steps_with_youtube`, `build_learning_roadmap` | — | Committed |
-| 35 | **REFACTOR:** `app.py` — thin routes; removed ~680 lines BTK/Selenium; `analyze_profile` returns `roadmap_title` + `roadmap_steps`; `add_course_to_roadmap` saves client payload directly | `app.py` | Committed |
-| 36 | **REFACTOR:** `learn.html` — roadmap preview (title + first 3 steps); `window.currentRoadmap`; new add payload | FE | Committed |
-| 37 | **REFACTOR:** `roadmap.html` — YouTube links, thumbnails, `watchVideo` i18n; course auto-complete on last step | FE | Committed |
+| 34 | **REFACTOR:** `services/roadmap_service.py` — Gemini roadmap, YouTube enrichment, `append_project_step` | — | Committed |
+| 35 | **REFACTOR:** `app.py` — thin routes; BTK/Selenium removed; new analyze/add API contract | `app.py` | Committed |
+| 36 | **REFACTOR:** `learn.html` + `roadmap.html` — preview, YouTube links/thumbnails, project card UI | FE | Committed |
+| 37 | **FIX:** `load_dotenv()` before `roadmap_service` import — `GEMINI_API_KEY` now loads correctly | `app.py`, `roadmap_service.py` | Committed |
 | 38 | **CLEANUP:** Removed `selenium`, `webdriver-manager`, `beautifulsoup4` from `requirements.txt` | — | Committed |
-| 39 | **i18n:** `learn.*` + `roadmap.watchVideo` updated (BTK → YouTube roadmap copy); homepage BTK copy unchanged (Phase 2) | `static/i18n/` | Committed |
-| 40 | Created 8 BE tests on portal (`api_login` … `api_roadmap_schema`) | CLI `test create` | **8 created** |
-| 41 | **CI policy:** push runs fast BE only (`18faba0d`, `36932166`); `workflow_dispatch` runs all 8; `run_backend_full=true` adds schema test | `.github/workflows/testsprite.yml` | Committed |
+| 39 | **i18n:** `learn.*` + `roadmap.watchVideo` updated (BTK → YouTube roadmap copy) | `static/i18n/` | Committed |
+| 40 | Created 3 Iter6 FE plans + 3 Iter6 BE tests on portal | CLI `create-batch` / `test create` | **6 created** |
+| 41 | Wired legacy 8 BE tests into CI alongside Iter6 tests | Portal (already uploaded) | **11 BE total** |
+| 42 | **CI policy:** push runs **14 tests** — 3 FE then 11 BE (fast → pipeline last) | `.github/workflows/testsprite.yml` | Committed |
+| 43 | GitHub Actions on push | Actions | **13 PASS / 1 BLOCKED** (see below) |
 
-#### Backend results — CI policy (schema)
+#### Frontend results — GitHub Actions (2026-07-05)
 
-| Test ID | File | Name | Push CI | Full dispatch |
-|---------|------|------|---------|---------------|
-| `8fe0eb1f` | `api_login.py` | API login returns token | — | Yes |
-| `407ed44d` | `api_profile_auth.py` | API profile requires auth | — | Yes |
-| `8444706e` | `api_tournaments.py` | API tournaments list | — | Yes |
-| `bee6c90f` | `api_active_course.py` | API active course with auth | — | Yes |
-| `561cd21f` | `api_completed_courses.py` | API completed courses with auth | — | Yes |
-| `18faba0d` | `api_analyze_profile_auth.py` | analyze-profile 401 without token | **Yes** | Yes |
-| `36932166` | `api_analyze_profile_validation.py` | analyze-profile 400 missing skill | **Yes** | Yes |
-| `a7bbf927` | `api_roadmap_schema.py` | Full pipeline — `roadmap_steps` schema | — | Optional (`run_backend_full`) |
+| Verdict | Test ID | Name | Purpose |
+|---------|---------|------|---------|
+| **BLOCKED** | `a4bd6c04` | Iter6 Learn EN smoke | Login → `/learn` → 'Personal Learning Roadmap' visible (false blocked — 6/6 passed) |
+| **PASS** | `eca16881` | Iter6 Roadmap EN smoke | Login → `/roadmap` → '🚀 START LEARNING' visible |
+| **PASS** | `a4732506` | Iter6 Learn form visible | Login → `/learn` → skill label + '🤖 Analyze My Profile' button visible |
 
-**Push CI:** 2 fast BE tests (no Gemini/YouTube quota). **Full suite:** `workflow_dispatch` with `run_all_backend=true`; add `run_backend_full=true` for live Gemini+YouTube schema validation on Render.
+**FE score: 2 PASS / 1 BLOCKED.**
 
-#### API contract changes
+#### Backend results — GitHub Actions (2026-07-05)
+
+| Verdict | Test ID | File | Purpose |
+|---------|---------|------|---------|
+| **PASS** | `8fe0eb1f` | `api_login.py` | Login returns token |
+| **PASS** | `407ed44d` | `api_profile_auth.py` | Profile requires auth (401) |
+| **PASS** | `8444706e` | `api_tournaments.py` | Tournaments list returns 200 |
+| **PASS** | `bee6c90f` | `api_active_course.py` | Active course requires auth |
+| **PASS** | `561cd21f` | `api_completed_courses.py` | Completed courses requires auth |
+| **PASS** | `70309105` | `iter6_roadmap_auth.py` | analyze-profile → 401 without token |
+| **PASS** | `584d61dd` | `iter6_roadmap_validation.py` | analyze-profile → 400 missing skill |
+| **PASS** | `18faba0d` | `api_analyze_profile_auth.py` | Legacy analyze-profile → 401 |
+| **PASS** | `36932166` | `api_analyze_profile_validation.py` | Legacy analyze-profile → 400 |
+| **PASS** | `a7bbf927` | `api_roadmap_schema.py` | Full Gemini+YouTube pipeline — `roadmap_steps` schema (~15s) |
+| **PASS** | `f046f210` | `iter6_roadmap_pipeline.py` | Full pipeline + video steps (🎬) + project card last step (~17s) |
+
+**BE score: 11/11 PASS.** First live confirmation that Gemini + YouTube roadmap and capstone project card work on Render.
+
+#### CI totals
+
+| Metric | Value |
+|--------|-------|
+| **Official CI score** | **13 PASS / 1 BLOCKED** → exit code **1** |
+| **Functional score** | **14/14 working** |
+| **Duration** | ~8 min (22:44 → 22:52 UTC) |
+| **Open bugs** | None |
+
+#### Waived — false blocked (app works, not a bug)
+
+| Test ID | Name | Purpose | Reason |
+|---------|------|---------|--------|
+| `a4bd6c04` | Iter6 Learn EN smoke | Learn page heading visible | Agent: "All required steps were completed and verified" — 6/6 passed; verdict box got a summary instead of formal PASS (same pattern as `fba7706b` iter 5) |
+
+#### API contract (refactor)
 
 | Endpoint | Change |
 |----------|--------|
 | `POST /api/analyze-profile` | Response: `roadmap_title`, `roadmap_steps`, `total_steps` (removed `recommended_course`) |
 | `POST /api/add-course-to-roadmap` | Body: `{ roadmap_title, roadmap_steps }` — no BTK scrape |
-| Step schema | `{ id, title, description, link, video_title, thumbnail, youtube_search_query, status, icon }` |
+| Step schema | Video steps: `icon: 🎬`; last step: project card (`🚀` etc., `status: locked`, `link: #`) |
 
-#### Env vars
+#### Env vars (Render)
 
 | Var | Status |
 |-----|--------|
-| `GEMINI_API_KEY` | Required for live roadmap generation |
-| `YOUTUBE_API_KEY` | Required for video links/thumbnails |
+| `GEMINI_API_KEY` | Required — confirmed working in CI (`a7bbf927`, `f046f210`) |
+| `YOUTUBE_API_KEY` | Required — confirmed working in CI |
 | `GOOGLE_SEARCH_API_KEY` / `GOOGLE_CSE_ID` | Removed (BTK CSE only) |
-
-#### Frontend (not re-run in Iteration 6 CI)
-
-Existing FE smoke tests (`fba7706b` Learn EN, `15-roadmap-start-learning`) remain valid — form heading unchanged; loading subtitle i18n updated. Re-run manually after deploy if needed.
-
----
-
-<!-- ŞABLON: Yeni iterasyonları aşağıdaki şema (sütun yapısı) ile ekleyin. Testler yapılacak.txt'ten seçilecek. -->
-
-### Iteration N — <title>
-
-> _Why:_ <reason>
-
-| # | Action | TestSprite | Result |
-|---|--------|-----------|--------|
-|   |        |           |        |
-
-#### Frontend results (schema)
-
-| Verdict | Test ID | Name | Purpose |
-|---------|---------|------|---------|
-|         |         |      |         |
-
-#### Backend (schema)
-
-| Test ID | Name | Status | Purpose |
-|---------|------|--------|---------|
-|         |      |        |         |
-
-#### Waived (schema)
-
-| Test ID | Name | Purpose | Reason |
-|---------|------|---------|--------|
-|         |      |         |        |
 
 ---
 
@@ -281,17 +277,17 @@ Existing FE smoke tests (`fba7706b` Learn EN, `15-roadmap-start-learning`) remai
 | Metric | Count |
 |--------|:---:|
 | Current project | `1839c68e` |
-| FE tests created | **22** (6+6+4+6 across iter 2–5) |
-| BE tests created | **8** (iter 6 — auth, validation, schema) |
+| FE tests created | **25** (22 iter 2–5 + 3 iter 6) |
+| BE tests created | **11** (8 legacy + 3 iter 6) |
 | Iteration 2 CI | **4 PASS / 2 BLOCKED** (both waived) |
 | Iteration 3 CI (2026-07-03) | **4 PASS / 1 FAILED / 1 BLOCKED** |
 | Iteration 4 CI (2026-07-03) | **1 FAILED / 2 BLOCKED / 2 CLI timeout** → functional **5/5** |
 | Iteration 5 CI (2026-07-04) | **4 PASS / 2 BLOCKED** → functional **6/6** |
-| Iteration 6 CI | **BE-only on push** — 2 fast API tests (`18faba0d`, `36932166`) |
-| Banked (PASS) | `5d9b778f`, `acaa43a5`, `d6999073`, `88d22a64`, `bebca88c`, `3053ece4`, `fe10d08c`, `f2742156`, `ebe0b04d`, `9c5d5682`, `0dff072e`, `b0ff2134`, `d9f72918`, `bf65fb04`, `d2bc376f` |
-| Waived (false blocked) | `9d591c13`, `bac70c37`, `64381628`, `f649b96b`, `8fed1daf`, `fba7706b`, `d8d0fdec` |
+| Iteration 6 CI (2026-07-05) | **13 PASS / 1 BLOCKED** → functional **14/14** |
+| Banked (PASS) | `5d9b778f`, `acaa43a5`, `d6999073`, `88d22a64`, `bebca88c`, `3053ece4`, `fe10d08c`, `f2742156`, `ebe0b04d`, `9c5d5682`, `0dff072e`, `b0ff2134`, `d9f72918`, `bf65fb04`, `d2bc376f`, `eca16881`, `a4732506`, `8fe0eb1f`, `407ed44d`, `8444706e`, `bee6c90f`, `561cd21f`, `70309105`, `584d61dd`, `18faba0d`, `36932166`, `a7bbf927`, `f046f210` |
+| Waived (false blocked) | `9d591c13`, `bac70c37`, `64381628`, `f649b96b`, `8fed1daf`, `fba7706b`, `d8d0fdec`, `a4bd6c04` |
 | Open bugs | None |
-| CI on push | Enabled — Iteration 6: fast BE API tests only |
+| CI on push | Disabled — manual `workflow_dispatch` only (14 tests: 3 FE → 11 BE) |
 
 **Evidence:** https://github.com/Kerden22/TestSprite_HackathonSeason3_KnowledgeWar/commits/master  
 **Live URL:** https://testsprite-hackathonseason3-knowledgewar-xk2p.onrender.com  
