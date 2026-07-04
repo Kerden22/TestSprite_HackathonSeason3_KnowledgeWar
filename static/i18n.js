@@ -1,3 +1,10 @@
+// Apply theme immediately to documentElement to avoid styling flash
+(function() {
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.classList.add(theme);
+  document.documentElement.classList.remove(theme === 'dark' ? 'light' : 'dark');
+})();
+
 let _dict = {};
 let _lang = 'en';
 
@@ -80,6 +87,16 @@ function applyTranslations() {
 
   const titleKey = document.body.getAttribute('data-i18n-page-title');
   if (titleKey) document.title = t(titleKey);
+
+  // Update theme button title dynamically with active language
+  const themeBtn = document.getElementById('themeToggleBtn');
+  if (themeBtn) {
+    const isDark = document.documentElement.classList.contains('dark');
+    const isTr = _lang === 'tr';
+    themeBtn.title = isDark
+      ? (isTr ? 'Açık Temaya Geç' : 'Switch to Light Mode')
+      : (isTr ? 'Koyu Temaya Geç' : 'Switch to Dark Mode');
+  }
 }
 
 function setLang(code) {
@@ -127,6 +144,64 @@ function setupLangToggle() {
   if (trBtn) trBtn.addEventListener('click', () => setLang('tr'));
 }
 
+function setupThemeToggle() {
+  const currentTheme = localStorage.getItem('theme') || 'dark';
+  // Also apply to body when body is ready
+  document.body.classList.add(currentTheme);
+  document.body.classList.remove(currentTheme === 'dark' ? 'light' : 'dark');
+
+  const langToggle = document.getElementById('langToggle');
+  let parentNode = langToggle || document.getElementById('langEn')?.parentNode;
+  
+  if (!parentNode) {
+    // Fallback for pages like battle screen which might not have a lang toggle but have the navigation area
+    parentNode = document.querySelector('.timer')?.parentNode || document.querySelector('.nav-right') || document.querySelector('header');
+  }
+
+  if (parentNode) {
+    // Check if the theme toggle button already exists to prevent duplicate injections
+    if (document.getElementById('themeToggleBtn')) return;
+
+    const themeBtn = document.createElement('button');
+    themeBtn.type = 'button';
+    themeBtn.id = 'themeToggleBtn';
+    
+    // Style the button matching the rest of the navigation
+    themeBtn.className = 'ml-3 p-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center text-base';
+    themeBtn.style.outline = 'none';
+    
+    const isTr = _lang === 'tr';
+    themeBtn.innerHTML = currentTheme === 'dark' ? '☀️' : '🌙';
+    themeBtn.title = currentTheme === 'dark' 
+      ? (isTr ? 'Açık Temaya Geç' : 'Switch to Light Mode') 
+      : (isTr ? 'Koyu Temaya Geç' : 'Switch to Dark Mode');
+
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        document.body.classList.remove('dark');
+        document.body.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeBtn.innerHTML = '🌙';
+        themeBtn.title = isTr ? 'Koyu Temaya Geç' : 'Switch to Dark Mode';
+      } else {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+        document.body.classList.remove('light');
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeBtn.innerHTML = '☀️';
+        themeBtn.title = isTr ? 'Açık Temaya Geç' : 'Switch to Light Mode';
+      }
+    });
+
+    parentNode.appendChild(themeBtn);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   setupLangToggle();
+  setupThemeToggle();
 });
