@@ -299,6 +299,48 @@ def battle():
 @app.route('/test')
 def test():
     return render_template('test.html')
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    health_status = {
+        'status': 'healthy',
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'services': {
+            'database': 'unknown',
+            'gemini_api': 'unknown',
+            'youtube_api': 'unknown'
+        }
+    }
+    
+    # 1. Database Check
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT 1')
+        cursor.fetchone()
+        conn.close()
+        health_status['services']['database'] = 'healthy'
+    except Exception as e:
+        health_status['status'] = 'unhealthy'
+        health_status['services']['database'] = f'unhealthy: {str(e)}'
+        
+    # 2. Gemini API Check
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if gemini_key and gemini_key != "your_gemini_api_key_here":
+        health_status['services']['gemini_api'] = 'configured'
+    else:
+        health_status['status'] = 'unhealthy'
+        health_status['services']['gemini_api'] = 'missing key'
+
+    # 3. YouTube API Check
+    youtube_key = os.getenv("YOUTUBE_API_KEY")
+    if youtube_key and youtube_key != "your_youtube_api_key_here":
+        health_status['services']['youtube_api'] = 'configured'
+    else:
+        health_status['status'] = 'unhealthy'
+        health_status['services']['youtube_api'] = 'missing key'
+        
+    status_code = 200 if health_status['status'] == 'healthy' else 503
+    return jsonify(health_status), status_code
 
 
 

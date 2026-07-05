@@ -68,3 +68,118 @@ table {
         font-size: clamp(1.25rem, 6vw, 2rem) !important;
     }
 }
+
+/* ==========================================================================
+   Cosmic Light Theme Overrides (TestSprite Hackathon)
+   ========================================================================== */
+html.light,
+html.light body,
+body.light {
+    background: radial-gradient(ellipse at top left, #f5f3ff 0%, #e0e7ff 40%, #e0f2fe 100%) !important;
+    color: #1e1b4b !important;
+}
+
+html.light .glass-card,
+html.light .gradient-border-inner {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(99, 102, 241, 0.15) !important;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08) !important;
+    color: #1e1b4b !important;
+}
+
+html.light .text-white,
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6 {
+    color: #1e1b4b !important;
+}
+
+html.light .text-gray-300,
+html.light .text-gray-400 {
+    color: #4338ca !important;
+}
+
+html.light .text-gray-500 {
+    color: #6366f1 !important;
+}
+
+html.light .bg-gray-800,
+html.light .bg-gray-900,
+html.light .bg-slate-900 {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
+    color: #1e1b4b !important;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    color: #1e1b4b !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+html.light input::placeholder {
+    color: #818cf8 !important;
+    opacity: 0.8;
+}
+
+html.light .star {
+    background: #818cf8 !important; /* Soft indigo twinkling stars */
+}
+
+html.light .neon-text {
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.15) !important;
+    color: #4f46e5 !important;
+}
+
+html.light .main-nav,
+html.light .cosmic-header,
+html.light .profile-nav {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.15) !important;
+    backdrop-filter: blur(20px) !important;
+}
+
+html.light .nav-link {
+    color: #4338ca !important;
+}
+
+html.light .nav-link:hover {
+    color: #6366f1 !important;
+}
+
+html.light #themeToggleBtn {
+    background: rgba(99, 102, 241, 0.08) !important;
+    border-color: rgba(99, 102, 241, 0.15) !important;
+    color: #4f46e5 !important;
+}
+
+html.light #themeToggleBtn:hover {
+    background: rgba(99, 102, 241, 0.15) !important;
+    color: #4338ca !important;
+}
+
+/* Light mode specific adjustment for tables, links and active items */
+html.light td, 
+html.light th {
+    color: #1e1b4b !important;
+    border-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+html.light .border-white\/10 {
+    border-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+html.light .bg-white\/5 {
+    background-color: rgba(99, 102, 241, 0.05) !important;
+}
+
+html.light .text-cyan-400 {
+    color: #2563eb !important; /* Deep blue instead of cyan for readability */
+}
+
