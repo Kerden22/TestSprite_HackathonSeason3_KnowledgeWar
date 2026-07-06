@@ -8,6 +8,7 @@
 | **TestSprite dashboard** | https://www.testsprite.com/dashboard/tests/1839c68e-2f6e-497e-a25f-7c9b798a7c1a |
 | **Verification log** | [`LOOP.md`](LOOP.md) |
 | **Test evidence** | [`.testsprite/manifest-all.json`](.testsprite/manifest-all.json) |
+| **Demo video** | https://www.youtube.com/watch?v=PlXf76Qz5_Q |
 
 ---
 
